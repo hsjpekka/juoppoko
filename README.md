@@ -1,2 +1,2 @@
 # juoppoko
-Saves drunken alcoholic drinks and calculates blood alcohol content.
+Keeps log of drinks and calculates blood alcohol content.
