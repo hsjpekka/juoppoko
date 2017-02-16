@@ -35,6 +35,10 @@
         <translation>Juoppoko</translation>
     </message>
     <message>
+        <source>wk</source>
+        <translation>vk</translation>
+    </message>
+    <message>
         <source>BAC</source>
         <translation>veressä</translation>
     </message>
@@ -55,20 +59,16 @@
         <translation>til-%</translation>
     </message>
     <message>
+        <source>cheers!</source>
+        <translation>skåål!</translation>
+    </message>
+    <message>
         <source>time</source>
         <translation>aika</translation>
     </message>
     <message>
         <source>drink</source>
         <translation>juoma</translation>
-    </message>
-    <message>
-        <source>cheers!</source>
-        <translation>skåål!</translation>
-    </message>
-    <message>
-        <source>wk</source>
-        <translation>vk</translation>
     </message>
 </context>
 <context>
@@ -157,10 +157,6 @@
 <context>
     <name>juomanMuokkaus</name>
     <message>
-        <source>cocktail</source>
-        <translation>cocktail</translation>
-    </message>
-    <message>
         <source>Drink</source>
         <translation>Juoma</translation>
     </message>
@@ -175,6 +171,10 @@
     <message>
         <source>wine</source>
         <translation>viini</translation>
+    </message>
+    <message>
+        <source>cocktail</source>
+        <translation>cocktail</translation>
     </message>
     <message>
         <source>schnaps</source>
@@ -200,12 +200,16 @@
         <translation>Oletusrajat ovat sivulta </translation>
     </message>
     <message>
-        <source>according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. Here the values are expected to depend only on the amount of water in body, not on sex.</source>
-        <translation>jonka mukaan kohtuukäytön raja on naisille 7 annosta viikossa ja miehille 14, ja riskiraja naisille 16 ja miehille 24 annosta. Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.</translation>
+        <source>according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. </source>
+        <translation>jonka mukaan kohtuukäytön raja on naisille 7 annosta viikossa ja miehille 14, ja riskiraja naisille 16 ja miehille 24 annosta. </translation>
     </message>
     <message>
-        <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
+        <source>Here the values are expected to depend only on the amount of water in body, not on sex.</source>
+        <translation>Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.</translation>
+    </message>
+    <message>
         <source>Alcohol burning rate is also from the same site.</source>
+        <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
     </message>
     <message>
         <source>Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>

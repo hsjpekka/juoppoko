@@ -14,7 +14,7 @@ Page {
         //width: page.width
         wrapMode: TextEdit.WordWrap
 
-        text: "Juoppoko 0.9" + "\n \n" + qsTr("The default limits are from ") +
+        text: "Juoppoko 0.1" + "\n \n" + qsTr("The default limits are from ") +
               "http://www.paihdelinkki.fi/fi/tietopankki/tietoiskut/alkoholi/liikakayton-tunnistaminen \n" +
               qsTr("according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. ") +
               qsTr("Here the values are expected to depend only on the amount of water in body, not on sex.") +

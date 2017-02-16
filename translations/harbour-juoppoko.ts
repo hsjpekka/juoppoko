@@ -200,20 +200,20 @@
         <translation>Oletusrajat ovat sivulta </translation>
     </message>
     <message>
-        <source>Alcohol burning rate is also from the same site.</source>
-        <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
-    </message>
-    <message>
-        <source>Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>
-        <translation>Yli 4.0 ‰ alkoholipitoisuus voi aiheuttaa kooman tai olla tappava. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
-    </message>
-    <message>
         <source>according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. </source>
         <translation>jonka mukaan kohtuukäytön raja on naisille 7 annosta viikossa ja miehille 14, ja riskiraja naisille 16 ja miehille 24 annosta. </translation>
     </message>
     <message>
         <source>Here the values are expected to depend only on the amount of water in body, not on sex.</source>
         <translation>Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.</translation>
+    </message>
+    <message>
+        <source>Alcohol burning rate is also from the same site.</source>
+        <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
+    </message>
+    <message>
+        <source>Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>
+        <translation>Yli 4.0 ‰ alkoholipitoisuus voi aiheuttaa kooman tai olla tappava. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
     </message>
 </context>
 <context>
