@@ -47,7 +47,7 @@ CoverBackground {
             kunnossa.text = ""
             //kunnossa.label = ""
         } else {
-            kunnossa.text = paaikkuna.promilleRaja1 + qsTr(" ‰ klo ") + paaikkuna.msKunnossa.toLocaleTimeString(Qt.locale(),"HH:mm")
+            kunnossa.text = paaikkuna.promilleRaja1 + qsTr(" ‰ at ") + paaikkuna.msKunnossa.toLocaleTimeString(Qt.locale(),"HH:mm")
             //kunnossa.label = "at " + paaikkuna.msOkAt.toLocaleTimeString(Qt.locale(),"HH:MM")
         }
 

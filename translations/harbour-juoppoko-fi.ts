@@ -207,6 +207,10 @@
         <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
         <source>Alcohol burning rate is also from the same site.</source>
     </message>
+    <message>
+        <source>Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>
+        <translation>Yli 4.0 ‰ alkoholipitoisuus voi aiheuttaa kooman tai olla tappava. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
+    </message>
 </context>
 <context>
     <name>tilastot</name>

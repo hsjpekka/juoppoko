@@ -91,11 +91,11 @@ Page {
 
 //            DialogHeader {
             PageHeader {
-                title: qsTr("Tilastot")
+                title: qsTr("Statistics")
             }
 
                 SectionHeader {
-                    text: qsTr("viimeiset 24 h")
+                    text: qsTr("last 24 h")
                 }
 
             Row {
@@ -110,7 +110,7 @@ Page {
 
 
                 SectionHeader {
-                    text: qsTr("viimeinen viikko")
+                    text: qsTr("last week")
                 }
 
             Row {
@@ -123,19 +123,19 @@ Page {
 
                 Label {
                     color: Theme.primaryColor
-                    text: qsTr(", vastaa ")
+                    text: qsTr(", equals to ")
                 }
 
                 Label {
                     color: Theme.primaryColor
-                    text: (mlViikossa*52/1000).toFixed(1) + " l " + qsTr("vuodessa")
+                    text: (mlViikossa*52/1000).toFixed(1) + " l " + qsTr("in year")
                 }
 
             } // viikossa
 
 
                 SectionHeader {
-                    text: qsTr("viimeinen kuukausi")
+                    text: qsTr("last month")
                 }
 
             Row {
@@ -148,19 +148,19 @@ Page {
 
                 Label {
                     color: Theme.primaryColor
-                    text: qsTr(", vastaa ")
+                    text: qsTr(", equals to ")
                 }
 
                 Label {
                     color: Theme.primaryColor
-                    text: (mlKuussa/30*365/1000).toFixed(1) + " l " + qsTr("vuodessa")
+                    text: (mlKuussa/30*365/1000).toFixed(1) + " l " + qsTr("in year")
                 }
 
 
             } // kuussa
 
             SectionHeader {
-                text: qsTr("vuodessa")
+                text: qsTr("in year")
             }
 
             Row {
@@ -173,12 +173,12 @@ Page {
 
                 Label {
                     //color: Theme.primaryColor
-                    text: qsTr(", vastaa ")
+                    text: qsTr(", equals to ")
                 }
 
                 Label {
                     color: Theme.primaryColor
-                    text: (mlVuodessa()/52).toFixed(1) + " ml " + qsTr("viikossa")
+                    text: (mlVuodessa()/52).toFixed(1) + " ml " + qsTr("in week")
                 }                
 
             } // vuodessa

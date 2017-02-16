@@ -119,7 +119,7 @@ Dialog {
             width: parent.width
 
             DialogHeader {
-                title: qsTr("Juoma")
+                title: qsTr("Drink")
             } // */
 
             Row {
@@ -131,11 +131,11 @@ Dialog {
 
                     menu: ContextMenu {
                         //id: drinkMenu
-                        MenuItem { text: qsTr("-juomia-") }
-                        MenuItem { text: qsTr("olut") }
-                        MenuItem { text: qsTr("viini") }
+                        MenuItem { text: qsTr("-drinks-") }
+                        MenuItem { text: qsTr("beer") }
+                        MenuItem { text: qsTr("wine") }
                         MenuItem { text: qsTr("cocktail") }
-                        MenuItem { text: qsTr("paukku") }
+                        MenuItem { text: qsTr("schnaps") }
                     }
 
                     currentIndex: 0
@@ -145,12 +145,12 @@ Dialog {
                         case 0:
                             break
                         case 1:
-                            juoma.text = qsTr("olut")
+                            juoma.text = qsTr("beer")
                             maara = 500
                             vahvuus = 4.7
                             break
                         case 2:
-                            juoma.text = qsTr("viini")
+                            juoma.text = qsTr("wine")
                             maara = 180
                             vahvuus = 13
                             break
@@ -160,7 +160,7 @@ Dialog {
                             vahvuus = 6.4
                             break
                         case 4:
-                            juoma.text = qsTr("paukku")
+                            juoma.text = qsTr("schnaps")
                             maara = 40
                             vahvuus = 40
                             break
@@ -245,7 +245,7 @@ Dialog {
 
             DetailItem {
                 id: maaranNaytto
-                label: qsTr("tilavuus")
+                label: qsTr("volume")
                 value: maara + " ml"
             }
 
@@ -282,7 +282,7 @@ Dialog {
 
             DetailItem {
                 id: prosenntienNaytto
-                label: qsTr("prosentteja")
+                label: qsTr("alcohol")
                 value: vahvuus.toFixed(1) + " vol-%"
             }
 
@@ -322,7 +322,7 @@ Dialog {
                 text: juomanKuvaus
                 readOnly: false
                 width: parent.width
-                placeholderText: qsTr("muuta?")
+                placeholderText: qsTr("some notes?")
             }
 
 

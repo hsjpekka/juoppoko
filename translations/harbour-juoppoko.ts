@@ -4,239 +4,247 @@
 <context>
     <name>Kansi</name>
     <message>
-        <source> ‰ klo </source>
-        <translation> ‰ at </translation>
+        <source> ‰ at </source>
+        <translation> ‰ klo </translation>
     </message>
 </context>
 <context>
     <name>Paaikkuna</name>
     <message>
-        <source>poista</source>
-        <translation>delete</translation>
+        <source>delete</source>
+        <translation>poista</translation>
     </message>
     <message>
-        <source>poistaa</source>
-        <translation>deleting</translation>
+        <source>deleting</source>
+        <translation>poistaa</translation>
     </message>
     <message>
-        <source>muokkaa</source>
-        <translation>modify</translation>
+        <source>modify</source>
+        <translation>muokkaa</translation>
     </message>
     <message>
-        <source>tietoja</source>
-        <translation>info</translation>
+        <source>info</source>
+        <translation>tietoja</translation>
     </message>
     <message>
-        <source>asetukset</source>
-        <translation>settings</translation>
+        <source>settings</source>
+        <translation>asetukset</translation>
     </message>
     <message>
-        <source>Juoppoko</source>
-        <translation>Drunkard?</translation>
+        <source>Drunkard?</source>
+        <translation>Juoppoko</translation>
     </message>
     <message>
-        <source>veressä</source>
-        <translation>BAC</translation>
+        <source>wk</source>
+        <translation>vk</translation>
     </message>
     <message>
-        <source>selvänä</source>
-        <translation>sober at</translation>
+        <source>BAC</source>
+        <translation>veressä</translation>
     </message>
     <message>
-        <source> ‰ klo</source>
-        <translation> ‰ at</translation>
+        <source>sober at</source>
+        <translation>selvänä</translation>
     </message>
     <message>
-        <source>olut</source>
-        <translation>beer</translation>
+        <source> ‰ at</source>
+        <translation> ‰ klo</translation>
     </message>
     <message>
-        <source>til-%</source>
-        <translation>vol-%</translation>
+        <source>beer</source>
+        <translation>olut</translation>
     </message>
     <message>
-        <source>aika</source>
-        <translation>time</translation>
+        <source>vol-%</source>
+        <translation>til-%</translation>
     </message>
     <message>
-        <source>juoma</source>
-        <translation>drink</translation>
+        <source>cheers!</source>
+        <translation>skåål!</translation>
     </message>
     <message>
-        <source>skåål!</source>
-        <translation>cheers!</translation>
+        <source>time</source>
+        <translation>aika</translation>
     </message>
     <message>
-        <source>vk</source>
-        <translation>wk</translation>
+        <source>drink</source>
+        <translation>juoma</translation>
     </message>
 </context>
 <context>
     <name>asetukset</name>
     <message>
-        <source>tietoja</source>
-        <translation>info</translation>
+        <source>info</source>
+        <translation>tietoja</translation>
     </message>
     <message>
-        <source>palauta</source>
-        <translation>restore</translation>
+        <source>restore</source>
+        <translation>palauta</translation>
     </message>
     <message>
-        <source>Arvot</source>
-        <translation>Data</translation>
+        <source>Data</source>
+        <translation>Arvot</translation>
     </message>
     <message>
-        <source>paino</source>
-        <translation>weight</translation>
+        <source>weight</source>
+        <translation>paino</translation>
     </message>
     <message>
-        <source>maksa %</source>
-        <translation>lever %</translation>
+        <source>lever %</source>
+        <translation>maksa %</translation>
     </message>
     <message>
-        <source>100% - normaali</source>
-        <translation>100% - healthy</translation>
+        <source>100% - healthy</source>
+        <translation>100% - terve</translation>
     </message>
     <message>
-        <source>alkoholin palonopeus</source>
-        <translation>alcohol burning rate</translation>
+        <source>alcohol burning rate</source>
+        <translation>alkoholin palonopeus</translation>
     </message>
     <message>
-        <source>kehon neste-%</source>
-        <translation>body water content</translation>
+        <source>body water content</source>
+        <translation>kehon neste-%</translation>
     </message>
     <message>
-        <source>mies</source>
-        <translation>man</translation>
+        <source>man</source>
+        <translation>mies</translation>
     </message>
     <message>
-        <source>nainen</source>
-        <translation>woman</translation>
+        <source>woman</source>
+        <translation>nainen</translation>
     </message>
     <message>
-        <source>muu</source>
-        <translation>other</translation>
+        <source>other</source>
+        <translation>muu</translation>
     </message>
     <message>
-        <source>laske rajat</source>
-        <translation>calculate limits</translation>
+        <source>calculate limits</source>
+        <translation>laske rajat</translation>
     </message>
     <message>
-        <source>alempi raja</source>
-        <translation>lower limit</translation>
+        <source>lower limit</source>
+        <translation>alempi raja</translation>
     </message>
     <message>
-        <source>promillea</source>
-        <translation>BAC - [‰]</translation>
+        <source>BAC - [‰]</source>
+        <translation>promillea</translation>
     </message>
     <message>
-        <source>ylempi raja</source>
-        <translation>upper limit</translation>
+        <source>upper limit</source>
+        <translation>ylempi raja</translation>
     </message>
     <message>
-        <source>alempi viikkoraja</source>
-        <translation>lower weekly limit</translation>
+        <source>lower weekly limit</source>
+        <translation>alempi viikkoraja</translation>
     </message>
     <message>
-        <source>alkoholia [ml]</source>
-        <translation>alcohol [ml]</translation>
+        <source>alcohol [ml]</source>
+        <translation>alkoholia [ml]</translation>
     </message>
     <message>
-        <source>ylempi viikkoraja</source>
-        <translation>upper weekly limit</translation>
+        <source>upper weekly limit</source>
+        <translation>ylempi viikkoraja</translation>
     </message>
     <message>
-        <source>alempi vuosiraja</source>
-        <translation>lower yearly limit</translation>
+        <source>lower yearly limit</source>
+        <translation>alempi vuosiraja</translation>
     </message>
     <message>
-        <source>ylempi vuosiraja</source>
-        <translation>upper yearly limit</translation>
+        <source>upper yearly limit</source>
+        <translation>ylempi vuosiraja</translation>
     </message>
 </context>
 <context>
     <name>juomanMuokkaus</name>
     <message>
+        <source>Drink</source>
+        <translation>Juoma</translation>
+    </message>
+    <message>
+        <source>-drinks-</source>
+        <translation>-juomia-</translation>
+    </message>
+    <message>
+        <source>beer</source>
+        <translation>olut</translation>
+    </message>
+    <message>
+        <source>wine</source>
+        <translation>viini</translation>
+    </message>
+    <message>
         <source>cocktail</source>
         <translation>cocktail</translation>
     </message>
     <message>
-        <source>Juoma</source>
-        <translation>Drink</translation>
+        <source>schnaps</source>
+        <translation>paukku</translation>
     </message>
     <message>
-        <source>-juomia-</source>
-        <translation>-drinks-</translation>
+        <source>volume</source>
+        <translation>tilavuus</translation>
     </message>
     <message>
-        <source>olut</source>
-        <translation>beer</translation>
+        <source>alcohol</source>
+        <translation>prosentteja</translation>
     </message>
     <message>
-        <source>viini</source>
-        <translation>wine</translation>
-    </message>
-    <message>
-        <source>paukku</source>
-        <translation>schnaps</translation>
-    </message>
-    <message>
-        <source>tilavuus</source>
-        <translation>volume</translation>
-    </message>
-    <message>
-        <source>prosentteja</source>
-        <translation>alcohol</translation>
-    </message>
-    <message>
-        <source>muuta?</source>
-        <translation>some notes?</translation>
+        <source>some notes?</source>
+        <translation>muuta?</translation>
     </message>
 </context>
 <context>
     <name>tietoja</name>
     <message>
-        <source>Oletusrajat ovat sivulta </source>
-        <translation>The default limits are from </translation>
+        <source>The default limits are from </source>
+        <translation>Oletusrajat ovat sivulta </translation>
     </message>
     <message>
-        <source>jonka mukaan kohtuukäytön raja on naisille 7 annosta viikossa ja miehille 14, ja riskiraja naisille 16 ja miehille 24 annosta. Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.</source>
-        <translation>according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. Here the values are expected to depend only on the amount of water in body, not on sex.</translation>
+        <source>Alcohol burning rate is also from the same site.</source>
+        <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
     </message>
     <message>
-        <source>Alkoholin palamisnopeus samalta sivustolta.</source>
-        <translation>Alcohol burning rate is also from the same site.</translation>
+        <source>Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>
+        <translation>Yli 4.0 ‰ alkoholipitoisuus voi aiheuttaa kooman tai olla tappava. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
+    </message>
+    <message>
+        <source>according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. </source>
+        <translation>jonka mukaan kohtuukäytön raja on naisille 7 annosta viikossa ja miehille 14, ja riskiraja naisille 16 ja miehille 24 annosta. </translation>
+    </message>
+    <message>
+        <source>Here the values are expected to depend only on the amount of water in body, not on sex.</source>
+        <translation>Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.</translation>
     </message>
 </context>
 <context>
     <name>tilastot</name>
     <message>
-        <source>Tilastot</source>
-        <translation>Statistics</translation>
+        <source>Statistics</source>
+        <translation>Tilastot</translation>
     </message>
     <message>
-        <source>viimeiset 24 h</source>
-        <translation>last 24 h</translation>
+        <source>last 24 h</source>
+        <translation>viimeiset 24 h</translation>
     </message>
     <message>
-        <source>viimeinen viikko</source>
-        <translation>last week</translation>
+        <source>last week</source>
+        <translation>viimeinen viikko</translation>
     </message>
     <message>
-        <source>, vastaa </source>
-        <translation>, equals to </translation>
+        <source>, equals to </source>
+        <translation>, vastaa </translation>
     </message>
     <message>
-        <source>vuodessa</source>
-        <translation>in year</translation>
+        <source>in year</source>
+        <translation>vuodessa</translation>
     </message>
     <message>
-        <source>viimeinen kuukausi</source>
-        <translation>last month</translation>
+        <source>last month</source>
+        <translation>viimeinen kuukausi</translation>
     </message>
     <message>
-        <source>viikossa</source>
-        <translation>in week</translation>
+        <source>in week</source>
+        <translation>viikossa</translation>
     </message>
 </context>
 </TS>

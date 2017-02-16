@@ -29,10 +29,6 @@ Dialog {
 
     property real leveysVasen: 0.7
     property real leveysOikea: 0.3
-    //function newLine(msg)
-    //{
-        //listView.model.append({"text1": "vasen", "text2": "oikea"});
-    //}
 
     function alkutoimet() {
         massa = massa0
@@ -51,19 +47,6 @@ Dialog {
 
         return
     }
-
-    /*
-    function nesteCombo(nestepros) {
-
-        if ( (nestepros > 64.5) && (nestepros < 65.5) ){
-            cbNeste.currentIndex = 1
-        } else if ( nestepros == 75 ){
-            cbNeste.currentIndex = 0
-        } else
-            cbNeste.currentIndex = 2
-
-        return
-    }// */
 
     function palautaAlkuarvot() {
 
@@ -102,12 +85,12 @@ Dialog {
 
         PullDownMenu {
             MenuItem {
-                text: qsTr("tietoja")
+                text: qsTr("info")
                 onClicked: pageStack.push(Qt.resolvedUrl("tietoja.qml"))
 
             }
             MenuItem {
-                text: qsTr("palauta")
+                text: qsTr("restore")
                 onClicked: palautaAlkuarvot()
             }
         }
@@ -119,7 +102,7 @@ Dialog {
 
             DialogHeader {
                 id: otsikko
-                title: qsTr("Arvot")
+                title: qsTr("Data")
             }
 
             Row { //paino
@@ -127,7 +110,7 @@ Dialog {
                 TextField {
                 width: leveysVasen*sivu.width
                 readOnly: true
-                text: qsTr("paino")
+                text: qsTr("weight")
                 label: "kg"
             }
 
@@ -145,8 +128,8 @@ Dialog {
                 TextField {
                 width: leveysVasen*sivu.width
                 readOnly: true
-                text: qsTr("maksa %")
-                label: qsTr("100% - normaali")
+                text: qsTr("lever %")
+                label: qsTr("100% - healthy")
             }
 
                 TextField {
@@ -163,7 +146,7 @@ Dialog {
                 TextField {
                 width: leveysVasen*sivu.width
                 readOnly: true
-                text: qsTr("alkoholin palonopeus")
+                text: qsTr("alcohol burning rate")
                 label: "1 g/h /10 kg"
             }
 
@@ -181,7 +164,7 @@ Dialog {
                 ComboBox {
                 id: cbNeste
                 width: leveysVasen*sivu.width
-                label: qsTr("kehon neste-%")
+                label: qsTr("body water content")
 
                 currentIndex: {
                     switch (parseInt(vetta*100)){
@@ -212,9 +195,9 @@ Dialog {
                 }
 
                 menu: ContextMenu {
-                    MenuItem { text: qsTr("mies") }
-                    MenuItem { text: qsTr("nainen") }
-                    MenuItem { text: qsTr("muu") }
+                    MenuItem { text: qsTr("man") }
+                    MenuItem { text: qsTr("woman") }
+                    MenuItem { text: qsTr("other") }
                 }
             }
 
@@ -237,7 +220,7 @@ Dialog {
             } //nesteprosentti
 
             Button {
-                text: qsTr("laske rajat")
+                text: qsTr("calculate limits")
                 onClicked: {
                     laskeRajat()
                 }
@@ -249,8 +232,8 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("alempi raja")
-                    label: qsTr("promillea")
+                    text: qsTr("lower limit")
+                    label: qsTr("BAC - [‰]")
                 }
 
                 TextField {
@@ -270,8 +253,8 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("ylempi raja")
-                    label: qsTr("promillea")
+                    text: qsTr("upper limit")
+                    label: qsTr("BAC - [‰]")
                 }
 
                 TextField {
@@ -331,8 +314,8 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("alempi viikkoraja")
-                    label: qsTr("alkoholia [ml]")
+                    text: qsTr("lower weekly limit")
+                    label: qsTr("alcohol [ml]")
                 }
 
                 TextField {
@@ -351,8 +334,8 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("ylempi viikkoraja")
-                    label: qsTr("alkoholia [ml]")
+                    text: qsTr("upper weekly limit")
+                    label: qsTr("alcohol [ml]")
                 }
 
                 TextField {
@@ -371,8 +354,8 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("alempi vuosiraja")
-                    label: qsTr("alkoholia [ml]")
+                    text: qsTr("lower yearly limit")
+                    label: qsTr("alcohol [ml]")
                 }
 
                 TextField {
@@ -391,8 +374,8 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("ylempi vuosiraja")
-                    label: qsTr("alkoholia [ml]")
+                    text: qsTr("upper yearly limit")
+                    label: qsTr("alcohol [ml]")
                 }
 
                 TextField {

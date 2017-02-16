@@ -14,11 +14,13 @@ Page {
         //width: page.width
         wrapMode: TextEdit.WordWrap
 
-        text: "Juoppoko 0.9" + "\n \n" + qsTr("Oletusrajat ovat sivulta ") +
-                   "http://www.paihdelinkki.fi/fi/tietopankki/tietoiskut/alkoholi/liikakayton-tunnistaminen \n" +
-                   qsTr("jonka mukaan kohtuukäytön raja on naisille 7 annosta viikossa ja miehille 14, ja riskiraja naisille 16 ja miehille 24 annosta. Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.") +
-                   "\n \n" +
-                   qsTr("Alkoholin palamisnopeus samalta sivustolta.")
+        text: "Juoppoko 0.9" + "\n \n" + qsTr("The default limits are from ") +
+              "http://www.paihdelinkki.fi/fi/tietopankki/tietoiskut/alkoholi/liikakayton-tunnistaminen \n" +
+              qsTr("according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. ") +
+              qsTr("Here the values are expected to depend only on the amount of water in body, not on sex.") +
+              "\n \n" +
+              qsTr("Alcohol burning rate is also from the same site.") + "\n \n" +
+              qsTr("Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.")
     }
 
 }

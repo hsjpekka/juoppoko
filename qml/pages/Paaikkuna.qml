@@ -1185,9 +1185,9 @@ Page {
             // contextmenu erillisenä komponenttina on ongelma remorseActionin kanssa
             menu: ContextMenu {
                 MenuItem {
-                    text: qsTr("poista")
+                    text: qsTr("delete")
                     onClicked: {
-                        juomaLista.currentItem.remorseAction(qsTr("poistaa"), function () {
+                        juomaLista.currentItem.remorseAction(qsTr("deleting"), function () {
                             lisaaKuvaajaan(lueJuomanAika(valittu),-lueJuomanMaara(valittu),lueJuomanVahvuus(valittu))
                             tyhjennaDbJuodut(lueJuomanId(valittu))
                             juomat.remove(valittu)                            
@@ -1201,7 +1201,7 @@ Page {
                 }
 
                 MenuItem {
-                    text: qsTr("muokkaa")
+                    text: qsTr("modify")
                     onClicked: {
                         muutaValittu(valittu);
 
@@ -1337,13 +1337,13 @@ Page {
 
         PullDownMenu {
             MenuItem {
-                text: qsTr("tietoja")
+                text: qsTr("info")
                 onClicked:
                     pageStack.push(Qt.resolvedUrl("tietoja.qml"))
             }
 
             MenuItem {
-                text: qsTr("asetukset")
+                text: qsTr("settings")
                 onClicked:
                     kysyAsetukset()
             }
@@ -1357,7 +1357,7 @@ Page {
             spacing: Theme.paddingSmall
 
             PageHeader {
-                title: qsTr("Juoppoko")
+                title: qsTr("Drunkard?")
             }
 
             SilicaListView {
@@ -1403,7 +1403,7 @@ Page {
                     }
                     Label {
                         id: kuvaajanXakseli
-                        text: qsTr("vk")
+                        text: qsTr("wk")
                         font.pixelSize: Theme.fontSizeExtraSmall
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -1420,7 +1420,7 @@ Page {
                 TextField {
                     id: txtPromilleja
                     text: "X ‰"
-                    label: qsTr("veressä")
+                    label: qsTr("BAC")
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.primaryColor
                     readOnly: true
@@ -1429,7 +1429,7 @@ Page {
                 TextField {
                     id: txtSelvana
                     text: "?"
-                    label: qsTr("selvänä")
+                    label: qsTr("sober at")
                     font.pixelSize: Theme.fontSizeSmall
                     width: Theme.fontSizeSmall*6
                     readOnly: true
@@ -1438,7 +1438,7 @@ Page {
                 TextField {
                     id: txtAjokunnossa
                     text: "?"
-                    label: promilleRaja1.toFixed(1) + qsTr(" ‰ klo")
+                    label: promilleRaja1.toFixed(1) + qsTr(" ‰ at")
                     font.pixelSize: Theme.fontSizeSmall
                     width: Theme.fontSizeSmall*8
                     readOnly: true
@@ -1529,7 +1529,7 @@ Page {
 
             } // aika
 
-            Row { //arvot
+            Row { //lisattava juoma
                 //id: drinkData
                 spacing: 2
 
@@ -1537,7 +1537,7 @@ Page {
                     id: txtJuoma
                     width: Theme.fontSizeExtraSmall*8
                     readOnly: true
-                    text: qsTr("olut")
+                    text: qsTr("beer")
                     onClicked: {
                         muutaUusi()
                     }
@@ -1556,7 +1556,7 @@ Page {
 
                 TextField {
                     id: voltit
-                    label: qsTr("til-%")
+                    label: qsTr("vol-%")
                     width: Theme.fontSizeExtraSmall*5
                     readOnly: true
                     text: "4.7"
@@ -1568,7 +1568,7 @@ Page {
                 Button { //add
                     width: 100
 
-                    text: qsTr("skåål!")
+                    text: qsTr("cheers!")
                     onClicked: {
                         uusiJuoma(new Date().getTime(), pvm.getTime(), 0.0, parseInt(txtMaara.text),
                                  parseFloat(voltit.text), txtJuoma.text, juomanKuvaus)
@@ -1588,14 +1588,14 @@ Page {
                 height: 1
                 width: 0.9*parent.width
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: "black"
+                color: "dimgray"
             }
 
             SilicaListView {
                 id: juomaLista
                 height: sivu.height - y
                 width: parent.width
-                clip: true
+                clip: true                
 
                 model: ListModel {
                     id: juomat
@@ -1616,11 +1616,11 @@ Page {
                     height: 70
 
                     Label {
-                        text: qsTr("aika")
+                        text: qsTr("time")
                         width: Theme.fontSizeExtraSmall*6
                     }
                     Label {
-                        text: qsTr("juoma")
+                        text: qsTr("drink")
                         width: Theme.fontSizeExtraSmall*8
                     }
                     Label {
@@ -1628,7 +1628,7 @@ Page {
                         width: Theme.fontSizeExtraSmall*3
                     }
                     Label {
-                        text: qsTr("til-%")
+                        text: qsTr("vol-%")
                         width: Theme.fontSizeExtraSmall*3
                     }
                 }
