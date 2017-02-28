@@ -281,6 +281,20 @@ Page {
         return
     }
 
+    function jaksonVari(maara){
+        //console.log("jaksonVari " + maara + " vkoRaja1 " + vkoRaja1 + " vkoRaja2 " + vkoRaja2)
+        if (maara > vkoRaja2 )
+            return "red"
+        else if (maara > vkoRaja1)
+            return "yellow"
+        else
+            return "green"
+    }
+
+    function juomienMaara() {
+        return juomat.count
+    }
+
     function laskePromillet(ms){
         var ml0, edellinen = etsiPaikka(ms, juomat.count -1)
 
@@ -311,20 +325,6 @@ Page {
 
         return
     }    
-
-    function jaksonVari(maara){
-        //console.log("jaksonVari " + maara + " vkoRaja1 " + vkoRaja1 + " vkoRaja2 " + vkoRaja2)
-        if (maara > vkoRaja2 )
-            return "red"
-        else if (maara > vkoRaja1)
-            return "yellow"
-        else
-            return "green"
-    }
-
-    function juomienMaara() {
-        return juomat.count
-    }
 
     // sarja = kuvaajan id, monesko = 0-N - järjestys kuvaajassa, maara = piirrettavan pylvaan korkeus, merkki = pylvään alla näkyvä teksti,
     // id = piirrettävän pylvään tunnus, jakso = väliotsikko
@@ -495,10 +495,10 @@ Page {
         return;
     }
 
-    function lueJuomanAika(xid) {  // palauttaa ajan millisenkunteina
+    // palauttaa ajan millisenkunteina
+    function lueJuomanAika(xid) {
         var ms = 0
-        if ((juomat.count > xid) && (xid > -0.5)) {
-            //return new Date(juomat.get(index2).section + " " + juomat.get(index2).juomaaika)
+        if ((juomat.count > xid) && (xid > -0.5)) {            
             ms = juomat.get(xid).aikaMs
         }
         return ms
@@ -907,6 +907,46 @@ Page {
         return
     }
 
+    // päivittää juomishistorian tiedot alkoholin määrästä veressä hetkestä ms1 alkaen
+    // (jos listasta poistetaan, lisätään tai muutetaan)
+    function paivitaMlVeressa(ms1, xInd) {
+        var ind = etsiPaikka(ms1, xInd)
+        var ms0, ml0, koko0, vahvuus0, id1, ml1, koko1, vahvuus1
+
+        if (ind > 0){ // ms1 on listan ensimmäisen jälkeen
+            ms0 = lueJuomanAika(ind-1)
+            ml0 = lueMlVeressa(ind-1)
+            koko0 = lueJuomanMaara(ind-1)
+            vahvuus0 = lueJuomanVahvuus(ind-1)
+        } else { // ms1 on ennen listan ensimmäistä
+            ms0 = 0
+            ml0 = 0
+            koko0 = 0
+            vahvuus0 = 0
+        }
+
+        while (ind < juomat.count) {
+            id1 = lueJuomanId(ind)
+            ms1 = lueJuomanAika(ind)
+            ml1 = alkoholiaVeressa(ms0, ml0, koko0, vahvuus0, ms1 ) // paljonko tälle juomalle oli pohjia
+            if ( (ml1 > 0) || (lueMlVeressa(ind) > 0) ) {
+                juomat.set(ind,{"mlVeressa": ml1})
+                koko1 = lueJuomanMaara(ind)
+                vahvuus1 = lueJuomanVahvuus(ind)
+                muutaDbJuodut(id1, ms1, ml1, koko1, vahvuus1, lueJuomanTyyppi(ind), lueJuomanKuvaus(ind))
+                ms0 = ms1
+                ml0 = ml1
+                koko0 = koko1
+                vahvuus0 = vahvuus1
+            } else
+                ind = juomat.count
+
+            ind++
+        }
+
+        return
+    }
+
     // etsii juomalistasta hetkeä nytMs edeltävän juoman tiedot ja laskee hetken nytMs promillemäärän
     function paivitaPromillet() {
         var nytMs = pvm.getTime()
@@ -946,46 +986,6 @@ Page {
     // ml/h
     function palonopeus() {
         return polttonopeus*massa*kunto
-    }
-
-    // päivittää juomishistorian tiedot alkoholin määrästä veressä hetkestä ms1 alkaen
-    // (jos listasta poistetaan, lisätään tai muutetaan)
-    function paivitaMlVeressa(ms1, xInd) {
-        var ind = etsiPaikka(ms1, xInd)
-        var ms0, ml0, koko0, vahvuus0, id1, ml1, koko1, vahvuus1
-
-        if (ind > 0){ // ms1 on listan ensimmäisen jälkeen
-            ms0 = lueJuomanAika(ind-1)
-            ml0 = lueMlVeressa(ind-1)
-            koko0 = lueJuomanMaara(ind-1)
-            vahvuus0 = lueJuomanVahvuus(ind-1)
-        } else { // ms1 on ennen listan ensimmäistä
-            ms0 = 0
-            ml0 = 0
-            koko0 = 0
-            vahvuus0 = 0
-        }
-
-        while (ind < juomat.count) {
-            id1 = lueJuomanId(ind)
-            ms1 = lueJuomanAika(ind)
-            ml1 = alkoholiaVeressa(ms0, ml0, koko0, vahvuus0, ms1 ) // paljonko tälle juomalle oli pohjia
-            if ( (ml1 > 0) || (lueMlVeressa(ind) > 0) ) {
-                juomat.set(ind,{"mlVeressa": ml1})
-                koko1 = lueJuomanMaara(ind)
-                vahvuus1 = lueJuomanVahvuus(ind)
-                muutaDbJuodut(id1, ms1, ml1, koko1, vahvuus1, lueJuomanTyyppi(ind), lueJuomanKuvaus(ind))
-                ms0 = ms1
-                ml0 = ml1
-                koko0 = koko1
-                vahvuus0 = vahvuus1
-            } else
-                ind = juomat.count
-
-            ind++
-        }
-
-        return
     }
 
     function tilastojenTarkastelu(){
@@ -1191,11 +1191,11 @@ Page {
                             lisaaKuvaajaan(lueJuomanAika(valittu),-lueJuomanMaara(valittu),lueJuomanVahvuus(valittu))
                             tyhjennaDbJuodut(lueJuomanId(valittu))
                             juomat.remove(valittu)                            
-                        })
+                            paivitaMlVeressa(lueJuomanAika(valittu)-1, valittu); //-1 varmistaa, että usean samaan aikaan juodun juoman kohdalla päivitys toimii
+                            paivitaPromillet();
+                            paivitaAjatRajoille();
 
-                        paivitaMlVeressa(lueJuomanAika(valittu)-1, valittu); //-1 varmistaa, että usean samaan aikaan juodun juoman kohdalla päivitys toimii
-                        paivitaPromillet();
-                        paivitaAjatRajoille();
+                        })
 
                     }
                 }
@@ -1346,6 +1346,16 @@ Page {
                 text: qsTr("settings")
                 onClicked:
                     kysyAsetukset()
+            }
+
+            MenuItem {
+                text: qsTr("demo")
+                onClicked:
+                    pageStack.push(Qt.resolvedUrl("demolaskuri.qml"), {
+                                   "promilleRaja1": promilleRaja1,
+                                   "promilleja": laskePromillet(new Date().getTime()),
+                                   "vetta": vetta, "paino": massa
+                                   })
             }
 
         }

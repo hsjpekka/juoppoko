@@ -108,114 +108,114 @@ Dialog {
             Row { //paino
 
                 TextField {
-                width: leveysVasen*sivu.width
-                readOnly: true
-                text: qsTr("weight")
-                label: "kg"
-            }
+                    width: leveysVasen*sivu.width
+                    readOnly: true
+                    text: qsTr("weight")
+                    label: "kg"
+                }
 
                 TextField {
-                id: massaTxt
-                width: leveysOikea*sivu.width
-                text: massa
-                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                validator: IntValidator {bottom: 1; top: 1000}
-                onTextChanged: massa = massaTxt.text*1
-            }
+                    id: massaTxt
+                    width: leveysOikea*sivu.width
+                    text: massa
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    validator: IntValidator {bottom: 1; top: 1000}
+                    onTextChanged: massa = massaTxt.text*1
+                }
             }
 
             Row { //maksa
                 TextField {
-                width: leveysVasen*sivu.width
-                readOnly: true
-                text: qsTr("lever %")
-                label: qsTr("100% - healthy")
-            }
+                    width: leveysVasen*sivu.width
+                    readOnly: true
+                    text: qsTr("lever %")
+                    label: qsTr("100% - healthy")
+                }
 
                 TextField {
-                id: kuntoTxt
-                width: leveysOikea*sivu.width
-                text: (kunto*100).toFixed(0)
-                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                validator: IntValidator {bottom: 1; top: 1000}
-                onTextChanged: kunto = parseFloat(kuntoTxt.text/100)
-            }
+                    id: kuntoTxt
+                    width: leveysOikea*sivu.width
+                    text: (kunto*100).toFixed(0)
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    validator: IntValidator {bottom: 1; top: 1000}
+                    onTextChanged: kunto = parseFloat(kuntoTxt.text/100)
+                }
             } //maksa
 
             Row { //palonopeus
                 TextField {
-                width: leveysVasen*sivu.width
-                readOnly: true
-                text: qsTr("alcohol burning rate")
-                label: "1 g/h /10 kg"
-            }
+                    width: leveysVasen*sivu.width
+                    readOnly: true
+                    text: qsTr("alcohol burning rate")
+                    label: "1 g/h /10 kg"
+                }
 
                 TextField {
-                id: paloTxt
-                width: leveysOikea*sivu.width
-                readOnly: true
-                text: (palonopeus*0.7894*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " g/h"
-                label: (palonopeus*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " ml/h"
-            }
+                    id: paloTxt
+                    width: leveysOikea*sivu.width
+                    readOnly: true
+                    text: (palonopeus*0.7894*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " g/h"
+                    label: (palonopeus*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " ml/h"
+                }
             } //palonopeus
 
             Row { //nesteprosentti
 
                 ComboBox {
-                id: cbNeste
-                width: leveysVasen*sivu.width
-                label: qsTr("body water content")
+                    id: cbNeste
+                    width: leveysVasen*sivu.width
+                    label: qsTr("body water content")
 
-                currentIndex: {
-                    switch (parseInt(vetta*100)){
-                    case 65:
-                        currentIndex = 1
-                        break
-                    case 75:
-                        currentIndex = 0
-                        break
-                    currentIndex = 2
+                    currentIndex: {
+                        switch (parseInt(vetta*100)){
+                        case 65:
+                            currentIndex = 1
+                            break
+                        case 75:
+                            currentIndex = 0
+                            break
+                        currentIndex = 2
+                        }
+                    }
+
+                    onCurrentIndexChanged: {
+                        switch (currentIndex) {
+                        case 0:
+                            nesteTxt.text = 75 //mies
+                            nesteTxt.readOnly = true
+                            break
+                        case 1:
+                            nesteTxt.text = 65 //nainen
+                            nesteTxt.readOnly = true
+                            break
+                        case 2:
+                            nesteTxt.readOnly = false
+                            break
+                        }
+                    }
+
+                    menu: ContextMenu {
+                        MenuItem { text: qsTr("man") }
+                        MenuItem { text: qsTr("woman") }
+                        MenuItem { text: qsTr("other") }
                     }
                 }
-
-                onCurrentIndexChanged: {
-                    switch (currentIndex) {
-                    case 0:
-                        nesteTxt.text = 75 //mies
-                        nesteTxt.readOnly = true
-                        break
-                    case 1:
-                        nesteTxt.text = 65 //nainen
-                        nesteTxt.readOnly = true
-                        break
-                    case 2:
-                        nesteTxt.readOnly = false
-                        break
-                    }
-                }
-
-                menu: ContextMenu {
-                    MenuItem { text: qsTr("man") }
-                    MenuItem { text: qsTr("woman") }
-                    MenuItem { text: qsTr("other") }
-                }
-            }
 
                 TextField {
-                id: nesteTxt
-                //anchors.bottom: parent.bottom
-                //anchors.baselineOffset: 60
-                width: leveysOikea*sivu.width
-                validator: IntValidator {bottom: 1; top: 100}
-                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                readOnly: true
-                text: (vetta*100).toFixed(0)
-                onTextChanged: vetta = nesteTxt.text/100
-                //onAccepted: {
-                //    nesteprosentti = kehonnesteprosentti.text
-                //}
-                //horizontalAlignment: textAlignment
-            }
+                    id: nesteTxt
+                    //anchors.bottom: parent.bottom
+                    //anchors.baselineOffset: 60
+                    width: leveysOikea*sivu.width
+                    validator: IntValidator {bottom: 1; top: 100}
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    readOnly: true
+                    text: (vetta*100).toFixed(0)
+                    onTextChanged: vetta = nesteTxt.text/100
+                    //onAccepted: {
+                    //    nesteprosentti = kehonnesteprosentti.text
+                    //}
+                    //horizontalAlignment: textAlignment
+                }
 
             } //nesteprosentti
 
@@ -242,7 +242,7 @@ Dialog {
                     text: prom10.toFixed(2)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
-                    onTextChanged: prom1 = parseFloat(prom1txt.text)
+                    onTextChanged: prom1 = parseFloat(text)
                 }
 
 
@@ -263,7 +263,7 @@ Dialog {
                     text: prom20.toFixed(2)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
-                    onTextChanged: prom2 = parseFloat(prom1txt.text)
+                    onTextChanged: prom2 = parseFloat(text)
                 }
 
             }

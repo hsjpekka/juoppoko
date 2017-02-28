@@ -70,6 +70,10 @@
         <source>drink</source>
         <translation>juoma</translation>
     </message>
+    <message>
+        <source>demo</source>
+        <translation>demo</translation>
+    </message>
 </context>
 <context>
     <name>asetukset</name>
@@ -152,6 +156,73 @@
     <message>
         <source>upper yearly limit</source>
         <translation>ylempi vuosiraja</translation>
+    </message>
+</context>
+<context>
+    <name>demolaskuri</name>
+    <message>
+        <source>delete</source>
+        <translation>poista</translation>
+    </message>
+    <message>
+        <source>deleting</source>
+        <translation>poistaa</translation>
+    </message>
+    <message>
+        <source>modify</source>
+        <translation>muokkaa</translation>
+    </message>
+    <message>
+        <source>Demo</source>
+        <translation>Demo</translation>
+    </message>
+    <message>
+        <source>values not saved, clock not running</source>
+        <translation>arvoja ei talleteta, kello ei käy</translation>
+    </message>
+    <message>
+        <source>weight</source>
+        <translation>paino</translation>
+    </message>
+    <message>
+        <source>limit</source>
+        <translation>raja</translation>
+    </message>
+    <message>
+        <source>BAC</source>
+        <translation>veressä</translation>
+    </message>
+    <message>
+        <source>sober at</source>
+        <translation>selvänä</translation>
+    </message>
+    <message>
+        <source>beer</source>
+        <translation>olut</translation>
+    </message>
+    <message>
+        <source>vol-%</source>
+        <translation>til-%</translation>
+    </message>
+    <message>
+        <source>cheers!</source>
+        <translation>skåål!</translation>
+    </message>
+    <message>
+        <source>time</source>
+        <translation>aika</translation>
+    </message>
+    <message>
+        <source>drink</source>
+        <translation>juoma</translation>
+    </message>
+    <message>
+        <source>water</source>
+        <translation>vettä</translation>
+    </message>
+    <message>
+        <source>at</source>
+        <translation>klo</translation>
     </message>
 </context>
 <context>
