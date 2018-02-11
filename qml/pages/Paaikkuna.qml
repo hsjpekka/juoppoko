@@ -32,18 +32,31 @@ import QtQuick.LocalStorage 2.0
 
 Page {
     id: sivu
+
     anchors.leftMargin: 0.05*width
     property date pvm: new Date() // kello- ja päiväkohdissa oleva aika (sekunnit ja millisekunnit = 0.0, alustusta lukuunottamatta )
     property string kelloMuoto: "HH:mm"
     property real polttonopeus: 0.1267 // ml/kg/h -- 1 g/10 kg/h = 1.267 ml/10 kg/h
     property real tiheys: 0.7897 // alkoholin tiheys, g/ml
     property int tunti: 60*60*1000 // ms
-    property int vrk: 24*tunti // ms
+    property int minuutti: 60*1000 // ms
+    property int vrk: 24*tunti // ms    
+    property int aikaVyohyke: 0 // aikavyöhykkeen ja GMT:n ero minuutteina
+
+    //hakusana "kuvaaja"
+    property string tunnusKuvaaja: "kuvaaja"
+    property int nakyvaKuvaaja: 1 // 0 - paivaruudukko, 1 - viikkokulutus, 2 - paivakulutus
+    property bool luettuNakyvaKuvaaja: false
+    property string tunnusVrkVaihdos: "ryypaysVrk"
+    property int vrkVaihtuu: 0*60 // minuuttia puolen yön jälkeen
+    property bool luettuVrkVaihtuu: false
 
     property date msSelvana: new Date()
     property date msKunnossa: new Date()
     property string juomanKuvaus: ""
     property int kuvaajanKorkeus: 121
+    property int pikkuKirjainKoko: Theme.fontSizeExtraSmall //24
+    property int isoKirjainKoko: Theme.fontSizeSmall //28
 
     property int valittu: 0
 
@@ -57,20 +70,28 @@ Page {
     //alkuarvot: [    0.5,    1.0,        120,            320,        500,            1000,            5000,        10000]
     property string tunnusProm1: "ajoraja1"
     property real promilleRaja1: 0.5 // 0.5 = 0.5 promillea
+    property bool luettuPromilleRaja1: false
     property string tunnusProm2: "ajoraja2"
     property real promilleRaja2: 1.0 // 1.0 = 1 promille
+    property bool luettuPromilleRaja2: false
     property string tunnusVrkRaja1: "paivaraja1"
     property int vrkRaja1: 120 // ml alkoholia
+    property bool luettuVrkRaja1: false
     property string tunnusVrkRaja2: "paivaraja2"
     property int vrkRaja2: 320 // ml alkoholia
+    property bool luettuVrkRaja2: false
     property string tunnusVkoRaja1: "viikkoraja1"
     property int vkoRaja1: 150 // ml alkoholia
+    property bool luettuVkoRaja1: false
     property string tunnusVkoRaja2: "viikkoraja2"
     property int vkoRaja2: 350 // ml alkoholia
+    property bool luettuVkoRaja2: false
     property string tunnusVsRaja1: "vuosiraja1"
     property int vsRaja1: 7000 // ml alkoholia
+    property bool luettuVsRaja1: false
     property string tunnusVsRaja2: "vuosiraja2"
     property int vsRaja2: 20000 // ml alkoholia
+    property bool luettuVsRaja2: false
 
     //hakusana "paino"
     property int massa: 84
@@ -105,8 +126,6 @@ Page {
 
         ml1 = ml0 + mlJuoma*vahvuus/100 - palonopeus()*dt // vanhat pohjat + juotu - poltetut
 
-        //console.log("juomien väli " + Math.round(dt*60) + " min " + mlJuoma*vahvuus/100 + " " + palonopeus()*dt)
-
         if (ml1 < 0)
             ml1 = 0
 
@@ -114,19 +133,23 @@ Page {
     }
 
     function alkutoimet() {
-        var ehto = 0
+        var ehto = 0               
+
+        console.log("alkutoimet: napin leveys " + kulautus.width + " / " + sivu.width)
+
+        aikaVyohyke = new Date().getTimezoneOffset()
 
         avaaDb();
         lueAsetukset();
-        ehto = lueJuomari()
+        ehto = lueJuomari();
 
         lueSuosikit();
         lueJuodut();
 
+        paivitaKuvaaja();
         paivitaPromillet();
         paivitaAjatRajoille();
-        //naytaTilastot();
-        juomaLista.positionViewAtEnd();
+        juomaLista.positionViewAtEnd();        
 
         if (juomat.count > 0) {
             txtJuoma.text = lueJuomanTyyppi(juomat.count-1)
@@ -156,21 +179,64 @@ Page {
     }
 
     // oletuksena, että sarja on nousevassa järjestyksessä id:n mukaan
-    // hakee sarjasta ensimmäisen alkion, jonka pylvasTunnus on yhtä suuri tai suurempi kuin id
-    // jos id < ensimmäisen alkion pylvasTunnus, palauttaa eron negatiivisena
-    // jos id > viimeisen alkion pylvasTunnus, palauttaa alkioiden määrän + 1
+    // hakee sarjasta ensimmäisen alkion, jonka mlViikkoPylvasTunnus on yhtä suuri tai suurempi kuin id
+    // jos id < ensimmäisen alkion mlViikkoPylvasTunnus, palauttaa eron negatiivisena
+    // jos id > viimeisen alkion mlViikkoPylvasTunnus, palauttaa alkioiden määrän + 1
     // jos sarja on tyhjä, palauttaa 0
-    function etsiJakso(sarja, id) {
+    function etsiViikkoJakso(sarja, id) {
         var i=0
 
         if (sarja.count < 1) {
             return 0;
         }
 
-        if (sarja.get(0).pylvasTunnus > id)
-            return id - sarja.get(0).pylvasTunnus;
+        if (sarja.get(0).mlViikkoPylvasTunnus > id)
+            return id - sarja.get(0).mlViikkoPylvasTunnus;
 
-        while ( (i < sarja.count) && (sarja.get(i).pylvasTunnus < id) ) {
+        while ( (i < sarja.count) && (sarja.get(i).mlViikkoPylvasTunnus < id) ) {
+            i++;
+        }
+
+
+        return i;
+
+    }
+
+    function etsiPaivaJakso(sarja, id) {
+        var i=0
+
+        if (sarja.count < 1) {
+            return 0;
+        }
+
+        if (sarja.get(0).mlPaivaPylvasTunnus > id)
+            return id - sarja.get(0).mlPaivaPylvasTunnus;
+
+        while ( (i < sarja.count) && (sarja.get(i).mlPaivaPylvasTunnus < id) ) {
+            i++;
+        }
+
+
+        return i;
+
+    }
+
+    // oletuksena, että sarja on nousevassa järjestyksessä id:n mukaan
+    // hakee sarjasta ensimmäisen alkion, jonka juomaPaiviaTunnus on yhtä suuri tai suurempi kuin id
+    // jos id < ensimmäisen alkion juomaPaiviaTunnus, palauttaa eron negatiivisena
+    // jos id > viimeisen alkion juomaPaiviaTunnus, palauttaa alkioiden määrän + 1
+    // jos sarja on tyhjä, palauttaa 0
+    function etsiPaiviaJakso(sarja, id) {
+        var i=0
+
+        if (sarja.count < 1) {
+            return 0;
+        }
+
+        if (sarja.get(0).juomaPaiviaTunnus > id)
+            return id - sarja.get(0).juomaPaiviaTunnus;
+
+        while ( (i < sarja.count) && (sarja.get(i).juomaPaiviaTunnus < id) ) {
             i++;
         }
 
@@ -215,9 +281,32 @@ Page {
         } else
             ind0 = 0
 
-        //console.log("lisäyskohta " + listIndex )
-
         return ind0
+    }
+
+    function jaksonVari(maara){
+        var raja0, raja1, raja2
+        if ( (nakyvaKuvaaja < 0.5) || (nakyvaKuvaaja > 1.5) ) {
+            raja0 = 0.001*vrkRaja1
+            raja1 = vrkRaja1
+            raja2 = vrkRaja2
+        } else {
+            raja0 = 0.001*vkoRaja1
+            raja1 = vkoRaja1
+            raja2 = vkoRaja2
+        }
+        if (maara > raja2 )
+            return "red"
+        else if (maara > raja1)
+            return "yellow"
+        else if (maara > raja0)
+            return "green"
+        else
+            return "transparent"
+    }
+
+    function juomienMaara() {
+        return juomat.count
     }
 
     // kirjoittaa kellonajan halutussa muodossa
@@ -281,20 +370,7 @@ Page {
         return
     }
 
-    function jaksonVari(maara){
-        //console.log("jaksonVari " + maara + " vkoRaja1 " + vkoRaja1 + " vkoRaja2 " + vkoRaja2)
-        if (maara > vkoRaja2 )
-            return "red"
-        else if (maara > vkoRaja1)
-            return "yellow"
-        else
-            return "green"
-    }
-
-    function juomienMaara() {
-        return juomat.count
-    }
-
+    // promillet painosuhteena
     function laskePromillet(ms){
         var ml0, edellinen = etsiPaikka(ms, juomat.count -1)
 
@@ -319,86 +395,99 @@ Page {
 
             });
         } catch (err) {
-            //console.log("Error adding to juodut-table in database: " + err);
+            console.log("Error adding to juodut-table in database: " + err);
             virheet = virheet + "Error adding to juodut-table in database: " + err +" <br> "
         };
 
         return
     }    
 
-    // sarja = kuvaajan id, monesko = 0-N - järjestys kuvaajassa, maara = piirrettavan pylvaan korkeus, merkki = pylvään alla näkyvä teksti,
-    // id = piirrettävän pylvään tunnus, jakso = väliotsikko
-    function lisaaJaksoon(sarja, monesko, maara, merkki, id, jakso) {
-        var vari = "green"
-        var skaala = kuvaajanKorkeus/(0.5*(vkoRaja2+vkoRaja1))
-        var otsikkoNakyviin = false
-        var leveys = 30
+    function lisaaMlViikkoKuvaajaan(hetki, maara, vahvuus) {
+        var tunnus1, vkJuoma, i, pv1g = viikonPaiva(0), pvJuoma, tunnus, teksti
+        var alkoholia = maara*vahvuus/100
 
-        if (merkki == 1) {
-            otsikkoNakyviin = true
-            leveys = 60
-        }
+        vkJuoma = Math.floor((hetki - aikaVyohyke*minuutti + (pv1g-1)*vrk)/(7*vrk)) // montako viikkoa hetkestä 1970.1.1. 00:00
+        pvJuoma = Math.floor((hetki  - aikaVyohyke*minuutti)/vrk) // montako päivää hetkestä 1970.1.1. 00:00
 
-        if ( (monesko >= sarja.count) || (sarja.count == 0) ) {
-            vari = jaksonVari(maara)
-            sarja.append({"pylvasArvo": maara*skaala, "pylvasAika": merkki, "pylvasTunnus": id, "pylvaanVari": vari, "aikaJakso": jakso,
-                             "otsikko": jakso, "jaksoNakyvissa": otsikkoNakyviin, "pylvaanLeveys": leveys })
-        } else {
-            if (sarja.get(monesko).pylvasTunnus == id) {
-                sarja.get(monesko).pylvasArvo = sarja.get(monesko).pylvasArvo + maara*skaala
-                sarja.get(monesko).pylvaanVari = jaksonVari(sarja.get(monesko).pylvasArvo/skaala)                
-            }
-            else {
-                vari = jaksonVari(maara)
-                sarja.insert(monesko, {"pylvasArvo": maara*skaala, "pylvasAika": merkki, "pylvasTunnus": id, "pylvaanVari": vari, "aikaJakso": jakso,
-                                 "otsikko": jakso, "jaksoNakyvissa": otsikkoNakyviin, "pylvaanLeveys": leveys})
-            }
-        }
+        tunnus = vkJuoma
 
-        return
-    }
+        i = etsiViikkoJakso(viikkoArvot, tunnus)
 
-    function lisaaKuvaajaan(hetki, maara, vahvuus) {
-        var vk1, vkJuoma, i, pv1g, pvJuoma, alkoholia = maara*vahvuus/100, vuosi = new Date(hetki).getFullYear()
-
-        // montako viikkoa hetkestä 1970.1.1. 00:00
-        // varmistetaan, että ma = 0 ja su = 6
-        if (new Date(2017,0,1,1,1,1).getDay() == 0) {
-            pv1g = new Date(0).getDay() - 1
-            if (pv1g < 0)
-                pv1g = 6
-        }
-
-        vkJuoma = Math.floor((hetki+pv1g*vrk)/(7*vrk))
-
-        i = etsiJakso(viikkoArvot, vkJuoma)
-
-        // jos lisätty juoma on juotu ennen nykyistä taulukkoa
+        // jos lisätty juoma on juotu ennen nykyisen taulukon ensimmäistä sarjaa
         if (i < 0) {
-            vk1 = viikkoArvot.get(0).pylvasTunnus - 1
-            while (vk1 > vkJuoma){
-                lisaaJaksoon(viikkoArvot, 0, 0, viikonNumero(vk1*7*vrk), vk1, new Date(vk1*7*vrk).getFullYear())
-                vk1--
+            tunnus1 = viikkoArvot.get(0).mlViikkoPylvasTunnus - 1
+            while (tunnus1 > tunnus){
+                teksti = new Date(tunnus1*7*vrk).getFullYear() + " "
+                lisaaViikkoJaksoon(viikkoArvot, 0, 0, viikonNumero(tunnus1*7*vrk), tunnus1, teksti)
+                tunnus1--
             }
+            i = 0
         }
         // jos lisätty juoma on juotu nykyisen taulukon jälkeen
         if ( (i >= viikkoArvot.count) && (viikkoArvot.count > 0) ) {
-            vk1 = viikkoArvot.get(viikkoArvot.count-1).pylvasTunnus + 1
-            while (vk1 < vkJuoma){
-                //console.log("lisaaKuvaajaan 2: " +  viikonNumero(vk1*7*vrk) + " " + vk1)
-                lisaaJaksoon(viikkoArvot, viikkoArvot.count, 0, viikonNumero(vk1*7*vrk), vk1, new Date(vk1*7*vrk).getFullYear())
-                vk1++
+            tunnus1 = viikkoArvot.get(viikkoArvot.count-1).mlViikkoPylvasTunnus + 1
+            while (tunnus1 < tunnus){
+                teksti = new Date(tunnus1*7*vrk).getFullYear() + " "
+                lisaaViikkoJaksoon(viikkoArvot, viikkoArvot.count, 0, viikonNumero(tunnus1*7*vrk), tunnus1, teksti)
+                tunnus1++
             }
             i = viikkoArvot.count
         }
 
-        lisaaJaksoon(viikkoArvot, i, alkoholia, viikonNumero(hetki), vkJuoma, new Date(vkJuoma*7*vrk).getFullYear())
-
-        // päivittäiset määrät
-        pvJuoma = Math.floor(hetki/vrk) // montako päivää hetkestä 1970.1.1. 00:00
+        teksti = new Date(hetki).getFullYear() + " "
+        lisaaViikkoJaksoon(viikkoArvot, i, alkoholia, viikonNumero(hetki), tunnus, teksti)
 
         return
 }
+
+    function lisaaMlPaivaKuvaajaan(hetki, maara, vahvuus) {
+        var tunnus1, vkJuoma, i, pv1g = viikonPaiva(0), pvJuoma, tunnus, teksti
+        var alkoholia = maara*vahvuus/100
+
+        vkJuoma = Math.floor((hetki - aikaVyohyke*minuutti + (pv1g-1)*vrk)/(7*vrk)) // montako viikkoa hetkestä 1970.1.1. 00:00
+        pvJuoma = Math.floor((hetki  - aikaVyohyke*minuutti)/vrk) // montako päivää hetkestä 1970.1.1. 00:00
+
+        tunnus = pvJuoma
+
+        i = etsiPaivaJakso(mlPaivaArvot, tunnus)
+
+        // jos lisätty juoma on juotu ennen nykyisen taulukon ensimmäistä sarjaa
+        if (i < 0) {
+            tunnus1 = mlPaivaArvot.get(0).mlPaivaPylvasTunnus - 1
+            while (tunnus1 > tunnus){
+                teksti = new Date(tunnus1*vrk).getFullYear() + ", " + qsTr("wk") + viikonNumero(tunnus1*vrk)
+                lisaaPaivaJaksoon(mlPaivaArvot, 0, 0, viikonPaiva(tunnus1*vrk), tunnus1, teksti)
+                tunnus1--
+            }
+            i = 0
+        }
+        // jos lisätty juoma on juotu nykyisen taulukon jälkeen
+        if ( (i >= mlPaivaArvot.count) && (mlPaivaArvot.count > 0) ) {
+            tunnus1 = mlPaivaArvot.get(mlPaivaArvot.count-1).mlPaivaPylvasTunnus + 1
+            while (tunnus1 < tunnus){
+                teksti = new Date(tunnus1*vrk).getFullYear() + ", " + qsTr("wk") + viikonNumero(tunnus1*vrk)
+                lisaaPaivaJaksoon(mlPaivaArvot, mlPaivaArvot.count, 0, viikonPaiva(tunnus1*vrk), tunnus1, teksti)
+                tunnus1++
+            }
+            i = mlPaivaArvot.count
+        }
+
+        teksti = new Date(hetki).getFullYear() + ", " + qsTr("wk") + viikonNumero(hetki)
+        lisaaPaivaJaksoon(mlPaivaArvot, i, alkoholia, viikonPaiva(hetki), tunnus, teksti)
+
+        return
+}
+
+    function lisaaKuvaajaan(hetki, maara, vahvuus){
+        if (nakyvaKuvaaja > 1.5)
+            lisaaMlPaivaKuvaajaan(hetki - vrkVaihtuu*minuutti, maara, vahvuus)
+        else if (nakyvaKuvaaja > 0.5)
+            lisaaMlViikkoKuvaajaan(hetki - vrkVaihtuu*minuutti, maara, vahvuus)
+        else
+            lisaaPaiviaKuvaajaan(hetki - vrkVaihtuu*minuutti, maara, vahvuus)
+
+        return
+    }
 
     // xid - juoman tunnus, hetki - juontiaika [ms], mlVeressa - ml alkoholia veressä hetkellä hetki,
     // maara - juoman tilavuus, vahvuus- juoman prosentit, juomanNimi - nimi, juomanKuvaus - tekstiä, lisayskohta - kohta listassa
@@ -410,13 +499,179 @@ Page {
         if (ind < juomat.count) {
             juomat.insert(ind, {"tunnus": xid, "aikaMs": hetki, "mlVeressa": mlVeressa,
                                  "section": paiva, "juomaaika": kello, "juomatyyppi": juomanNimi,
-                                 "juomamaara": maara, "juomapros": vahvuus, "kuvaus": juomanKuvaus});
+                                 "juomamaara": maara, "juomapros": vahvuus.toFixed(1), "kuvaus": juomanKuvaus});
             paivitaMlVeressa(hetki, ind);
 
         } else
             juomat.append({"tunnus": xid, "aikaMs": hetki, "mlVeressa": mlVeressa,
                                  "section": paiva, "juomaaika": kello, "juomatyyppi": juomanNimi,
-                                 "juomamaara": maara, "juomapros": vahvuus, "kuvaus": juomanKuvaus});
+                                 "juomamaara": maara, "juomapros": vahvuus.toFixed(1), "kuvaus": juomanKuvaus});
+        return
+    }
+
+    // sarja = kuvaajan id, monesko = 0-N - järjestys kuvaajassa, maara = piirrettavan pylvaan korkeus, merkki = pylvään alla näkyvä teksti,
+    // id = piirrettävän pylvään tunnus, jakso = väliotsikko
+    function lisaaPaivaJaksoon(sarja, monesko, maara, merkki, id, jakso) {
+        var vari = "green"
+        var skaala = kuvaajanKorkeus/(0.5*(vrkRaja2+vrkRaja1))
+        var otsikkoNakyviin = false
+        var leveys, otsikonLeveys
+        var nimi
+
+        leveys = 20
+
+        if (merkki == 1) {
+            otsikkoNakyviin = true
+            otsikonLeveys = leveys + 30
+        } else
+            otsikonLeveys = leveys
+
+        if ( (monesko >= sarja.count) || (sarja.count == 0) ) {
+            vari = jaksonVari(maara)
+            sarja.append({"mlPaivaPylvasArvo": maara*skaala, "mlPaivaPylvasAika": merkki, "mlPaivaPylvasTunnus": id, "mlPaivaPylvaanVari": vari,
+                            "otsikko": jakso, "jaksoNakyvissa": otsikkoNakyviin, "mlPaivaPylvaanLeveys": leveys,
+                            "mlOtsikonLeveys": otsikonLeveys})
+            kuvaaja3.positionViewAtEnd();
+        } else {
+            if (sarja.get(monesko).mlPaivaPylvasTunnus == id) {
+                sarja.get(monesko).mlPaivaPylvasArvo = sarja.get(monesko).mlPaivaPylvasArvo + maara*skaala
+                sarja.get(monesko).mlPaivaPylvaanVari = jaksonVari(sarja.get(monesko).mlPaivaPylvasArvo/skaala)
+            } else {
+                vari = jaksonVari(maara)
+                sarja.insert(monesko, {"mlPaivaPylvasArvo": maara*skaala, "mlPaivaPylvasAika": merkki, "mlPaivaPylvasTunnus": id, "mlPaivaPylvaanVari": vari,
+                                "otsikko": jakso, "jaksoNakyvissa": otsikkoNakyviin, "mlPaivaPylvaanLeveys": leveys,
+                                "mlOtsikonLeveys": otsikonLeveys})
+            }
+        }
+
+        return
+    }
+
+    // sarja = kuvaajan id, monesko = 0-N - järjestys kuvaajassa, merkki = pylvään alla näkyvä teksti,
+    // id = piirrettävän pylvään tunnus, jakso = väliotsikko
+    function lisaaPaiviaJaksoon(sarja, monesko, merkki, id, jakso, mlMa, mlTi, mlKe, mlTo, mlPe, mlLa, mlSu) {
+        var otsikkoNakyviin = false
+        var leveys = 30
+
+        if (merkki == 1) {
+            otsikkoNakyviin = true
+            leveys = 60
+        }
+
+        if ( (monesko >= sarja.count) || (sarja.count == 0) ) {
+            sarja.append({"juomaPaiviaTunnus": id, "juomaPaiviaAika": merkki, "otsikko": jakso,
+                             "juomaPaiviaMa": paivanVari(mlMa), "juomaPaiviaTi": paivanVari(mlTi),
+                             "juomaPaiviaKe": paivanVari(mlKe), "juomaPaiviaTo": paivanVari(mlTo),
+                             "juomaPaiviaPe": paivanVari(mlPe), "juomaPaiviaLa": paivanVari(mlLa), "juomaPaiviaSu": paivanVari(mlSu),
+                             "jaksoNakyvissa": otsikkoNakyviin, "juomaPaiviaLeveys": leveys })            
+            kuvaaja2.positionViewAtEnd();
+        } else {
+            if (sarja.get(monesko).juomaPaiviaTunnus == id) {
+                sarja.get(monesko).juomaPaiviaMa = paivanVari(mlMa)
+                sarja.get(monesko).juomaPaiviaTi = paivanVari(mlTi)
+                sarja.get(monesko).juomaPaiviaKe = paivanVari(mlKe)
+                sarja.get(monesko).juomaPaiviaTo = paivanVari(mlTo)
+                sarja.get(monesko).juomaPaiviaPe = paivanVari(mlPe)
+                sarja.get(monesko).juomaPaiviaLa = paivanVari(mlLa)
+                sarja.get(monesko).juomaPaiviaSu = paivanVari(mlSu)
+            }
+            else {
+                sarja.insert(monesko, {"juomaPaiviaTunnus": id, "juomaPaiviaAika": merkki, "otsikko": jakso,
+                                     "juomaPaiviaMa": paivanVari(mlMa), "juomaPaiviaTi": paivanVari(mlTi),
+                                     "juomaPaiviaKe": paivanVari(mlKe), "juomaPaiviaTo": paivanVari(mlTo),
+                                     "juomaPaiviaPe": paivanVari(mlPe), "juomaPaiviaLa": paivanVari(mlLa), "juomaPaiviaSu": paivanVari(mlSu),
+                                     "jaksoNakyvissa": otsikkoNakyviin, "juomaPaiviaLeveys": leveys })
+            }
+        }
+
+        return
+    }
+
+    function lisaaPaiviaKuvaajaan(hetki, maara, vahvuus){
+        var vk1, vkJuoma, i, pv1g = viikonPaiva(0), pvJuoma, vuosi = new Date(hetki).getFullYear()
+        var mlMa = 0, mlTi = 0, mlKe = 0, mlTo = 0, mlPe = 0, mlLa = 0, mlSu = 0
+        var msMa
+
+        vkJuoma = Math.floor((hetki - aikaVyohyke*minuutti + (pv1g-1)*vrk)/(7*vrk))
+
+        i = etsiPaiviaJakso(paivaArvot, vkJuoma)
+
+        // jos lisätty juoma on juotu ennen nykyistä taulukkoa
+        if (i < 0) {
+            vk1 = paivaArvot.get(0).juomaPaiviaTunnus - 1
+            while (vk1 > vkJuoma){
+                lisaaPaiviaJaksoon(paivaArvot, 0, viikonNumero(vk1*7*vrk), vk1, new Date(vk1*7*vrk).getFullYear(),
+                                  mlMa,mlTi,mlKe,mlTo,mlPe,mlLa,mlSu)
+                vk1--
+            }
+            i = 0
+        }
+        // jos lisätty juoma on juotu nykyisen taulukon jälkeen
+        if ( (i >= paivaArvot.count) && (paivaArvot.count > 0) ) {
+            vk1 = paivaArvot.get(paivaArvot.count-1).juomaPaiviaTunnus + 1
+            while (vk1 < vkJuoma){                
+                lisaaPaiviaJaksoon(paivaArvot, paivaArvot.count, viikonNumero(vk1*7*vrk), vk1, new Date(vk1*7*vrk).getFullYear(),
+                                  mlMa,mlTi,mlKe,mlTo,mlPe,mlLa,mlSu)
+                vk1++
+            }
+            i = paivaArvot.count            
+        }
+
+        msMa = (vkJuoma*7 - (pv1g-1))*vrk + aikaVyohyke*minuutti - vrkVaihtuu*minuutti
+
+        mlMa = mlAikana(msMa,         msMa + vrk)
+        mlTi = mlAikana(msMa + vrk,   msMa + 2*vrk)
+        mlKe = mlAikana(msMa + 2*vrk, msMa + 3*vrk)
+        mlTo = mlAikana(msMa + 3*vrk, msMa + 4*vrk)
+        mlPe = mlAikana(msMa + 4*vrk, msMa + 5*vrk)
+        mlLa = mlAikana(msMa + 5*vrk, msMa + 6*vrk)
+        mlSu = mlAikana(msMa + 6*vrk, msMa + 7*vrk)
+
+        lisaaPaiviaJaksoon(paivaArvot, i, viikonNumero(hetki), vkJuoma, new Date(vkJuoma*7*vrk).getFullYear(),
+                          mlMa,mlTi,mlKe,mlTo,mlPe,mlLa,mlSu)
+
+        return
+
+    }
+
+    // sarja = kuvaajan id, monesko = 0-N - järjestys kuvaajassa, maara = piirrettavan pylvaan korkeus, merkki = pylvään alla näkyvä teksti,
+    // id = piirrettävän pylvään tunnus, jakso = väliotsikko
+    function lisaaViikkoJaksoon(sarja, monesko, maara, merkki, id, jakso) {
+        var vari = "green"
+        var skaala = kuvaajanKorkeus/(0.5*(vkoRaja2+vkoRaja1))
+        var otsikkoNakyviin = false
+        var leveys, otsikonLeveys
+        var nimi
+
+        //leveys = (pikkuKirjainKoko*1.1).toFixed(0) //30
+        leveys = pikkuKirjainKoko //30
+
+        if (merkki == 1) {
+            otsikkoNakyviin = true
+            otsikonLeveys = ((leveys + pikkuKirjainKoko)*1.2).toFixed(0)*1.0 // leveys + 30
+        } else
+            otsikonLeveys = leveys
+
+        //console.log("lisaaViikkoJaksoon - leveys " + leveys + " " + isoKirjainKoko + " " + Theme.fontSizeMedium)
+
+        if ( (monesko >= sarja.count) || (sarja.count == 0) ) {
+            vari = jaksonVari(maara)
+            sarja.append({"mlViikkoPylvasArvo": maara*skaala, "mlViikkoPylvasAika": merkki, "mlViikkoPylvasTunnus": id, "mlViikkoPylvaanVari": vari,
+                            "otsikko": jakso, "jaksoNakyvissa": otsikkoNakyviin, "mlViikkoPylvaanLeveys": leveys,
+                            "mlOtsikonLeveys": otsikonLeveys})
+            kuvaaja.positionViewAtEnd();
+        } else {
+            if (sarja.get(monesko).mlViikkoPylvasTunnus == id) {
+                sarja.get(monesko).mlViikkoPylvasArvo = sarja.get(monesko).mlViikkoPylvasArvo + maara*skaala
+                sarja.get(monesko).mlViikkoPylvaanVari = jaksonVari(sarja.get(monesko).mlViikkoPylvasArvo/skaala)
+            } else {
+                vari = jaksonVari(maara)
+                sarja.insert(monesko, {"mlViikkoPylvasArvo": maara*skaala, "mlViikkoPylvasAika": merkki, "mlViikkoPylvasTunnus": id, "mlViikkoPylvaanVari": vari,
+                                "otsikko": jakso, "jaksoNakyvissa": otsikkoNakyviin, "mlViikkoPylvaanLeveys": leveys,
+                                "mlOtsikonLeveys": otsikonLeveys})
+            }
+        }
+
         return
     }
 
@@ -430,28 +685,73 @@ Page {
                 var taulukko  = tx.executeSql("SELECT asia, arvo FROM asetukset");
 
                 for (var i = 0; i < taulukko.rows.length; i++ ) {
-                    if (taulukko.rows[i].asia == tunnusProm1 )
+                    if (taulukko.rows[i].asia == tunnusProm1 ){
                         promilleRaja1 = taulukko.rows[i].arvo;
-                    else if (taulukko.rows[i].asia == tunnusProm2 )
+                        luettuPromilleRaja1 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusProm2 ){
                         promilleRaja2 = taulukko.rows[i].arvo;
-                    else if (taulukko.rows[i].asia == tunnusVrkRaja1 )
+                        luettuPromilleRaja2 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusVrkRaja1 ) {
                         vrkRaja1 = taulukko.rows[i].arvo;
-                    else if (taulukko.rows[i].asia == tunnusVrkRaja2 )
+                        luettuVrkRaja1 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusVrkRaja2 ){
                         vrkRaja2 = taulukko.rows[i].arvo;
-                    else if (taulukko.rows[i].asia == tunnusVkoRaja1 )
+                        luettuVrkRaja2 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusVkoRaja1 ) {
                         vkoRaja1 = taulukko.rows[i].arvo;
-                    else if (taulukko.rows[i].asia == tunnusVkoRaja2 )
+                        luettuVkoRaja1 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusVkoRaja2 ) {
                         vkoRaja2 = taulukko.rows[i].arvo;
-                    else if (taulukko.rows[i].asia == tunnusVsRaja1 )
+                        luettuVkoRaja2 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusVsRaja1 ) {
                         vsRaja1 = taulukko.rows[i].arvo;
-                    else if (taulukko.rows[i].asia == tunnusVsRaja2 )
+                        luettuVsRaja1 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusVsRaja2 ) {
                         vsRaja2 = taulukko.rows[i].arvo;
+                        luettuVsRaja2 = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusKuvaaja ) {
+                        nakyvaKuvaaja = taulukko.rows[i].arvo;
+                        luettuNakyvaKuvaaja = true;
+                    }
+                    else if (taulukko.rows[i].asia == tunnusVrkVaihdos ) {
+                        vrkVaihtuu = taulukko.rows[i].arvo;
+                        luettuVrkVaihtuu = true;
+                    }
                 }
 
                 if(taulukko.rows.length <= 0){
                     uusiAsetukset()
                 } else {
                     luettu = i
+                    //varmistetaan, että kaikki asetukset ovat tietokannassa
+                    if (!luettuPromilleRaja1)
+                        uusiAsetus(tunnusProm1, promilleRaja1)
+                    if (!luettuPromilleRaja2)
+                        uusiAsetus(tunnusProm2, promilleRaja2)
+                    if (!luettuVrkRaja1)
+                        uusiAsetus(tunnusVrkRaja1, vrkRaja1)
+                    if (!luettuVrkRaja2)
+                        uusiAsetus(tunnusVrkRaja2, vrkRaja2)
+                    if (!luettuVkoRaja1)
+                        uusiAsetus(tunnusVkoRaja1, vkoRaja1)
+                    if (!luettuVkoRaja2)
+                        uusiAsetus(tunnusVkoRaja2, vkoRaja2)
+                    if (!luettuVsRaja1)
+                        uusiAsetus(tunnusVsRaja1, vsRaja1)
+                    if (!luettuVsRaja2)
+                        uusiAsetus(tunnusVsRaja2, vsRaja2)
+                    if (!luettuNakyvaKuvaaja)
+                        uusiAsetus(tunnusKuvaaja, nakyvaKuvaaja)
+                    if (!luettuVrkVaihtuu)
+                        uusiAsetus(tunnusVrkVaihdos, vrkVaihtuu)
                 }
 
             });
@@ -466,12 +766,6 @@ Page {
     }
 
     function lueJuodut() {
-        var nytMs = new Date().getTime()
-        //var mlVko = 0
-        //var mlVs = 0
-        //var mlJuomassa
-
-        //readingDb = 0
 
         try {
             db.transaction(function(tx) {
@@ -481,8 +775,6 @@ Page {
                     lisaaListaan(taulukko.rows[i].id, taulukko.rows[i].aika, taulukko.rows[i].veressa,
                              taulukko.rows[i].tilavuus, taulukko.rows[i].prosenttia,
                              taulukko.rows[i].juoma, taulukko.rows[i].kuvaus);
-
-                    lisaaKuvaajaan(taulukko.rows[i].aika, taulukko.rows[i].tilavuus, taulukko.rows[i].prosenttia);
 
                 } // for
 
@@ -673,6 +965,21 @@ Page {
         return
     }
 
+    function mlAikana(ms0, ms1) {
+        var ml = 0
+        var i0, i1
+
+        i0 = etsiPaikka(ms0, juomaLista.count-1)
+        i1 = etsiPaikka(ms1, i0+1)
+
+        while ( (i0 < i1 ) && (lueJuomanAika(i0) < ms1)){
+            ml = ml + lueJuomanMaara(i0)*lueJuomanVahvuus(i0)/100
+            i0++
+        }
+
+        return ml
+    }
+
     // laskee, paljonko alkoholia on veressä hetkellä ms
     // xid on edellisen juoman tunnus
     function mlKehossa(xid, ms) {
@@ -687,7 +994,7 @@ Page {
     function msRajalle(ml0, koko0, vahvuus0, promillea){
         var mlRajalle, hRajalle
 
-        mlRajalle = ml0 + koko0*vahvuus0/100 - promillea*massa*vetta/tiheys//*1000
+        mlRajalle = ml0 + koko0*vahvuus0/100 - promillea*massa*vetta/tiheys
         hRajalle = mlRajalle/palonopeus()
 
         return Math.round(hRajalle*tunti)
@@ -736,7 +1043,7 @@ Page {
 
         juomat.set(id, {"section": paiva,"juomaaika": kello, "aikaMs": ms,
                           "mlVeressa": mlAlkoholia, "juomatyyppi": juomanNimi, "juomamaara": maara,
-                          "juomapros": vahvuus, "kuvaus": juomanKuvaus});
+                          "juomapros": vahvuus.toFixed(1), "kuvaus": juomanKuvaus});
 
         muutaDbJuodut(lueJuomanId(id), ms, mlAlkoholia, maara, vahvuus, juomanNimi, juomanKuvaus);
 
@@ -773,8 +1080,8 @@ Page {
             }
 
             txtJuoma.text = dialog.nimi
-            txtMaara.text = dialog.maara
-            voltit.text = dialog.vahvuus
+            txtMaara.text = (dialog.maara).toFixed(0)
+            voltit.text = (dialog.vahvuus).toFixed(1)
             juomanKuvaus = dialog.juomanKuvaus
 
             return
@@ -801,12 +1108,9 @@ Page {
                         dialog.vahvuus, dialog.nimi, dialog.juomanKuvaus)
             juomanKuvaus = dialog.juomanKuvaus            
             paivitaMlVeressa(dialog.aika.getTime(), qId)
-            paivitaTilastot()
-            //naytaTilastot()
             paivitaPromillet()
             paivitaAjatRajoille()
-            lisaaKuvaajaan(vanhaHetki, -vanhaMaara, vanhaVahvuus)
-            lisaaKuvaajaan(dialog.aika.getTime(), dialog.maara, dialog.vahvuus)
+            paivitaKuvaaja()
 
         })
 
@@ -828,6 +1132,18 @@ Page {
         return parseFloat(voltit.text)
     }
 
+    function paivanVari(mlPaivassa){
+        var vari = "red"
+        if (mlPaivassa < 1) {
+            vari = "transparent"
+        } else if (mlPaivassa < vrkRaja1){
+            vari = "green"
+        } else if (mlPaivassa < vrkRaja2){
+            vari ="yellow"
+        }
+        return vari
+    }
+
     function paivitaAika() {
         var paiva = new Date()
 
@@ -835,7 +1151,7 @@ Page {
             pvm = paiva
             kello.valittuTunti = paiva.getHours()
             kello.valittuMinuutti = paiva.getMinutes()
-            kello.value = kellonaika(paiva.getTime()) //pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
+            kello.value = kellonaika(paiva.getTime())
             paivays.value = paiva.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
             paivays.valittuPaiva.setTime(paiva.getTime())
         }
@@ -898,11 +1214,41 @@ Page {
                               "  WHERE asia = '" + tunnusVsRaja1 + "'");
                 tx.executeSql("UPDATE asetukset SET arvo = " + vsRaja2 +
                               "  WHERE asia = '" + tunnusVsRaja2 + "'");
+                tx.executeSql("UPDATE asetukset SET arvo = " + nakyvaKuvaaja +
+                              "  WHERE asia = '" + tunnusKuvaaja + "'");
+                tx.executeSql("UPDATE asetukset SET arvo = " + vrkVaihtuu +
+                              "  WHERE asia = '" + tunnusVrkVaihdos + "'");
             });
         } catch (err) {
             console.log("Error modifying asetukset-table in database: " + err);
             virheet = virheet + "Error modifying asetukset-table in database: " + err +" <br> "
         };
+
+        return
+    }
+
+    function paivitaKuvaaja() {
+        var i
+
+        //tyhjennetään vanhat pois
+        if (nakyvaKuvaaja > 1.5) {
+            for (i = mlPaivaArvot.count-1; i >= 0; i--) {
+                mlPaivaArvot.remove(i)
+            }
+        } else if (nakyvaKuvaaja > 0.5) {
+            for (i = viikkoArvot.count-1; i >= 0; i--) {
+                viikkoArvot.remove(i)
+            }
+        } else {
+            for (i = paivaArvot.count-1; i >= 0; i--) {
+                paivaArvot.remove(i)
+            }
+        }
+
+        //täytetään uudelleen
+        for (i=0; i < juomat.count; i++) {
+            lisaaKuvaajaan(lueJuomanAika(i),lueJuomanMaara(i),lueJuomanVahvuus(i))
+        }
 
         return
     }
@@ -950,9 +1296,7 @@ Page {
     // etsii juomalistasta hetkeä nytMs edeltävän juoman tiedot ja laskee hetken nytMs promillemäärän
     function paivitaPromillet() {
         var nytMs = pvm.getTime()
-        //var edell = etsiPaikka(nytMs, juomat.count -1)
         var ml0, prml
-        //var edAika
 
         prml = laskePromillet(nytMs)
 
@@ -989,9 +1333,24 @@ Page {
     }
 
     function tilastojenTarkastelu(){
-        //var dialog = pageStack.push(Qt.resolvedUrl("tilastot.qml"), { })
-        pageStack.push(Qt.resolvedUrl("tilastot.qml"))
+        var uusiTaulukko, uusiRyyppyVrk
+        var dialog = pageStack.push(Qt.resolvedUrl("tilastot.qml"), {"valittuKuvaaja": nakyvaKuvaaja,
+                                    "ryyppyVrk": vrkVaihtuu})
 
+        dialog.accepted.connect(function() {           
+            uusiTaulukko = dialog.valittuKuvaaja
+            uusiRyyppyVrk = dialog.ryyppyVrk
+
+            if ( (nakyvaKuvaaja != uusiTaulukko) || (vrkVaihtuu != uusiRyyppyVrk) ) {
+                nakyvaKuvaaja = uusiTaulukko
+                vrkVaihtuu = uusiRyyppyVrk
+                paivitaKuvaaja()
+                paivitaAsetukset()
+            }
+
+        })
+
+        return
     }
 
     function tyhjennaDbJuodut(xid){
@@ -1049,6 +1408,10 @@ Page {
                               " VALUES ('" + tunnusVsRaja1 + "', " + vsRaja1 +")" )
                 tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
                               " VALUES ('" + tunnusVsRaja2 + "', " + vsRaja2 +")" )
+                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
+                              " VALUES ('" + tunnusKuvaaja + "', " + nakyvaKuvaaja +")" )
+                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
+                              " VALUES ('" + tunnusVrkVaihdos + "', " + vrkVaihtuu +")" )
             })
         } catch (err) {
             console.log("Error adding to asetukset-table in database: " + err);
@@ -1057,6 +1420,21 @@ Page {
 
         return
 
+    }
+
+    function uusiAsetus(tunnus, arvo){
+        if(db == null) return;
+
+        try {
+            db.transaction(function(tx){
+                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
+                              " VALUES ('" + tunnus + "', " + arvo +")" )
+            })
+        } catch (err) {
+            console.log("Error adding to asetukset-table in database: " + err);
+            virheet = virheet + "Error adding to asetukset-table in database: " + err +" <br> "
+        }
+        return
     }
 
     function uusiJuomari() {
@@ -1081,8 +1459,6 @@ Page {
         var ml0
         var apu
 
-        //console.log("hetki " + hetki)
-
         // lasketaan paljonko veressä on alkoholia juomishetkellä
         mlVeressa = mlKehossa(lisayskohta-1, hetki)
 
@@ -1099,43 +1475,46 @@ Page {
         return;
     }
 
-    // hetki = ms
+    // hetki = ms GMT
     // jos vuoden ensimmäinen päivä on ma-to, aloittaa se 1. viikon - muuten kyseessä edellisen vuoden 53. viikko
     function viikonNumero(hetki) {
-        var pv = new Date(hetki)
-        var vuosi = pv.getFullYear()
-        var ekapvm = new Date(vuosi,0,1,0,0,0)
-        var vkpaiva = ekapvm.getDay() //0-6
+        var vuosi = new Date(hetki).getFullYear() // GMT:n mukaan
+        var ekapvm = new Date(vuosi,0,1,0,0,0) // aikavyöhykkeen mukaan
+        var vkpaiva = viikonPaiva(ekapvm.getTime() - aikaVyohyke*minuutti) //1-7, ma - su
         var vk0, vknyt, erovk, eropv, eroms
 
-        // varmistetaan, että ma = 0 ja su = 6
-        if (new Date(2017,0,1,1,1,1).getDay() == 0) {
-            vkpaiva = vkpaiva - 1
-            if (vkpaiva < 0)
-                vkpaiva = 6
-        }
-
-        if (vkpaiva > 3.5) // pe-su
-            vk0 = 0        
-        else //ma-to
+        // onko vuoden ensimmäinen päivä edellisen vuoden viikolla 52/53 vai tämän vuoden viikolla 1
+        if (vkpaiva > 4.5) // pe-su -> vk 52/53
+            vk0 = 0
+        else //ma-to -> vk 1
             vk0 = 1
 
-        eroms = hetki-ekapvm.getTime() // ms
-        erovk = Math.floor((eroms)/(7*vrk)) // vko
+        eroms = hetki - ekapvm.getTime() // ms
+        erovk = Math.floor(eroms/(7*vrk)) // vko
         eropv = Math.floor((eroms-erovk*7*vrk)/vrk) // vrk
 
-        //console.log("viikonNumero " + "vuosi " + vuosi + ", aloituspaiva " + vkpaiva + ", " + "vk0 " + vk0 + ", erovk " + erovk)
-
-        if ( vkpaiva + eropv > 6.5) {
+        if ( vkpaiva + eropv > 7.5) {
             vknyt = vk0 + erovk + 1
         } else {
             vknyt = vk0 + erovk
         }
 
         if (vknyt < 0.5 )
-            vknyt = viikonNumero(new Date(vuosi-1,11,31,10,0,0).getTime())
+            vknyt = viikonNumero(new Date(vuosi-1,11,31,10,0,0).getTime() - aikaVyohyke*minuutti )
 
         return vknyt
+    }
+
+    // palauttaa 1 - maanantai, 7 - sunnuntai
+    // Date().getDay() palauttaa 0 - sunnuntai, 6 - lauantai
+    // hetki - ms hetkestä 1970.1.1 00:00 GMT
+    function viikonPaiva(hetki) {
+        var paiva = new Date(hetki).getDay()
+
+        if (paiva == 0)
+            paiva = 7
+
+        return paiva
     }
 
     Timer {
@@ -1188,12 +1567,12 @@ Page {
                     text: qsTr("delete")
                     onClicked: {
                         juomaLista.currentItem.remorseAction(qsTr("deleting"), function () {
-                            lisaaKuvaajaan(lueJuomanAika(valittu),-lueJuomanMaara(valittu),lueJuomanVahvuus(valittu))
                             tyhjennaDbJuodut(lueJuomanId(valittu))
                             juomat.remove(valittu)                            
                             paivitaMlVeressa(lueJuomanAika(valittu)-1, valittu); //-1 varmistaa, että usean samaan aikaan juodun juoman kohdalla päivitys toimii
                             paivitaPromillet();
                             paivitaAjatRajoille();
+                            paivitaKuvaaja();
 
                         })
 
@@ -1219,46 +1598,39 @@ Page {
                 width: sivu.width*0.9
                 x: sivu.width*0.05
                 Label {
-                    //id: juomanTunnus
                     text: tunnus
                     visible: false
                     width: 0
                 }
                 Label {
-                    //id: idDrinkTimeInMs
                     text: aikaMs
                     visible: false
                     width: 0
                 }
 
                 Label {
-                    //id: idAlcInBlood
                     text: mlVeressa
                     visible: false
                     width: 0
                 }
                 Label {
-                    //id: idDrinkTime
                     text: juomaaika
-                    width: Theme.fontSizeExtraSmall*6
+                    width: (Theme.fontSizeMedium*3.5).toFixed(0) //ExtraSmall*6
                 }
                 Label {
-                    //id: idDrinkName
                     text: juomatyyppi
-                    width: Theme.fontSizeExtraSmall*8
+                    width: Theme.fontSizeMedium*7 //ExtraSmall*8
+                    truncationMode: TruncationMode.Fade
                 }
                 Label {
-                    //id: idDrinkAmount
                     text: juomamaara
-                    width: Theme.fontSizeExtraSmall*3
+                    width: (Theme.fontSizeMedium*2.5).toFixed(0) //ExtraSmall*3
                 }
                 Label {
-                    //id: idDrinkAlc
                     text: juomapros
-                    width: Theme.fontSizeExtraSmall*3
+                    width: (Theme.fontSizeMedium*2.5).toFixed(0) //ExtraSmall*3
                 }
                 Label {
-                    //id: idDrinkDescription
                     text: kuvaus
                     visible: false
                     width: 0
@@ -1271,11 +1643,198 @@ Page {
     } //rivityyppi
 
     Component {
-        id: pylvas
+        id: mlViikkoPylvas
         ListItem {
-            id: pylvasOsio
-            height: kuvaajanKorkeus + pylvaanNimi.height
-            width: pylvaanLeveys
+            id: mlViikkoPylvasOsio
+            height: kuvaajanKorkeus + mlViikkoPylvaanNimi.height
+            width: mlOtsikonLeveys
+            propagateComposedEvents: true
+            onClicked: {
+                mouse.accepted = false
+                tilastojenTarkastelu()
+            }
+
+            Row {
+                Label {
+                    id: idOtsikko
+                    text: otsikko // vuosi
+                    rotation: 90
+                    visible: jaksoNakyvissa
+                    width: font.pixelSize
+                }
+
+                Column {
+                    //width: (mlViikkoPylvaanLeveys*3.5).toFixed() //lisäys
+                    //anchors.horizontalCenter: parent.horizontalCenter //lisäys
+
+                    Rectangle {
+                        id: mlViikkoPylvaanY
+                        height: kuvaajanKorkeus - mlViikkoPylvaanKorkeus.height
+                        width: (mlViikkoPylvaanLeveys*1.2).toFixed() //mlViikkoPylvaanLeveys
+                        border.width: 0
+                        border.color: "transparent"
+                        color: "transparent"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Rectangle {
+                        id: mlViikkoPylvaanKorkeus
+                        height: mlViikkoPylvasArvo
+                        width: (mlViikkoPylvaanLeveys*0.8).toFixed() //mlViikkoPylvaanLeveys-8
+                        //border.width: (mlViikkoPylvaanLeveys*0.4).toFixed() //0
+                        //border.color: "transparent"
+                        color: mlViikkoPylvaanVari //"red"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Label {
+                        id: mlViikkoPylvaanNimi
+                        text: mlViikkoPylvasAika
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        //width: (mlViikkoPylvaanLeveys*2.5).toFixed() //mlViikkoPylvaanLeveys
+                        horizontalAlignment: Text.AlignHCenter
+                    } //
+
+                    Label {                        
+                        text: mlViikkoPylvasTunnus //viikkoa tai paivaa ajankohdasta 1970.1.1 00:00
+                        visible: false
+                        height: 0
+                        width: (mlViikkoPylvaanLeveys*1.2).toFixed() //mlViikkoPylvaanLeveys
+                    } //
+
+                }//column
+            } //row            
+        }//listitem
+    }
+
+    Component {
+        id: mlViikkoPylvasOtsikko
+
+        Column {
+            Label {
+                text: vkoRaja1 + " ml"
+                rotation: 90
+                //anchors.horizontalCenter: parent.horizontalCenter
+                verticalAlignment: Text.AlignVCenter
+                height: kuvaajanKorkeus*0.5*(vkoRaja2 - vkoRaja1)/(0.5*(vkoRaja2+vkoRaja1))
+                font.pixelSize: Theme.fontSizeExtraSmall
+                width: (pikkuKirjainKoko*1.2).toFixed() //31
+            }
+            Rectangle {
+                height: kuvaajanKorkeus*vkoRaja1/(0.5*(vkoRaja2+vkoRaja1))
+                width: pikkuKirjainKoko //27
+                anchors.horizontalCenter: parent.horizontalCenter
+                //border.width: 1
+                //border.color: "transparent"
+                color: jaksonVari(0.5*vkoRaja1)
+                z: -1
+            }
+            Label {
+                text: qsTr("wk")
+                font.pixelSize: Theme.fontSizeExtraSmall
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+        }
+
+    }
+
+    Component {
+        id: mlPaivaPylvas
+        ListItem {
+            id: mlViikkoPylvasOsio
+            height: kuvaajanKorkeus + mlPaivaPylvaanNimi.height
+            width: mlOtsikonLeveys
+            propagateComposedEvents: true
+            onClicked: {
+                mouse.accepted = false
+                tilastojenTarkastelu()
+            }
+
+            Row {
+                Label {
+                    id: idOtsikko
+                    text: otsikko
+                    rotation: 90
+                    visible: jaksoNakyvissa
+                    width: font.pixelSize
+                }
+
+                Column {
+                    Rectangle { // asettaa väripylvään yläreunan oikealle tasalle
+                        id: mlPaivaPylvaanY
+                        height: kuvaajanKorkeus - mlPaivaPylvaanKorkeus.height
+                        width: mlPaivaPylvaanLeveys
+                        border.width: 0
+                        color: "transparent"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Rectangle {
+                        id: mlPaivaPylvaanKorkeus
+                        height: mlPaivaPylvasArvo
+                        width: mlPaivaPylvaanLeveys-8
+                        //border.width: 1
+                        //border.color: "transparent"
+                        color: mlPaivaPylvaanVari //"red"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Label {
+                        id: mlPaivaPylvaanNimi
+                        text: mlPaivaPylvasAika
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    } //
+                    Label {
+                        text: mlPaivaPylvasTunnus //viikkoa tai paivaa ajankohdasta 1970.1.1 00:00
+                        visible: false
+                        height: 0
+                        width: mlPaivaPylvaanLeveys
+                    } //
+                }//column
+            } //row
+        }//listitem
+    }
+
+    Component {
+        id: mlPaivaPylvasOtsikko
+
+        Column {
+            Label {
+                text: vrkRaja1 + " ml"
+                rotation: 90
+                //anchors.horizontalCenter: parent.horizontalCenter
+                verticalAlignment: Text.AlignVCenter
+                height: kuvaajanKorkeus*0.5*(vrkRaja2 - vrkRaja1)/(0.5*(vrkRaja2+vrkRaja1))
+                font.pixelSize: Theme.fontSizeExtraSmall
+                width: pikkuKirjainKoko //25
+            }
+            Rectangle {
+                height: kuvaajanKorkeus*vrkRaja1/(0.5*(vrkRaja2+vrkRaja1))
+                width: pikkuKirjainKoko //22
+                anchors.horizontalCenter: parent.horizontalCenter
+                //border.width: 1
+                //border.color: "transparent"
+                color: jaksonVari(0.5*vrkRaja1)
+                z: -1
+            }
+            Label {
+                text: ""
+                font.pixelSize: Theme.fontSizeExtraSmall
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+        }
+
+    }
+
+    Component {
+        id: juomaPaivia
+        ListItem {
+            id: juomaPaiviaOsio
+            height: kuvaajanKorkeus + juomaPaiviaNimi.height
+            width: juomaPaiviaLeveys
             propagateComposedEvents: true
             onClicked: {
                 mouse.accepted = false
@@ -1293,41 +1852,96 @@ Page {
 
                 Column {
                     Rectangle {
-                        id: pylvaanY
-                        height: kuvaajanKorkeus - pylvaanKorkeus.height
-                        width: 31
-                        border.width: 0
-                        color: "transparent"
+                        height: kuvaajanKorkeus*1/7
+                        width: 23
+                        border.width: 1
+                        border.color: "transparent"
+                        color: juomaPaiviaSu
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                     Rectangle {
-                        id: pylvaanKorkeus
-                        height: pylvasArvo
+                        height: kuvaajanKorkeus*1/7
                         width: 23
-                        //border.width: 1
-                        //border.color: "transparent"
-                        color: pylvaanVari //"red"
+                        border.width: 1
+                        border.color: "transparent"
+                        color: juomaPaiviaLa
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Rectangle {
+                        height: kuvaajanKorkeus*1/7
+                        width: 23
+                        border.width: 1
+                        border.color: "transparent"
+                        color: juomaPaiviaPe
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Rectangle {
+                        height: kuvaajanKorkeus*1/7
+                        width: 23
+                        border.width: 1
+                        border.color: "transparent"
+                        color: juomaPaiviaTo
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Rectangle {
+                        height: kuvaajanKorkeus*1/7
+                        width: 23
+                        border.width: 1
+                        border.color: "transparent"
+                        color: juomaPaiviaKe
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Rectangle {
+                        height: kuvaajanKorkeus*1/7
+                        width: 23
+                        border.width: 1
+                        border.color: "transparent"
+                        color: juomaPaiviaTi
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Rectangle {
+                        height: kuvaajanKorkeus*1/7
+                        width: 23
+                        border.width: 1
+                        border.color: "transparent"
+                        color: juomaPaiviaMa
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
                     Label {
-                        id: pylvaanNimi
-                        text: pylvasAika
+                        id: juomaPaiviaNimi
+                        text: juomaPaiviaAika //viikon numero
                         //width: 31
                         font.pixelSize: Theme.fontSizeExtraSmall
-                        anchors.horizontalCenter: pylvaanY.horizontalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
                     } //
                     Label {
                         //id: viivanTunnus //viikkoa, paivaa tai minuuttia ajankohdasta 1970.1.1 00:00
-                        text: pylvasTunnus
+                        text: juomaPaiviaTunnus
                         visible: false
                         height: 0
                         width: parent.width
                     } //
                 }//column
-            } //row            
+            } //row
         }
     }
+
+    Component {
+        id: juomaPaiviaOtsikko
+
+        Column {
+            Label {
+                text: qsTr("su fr we mo")
+                font.pixelSize: Theme.fontSizeExtraSmall
+                width: 31
+                rotation: 90
+            }
+
+        }
+
+    }
+
 
     SilicaFlickable {
         id: ylaosa
@@ -1373,9 +1987,10 @@ Page {
             SilicaListView {
                 id: kuvaaja
                 height: kuvaajanKorkeus + Theme.fontSizeExtraSmall + 7
-                width: sivu.width - 2*sivu.anchors.leftMargin //parent.width
+                width: sivu.width - 2*sivu.anchors.leftMargin //parent.width                
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: ListView.Horizontal
+                visible: (nakyvaKuvaaja < 0.5 || nakyvaKuvaaja > 1.5) ? false : true
 
                 model: ListModel {
                     id: viikkoArvot
@@ -1390,35 +2005,58 @@ Page {
                     //}
                 //}
 
-                delegate: pylvas
+                delegate: mlViikkoPylvas
 
-                header: Column {
-                    Label {
-                        text: vkoRaja1 + " ml"
-                        rotation: 90
-                        //anchors.horizontalCenter: parent.horizontalCenter
-                        verticalAlignment: Text.AlignVCenter
-                        height: kuvaajanKorkeus*0.5*(vkoRaja2 - vkoRaja1)/(0.5*(vkoRaja2+vkoRaja1))
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        width: 31
-                    }
-                    Rectangle {
-                        height: kuvaajanKorkeus*vkoRaja1/(0.5*(vkoRaja2+vkoRaja1))
-                        width: 27
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        //border.width: 1
-                        //border.color: "transparent"
-                        color: jaksonVari(0.5*vkoRaja1)
-                        z: -1
-                    }
-                    Label {
-                        id: kuvaajanXakseli
-                        text: qsTr("wk")
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+                header: mlViikkoPylvasOtsikko
 
-                }                
+                HorizontalScrollDecorator {}
+
+            }
+
+            SilicaListView {
+                id: kuvaaja3
+                height: kuvaajanKorkeus + Theme.fontSizeExtraSmall + 7
+                width: sivu.width - 2*sivu.anchors.leftMargin //parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
+                orientation: ListView.Horizontal
+                visible: (nakyvaKuvaaja < 1.5) ? false : true
+
+                model: ListModel {
+                    id: mlPaivaArvot
+                }
+
+                //section { //section ei jostain syystä toimi
+                    //property: 'section'
+                    //delegate: SectionHeader {
+                        //text: aikaJakso
+                        //rotation: 90
+                        //transform: Rotation { angle: 90 }
+                    //}
+                //}
+
+                delegate: mlPaivaPylvas
+
+                header: mlPaivaPylvasOtsikko
+
+                HorizontalScrollDecorator {}
+
+            }
+
+            SilicaListView {
+                id: kuvaaja2
+                height: kuvaajanKorkeus + Theme.fontSizeExtraSmall + 7
+                width: sivu.width - 2*sivu.anchors.leftMargin //parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
+                orientation: ListView.Horizontal
+                visible: (nakyvaKuvaaja < 0.5) ? true : false
+
+                model: ListModel {
+                    id: paivaArvot
+                }
+
+                delegate: juomaPaivia
+
+                header: juomaPaiviaOtsikko
 
                 HorizontalScrollDecorator {}
 
@@ -1486,7 +2124,7 @@ Page {
                         })
                     }
 
-                    width: Theme.fontSizeExtraSmall*8
+                    width: Theme.fontSizeSmall*6
                     value: pvm.toLocaleTimeString(Qt.locale(),kelloMuoto)
                     onClicked: {
                         if (kelloKay == true)
@@ -1524,7 +2162,7 @@ Page {
                     }
 
                     value: pvm.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-                    width: sivu.width - kello.width - 3*Theme.paddingSmall
+                    width: Theme.fontSizeSmall*8//sivu.width - kello.width - 3*Theme.paddingSmall
                     onClicked: {
                         if (paivyriKay == true)
                             avaaPaivanValinta()
@@ -1540,12 +2178,11 @@ Page {
             } // aika
 
             Row { //lisattava juoma
-                //id: drinkData
                 spacing: 2
 
                 TextField {
                     id: txtJuoma
-                    width: Theme.fontSizeExtraSmall*8
+                    width: Theme.fontSizeMedium*6 //Theme.fontSizeExtraSmall*8
                     readOnly: true
                     text: qsTr("beer")
                     onClicked: {
@@ -1556,7 +2193,7 @@ Page {
                 TextField {
                     id: txtMaara
                     label: "ml"
-                    width: Theme.fontSizeExtraSmall*4
+                    width: Theme.fontSizeMedium*3 //Theme.fontSizeExtraSmall*4
                     readOnly: true
                     text: "500"
                     onClicked: {
@@ -1567,7 +2204,7 @@ Page {
                 TextField {
                     id: voltit
                     label: qsTr("vol-%")
-                    width: Theme.fontSizeExtraSmall*5
+                    width: (Theme.fontSizeMedium*3.5).toFixed(0) //Theme.fontSizeExtraSmall*5
                     readOnly: true
                     text: "4.7"
                     onClicked: {
@@ -1576,7 +2213,8 @@ Page {
                 }
 
                 Button { //add
-                    width: 100
+                    id: kulautus
+                    width: Theme.fontSizeMedium*4 //sivu.width - txtJuoma.width - txtMaara.width - voltit.width - 8 //100
 
                     text: qsTr("cheers!")
                     onClicked: {
@@ -1627,19 +2265,19 @@ Page {
 
                     Label {
                         text: qsTr("time")
-                        width: Theme.fontSizeExtraSmall*6
+                        width: (Theme.fontSizeMedium*3.5).toFixed(0)
                     }
                     Label {
                         text: qsTr("drink")
-                        width: Theme.fontSizeExtraSmall*8
+                        width: Theme.fontSizeMedium*7
                     }
                     Label {
                         text: "ml"
-                        width: Theme.fontSizeExtraSmall*3
+                        width: (Theme.fontSizeMedium*2.5).toFixed(0)
                     }
                     Label {
                         text: qsTr("vol-%")
-                        width: Theme.fontSizeExtraSmall*3
+                        width: (Theme.fontSizeMedium*2.5).toFixed(0)
                     }
                 }
 
@@ -1652,6 +2290,7 @@ Page {
     }// SilicaFlickable
 
     Component.onCompleted: {
+
         alkutoimet()
     }
 }

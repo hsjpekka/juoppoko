@@ -34,7 +34,8 @@ DISTFILES += \
     rpm/harbour-juoppoko.spec \
     qml/harbour-juoppoko.qml \
     qml/pages/tilastot.qml \
-    qml/pages/demolaskuri.qml
+    qml/pages/demolaskuri.qml \
+    qml/scripts/scripts.js
 
 # to disable building translations every time, comment out the
 # following CONFIG line

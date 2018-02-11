@@ -23,6 +23,14 @@
         <translation>muokkaa</translation>
     </message>
     <message>
+        <source>wk</source>
+        <translation>vk</translation>
+    </message>
+    <message>
+        <source>su fr we mo</source>
+        <translation>su pe ke ma</translation>
+    </message>
+    <message>
         <source>info</source>
         <translation>tietoja</translation>
     </message>
@@ -31,12 +39,12 @@
         <translation>asetukset</translation>
     </message>
     <message>
-        <source>Drunkard?</source>
-        <translation>Juoppoko</translation>
+        <source>demo</source>
+        <translation>demo</translation>
     </message>
     <message>
-        <source>wk</source>
-        <translation>vk</translation>
+        <source>Drunkard?</source>
+        <translation>Juoppoko</translation>
     </message>
     <message>
         <source>BAC</source>
@@ -69,10 +77,6 @@
     <message>
         <source>drink</source>
         <translation>juoma</translation>
-    </message>
-    <message>
-        <source>demo</source>
-        <translation>demo</translation>
     </message>
 </context>
 <context>
@@ -157,6 +161,14 @@
         <source>upper yearly limit</source>
         <translation>ylempi vuosiraja</translation>
     </message>
+    <message>
+        <source>lower daily limit</source>
+        <translation>alempi päiväraja</translation>
+    </message>
+    <message>
+        <source>upper daily limit</source>
+        <translation>ylempi päiväraja</translation>
+    </message>
 </context>
 <context>
     <name>demolaskuri</name>
@@ -175,10 +187,6 @@
     <message>
         <source>Demo</source>
         <translation>Demo</translation>
-    </message>
-    <message>
-        <source>values not saved, clock not running</source>
-        <translation>arvoja ei talleteta, kello ei käy</translation>
     </message>
     <message>
         <source>weight</source>
@@ -224,6 +232,18 @@
         <source>at</source>
         <translation>klo</translation>
     </message>
+    <message>
+        <source>drinker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>current state at </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>juomanMuokkaus</name>
@@ -262,6 +282,10 @@
     <message>
         <source>some notes?</source>
         <translation>muuta?</translation>
+    </message>
+    <message>
+        <source>unit: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -316,6 +340,26 @@
     <message>
         <source>in week</source>
         <translation>viikossa</translation>
+    </message>
+    <message>
+        <source>chart</source>
+        <translation>kuvaaja</translation>
+    </message>
+    <message>
+        <source>weekly consumption</source>
+        <translation>viikkokulutus</translation>
+    </message>
+    <message>
+        <source>daily consumption</source>
+        <translation>päiväkulutus</translation>
+    </message>
+    <message>
+        <source>day grid</source>
+        <translation>päiväruudukko</translation>
+    </message>
+    <message>
+        <source>drinking day ends at</source>
+        <translation>ryyppypäivä vaihtuu</translation>
     </message>
 </context>
 </TS>

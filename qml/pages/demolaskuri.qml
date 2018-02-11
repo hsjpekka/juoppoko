@@ -12,7 +12,7 @@ Page {
     property date msKunnossa: new Date()
     property int paino
     property real polttonopeus: 0.1267 // ml/kg/h -- 1 g/10 kg/h = 1.267 ml/10 kg/h
-    property real promilleja
+    property real promilleja // g alkoholia / g vettä
     property real promilleRaja1
     property date pvm: new Date()
     property real tiheys: 0.7897 // alkoholin tiheys, g/ml
@@ -74,15 +74,39 @@ Page {
     function kopioiJuoma(qId) {
         txtJuoma.text = lueJuomanTyyppi(qId)
         txtMaara.text = lueJuomanMaara(qId)
-        voltit.text = lueJuomanVahvuus(qId)
+        voltit.text = lueJuomanVahvuus(qId).toFixed(1)
 
         return
     }
 
     function laskePromillet(ms){
-        var ml0, edellinen = etsiPaikka(ms, juomat.count -1)
+        var ml0 = promilleja*paino/tiheys, til = 0, pros = 0 //, edellinen = etsiPaikka(ms, juomat.count -1)
+        var ms0 = alkuhetki.getTime(), ms1
 
-        ml0 = mlKehossa(edellinen-1, ms)
+        //console.log("laskePromillet " + ml0.toFixed(2) + " " + juomat.count + " " + ms)
+
+        //ml0 = mlKehossa(edellinen-1, ms)
+
+        if (ms < ms0) return promilleja;
+
+        for (var i = 0; i < juomat.count; i++) {
+            ms1 = lueJuomanAika(i);
+            if (ms1 > ms){
+                i = juomat.count
+            } else {
+                ml0 = alkoholiaVeressa(ms0, ml0, til, pros, ms1)
+                til = lueJuomanMaara(i);
+                pros = lueJuomanVahvuus(i);
+                ms0 = ms1
+            }
+
+            //console.log("laskePromillet c i=" + i + " " + ml0.toFixed(2))
+
+        }
+
+        ml0 = alkoholiaVeressa(ms0, ml0, til, pros, ms)
+
+        //console.log("laskePromillet i=" + i + " " + ml0.toFixed(2) + " " + ms0 + " " + til + " " + pros + " " + ms)
 
         return ml0*tiheys/(paino*vetta)
     }
@@ -93,13 +117,13 @@ Page {
         var ind = etsiPaikka(hetki,juomat.count-1)
 
         if (ind < juomat.count) {
-            juomat.insert(ind, {"aikaMs": hetki, "mlVeressa": mlVeressa,
+            juomat.insert(ind, {"aikaMs": hetki, //"mlVeressa": mlVeressa,
                                  "section": paiva, "juomaaika": kello, "juomatyyppi": juomanNimi,
                                  "juomamaara": maara, "juomapros": vahvuus});
             paivitaMlVeressa(hetki, ind);
 
         } else
-            juomat.append({"aikaMs": hetki, "mlVeressa": mlVeressa,
+            juomat.append({"aikaMs": hetki, //"mlVeressa": mlVeressa,
                                  "section": paiva, "juomaaika": kello, "juomatyyppi": juomanNimi,
                                  "juomamaara": maara, "juomapros": vahvuus});
         return
@@ -118,7 +142,7 @@ Page {
 
     function lueJuomanMaara(xid) {
         var ml = 0
-        if ((juomat.count > xid) && (xid > -0.5)) {
+        if ((xid < juomat.count) && (xid > -0.5)) {
             ml = juomat.get(xid).juomamaara
         }
 
@@ -144,6 +168,7 @@ Page {
         return vahvuus
     }
 
+    /*
     function lueMlVeressa(xid) {
         var ml = 0
         if ((juomat.count > xid) && (xid > -0.5)) {
@@ -153,15 +178,16 @@ Page {
         }
 
         return ml
-    }
+    } // */
 
+    /*
     function mlKehossa(xid, ms) {
         var ml1
 
         ml1 = alkoholiaVeressa(lueJuomanAika(xid), lueMlVeressa(xid), lueJuomanMaara(xid), lueJuomanVahvuus(xid), ms )
 
         return ml1
-    }
+    } // */
 
     function msRajalle(ml0, koko0, vahvuus0, promillea){
         var mlRajalle, hRajalle
@@ -172,13 +198,13 @@ Page {
         return Math.round(hRajalle*tunti)
     }
 
-    function muutaJuoma(id, ms, mlAlkoholia, maara, vahvuus, juomanNimi, juomanKuvaus)     {
+    function muutaJuoma(id, ms, maara, vahvuus, juomanNimi, juomanKuvaus)     { //, mlAlkoholia
         var paiva = new Date(ms).toLocaleDateString(Qt.locale(), Locale.ShortFormat)
         var kello = new Date(ms).toLocaleTimeString(Qt.locale(), kelloMuoto)
 
-        juomat.set(id, {"section": paiva,"juomaaika": kello, "aikaMs": ms,
-                          "mlVeressa": mlAlkoholia, "juomatyyppi": juomanNimi, "juomamaara": maara,
-                          "juomapros": vahvuus});
+        juomat.set(id, {"section": paiva,"juomaaika": kello, "aikaMs": ms, //"mlVeressa": mlAlkoholia,
+                       "juomatyyppi": juomanNimi, "juomamaara": maara,
+                          "juomapros": vahvuus});               
 
         return
     }
@@ -230,9 +256,9 @@ Page {
                      })
 
         dialog.accepted.connect(function() {
-            muutaJuoma(qId, dialog.aika.getTime(), parseFloat(lueMlVeressa(qId)), dialog.maara,
+            muutaJuoma(qId, dialog.aika.getTime(), dialog.maara, //parseFloat(lueMlVeressa(qId)),
                         dialog.vahvuus, dialog.nimi, "")
-            paivitaMlVeressa(dialog.aika.getTime(), qId)
+            //paivitaMlVeressa(dialog.aika.getTime(), qId)
             paivitaPromillet()
             paivitaAjatRajoille()
 
@@ -242,19 +268,34 @@ Page {
     }
 
     function paivitaAjatRajoille() {
-        var ms1, ms0, ml0, koko0, vahvuus0, ind = juomat.count
+        var ms1, ms0, prom = 0, ml0, koko0, vahvuus0, ind = juomat.count
 
+        var nytMs = pvm.getTime()        
+
+        /*
         ms0 = lueJuomanAika(ind-1)
         ml0 = lueMlVeressa(ind-1)
         koko0 = lueJuomanMaara(ind-1)
-        vahvuus0 = lueJuomanVahvuus(ind-1)
+        vahvuus0 = lueJuomanVahvuus(ind-1) // */
+
+        if (ind > 0) {
+            ms0 = lueJuomanAika(ind-1)
+            prom = laskePromillet(ms0+1)
+        } else {
+            ms0 = alkuhetki.getTime()
+            prom = promilleja
+        }
+
+        ml0 = prom2ml(prom)
+
+        //console.log("paivitaAjatRajoille - alkoholia kehossa [ml]" + ml0 + " juomassa " + (lueJuomanMaara(ind-1)*lueJuomanVahvuus(ind-1)/100).toFixed(1))
 
         // selväksi
-        ms1 = ms0 + msRajalle(ml0, koko0, vahvuus0, 0)
+        ms1 = ms0 + msRajalle(ml0, 0, 0, 0) // msRajalle(ml0, koko0, vahvuus0, promillea)
         msSelvana = new Date(ms1)
 
         // ajokuntoon
-        ms1 = ms0 + msRajalle(ml0, koko0, vahvuus0, promilleRaja1)
+        ms1 = ms0 + msRajalle(ml0, 0, 0, promilleRaja1) //msRajalle(ml0, koko0, vahvuus0, promilleRaja1)
         msKunnossa = new Date(ms1)
 
         if ( msSelvana.getTime() > new Date().getTime() )
@@ -272,6 +313,7 @@ Page {
         return
     }
 
+    /*
     function paivitaMlVeressa(ms1, xInd) {
         var ind = etsiPaikka(ms1, xInd)
         var ms0, ml0, koko0, vahvuus0, id1, ml1, koko1, vahvuus1
@@ -299,7 +341,7 @@ Page {
         }
 
         return
-    }
+    } // */
 
     function paivitaPromillet() {
         var nytMs = pvm.getTime()
@@ -322,7 +364,7 @@ Page {
         } else {
             txtPromilleja.color = Theme.highlightColor
             txtPromilleja.font.pixelSize = Theme.fontSizeLarge
-        }
+        }        
 
         return prml
     }
@@ -331,15 +373,19 @@ Page {
         return polttonopeus*paino
     }
 
+    function prom2ml(pro) {
+        return pro*paino*vetta/tiheys
+    }
+
     function uusiJuoma(hetki, mlVeressa, maara, vahvuus, juomanNimi)     {
-        var lisayskohta = etsiPaikka(hetki, juomat.count -1) // mihin kohtaan uusi juoma kuuluu juomien historiassa?
-        var ml0
-        var apu
+        //var lisayskohta = etsiPaikka(hetki, juomat.count -1) // mihin kohtaan uusi juoma kuuluu juomien historiassa?
+        //var ml0
+        //var apu
 
         // lasketaan paljonko veressä on alkoholia juomishetkellä
-        mlVeressa = mlKehossa(lisayskohta-1, hetki)
+        //mlVeressa = mlKehossa(lisayskohta-1, hetki)
 
-        lisaaListaan(hetki, mlVeressa, maara, vahvuus, juomanNimi, "", lisayskohta)
+        lisaaListaan(hetki, mlVeressa, maara, vahvuus, juomanNimi) //
 
         paivitaPromillet();
 
@@ -385,7 +431,7 @@ Page {
                     onClicked: {
                         muutaValittu(valittu);
 
-                        paivitaMlVeressa(lueJuomanAika(valittu)-1, valittu);
+                        //paivitaMlVeressa(lueJuomanAika(valittu)-1, valittu);
                         paivitaPromillet();
                         paivitaAjatRajoille();
 
@@ -404,26 +450,27 @@ Page {
                     visible: false
                     width: 0
                 }
+                /*
                 Label {
                     text: mlVeressa
                     visible: false
                     width: 0
-                }
+                } // */
                 Label {
                     text: juomaaika
-                    width: Theme.fontSizeExtraSmall*6
+                    width: (Theme.fontSizeMedium*3.5).toFixed(0)
                 }
                 Label {
                     text: juomatyyppi
-                    width: Theme.fontSizeExtraSmall*8
+                    width: Theme.fontSizeMedium*7
                 }
                 Label {
                     text: juomamaara
-                    width: Theme.fontSizeExtraSmall*3
+                    width: (Theme.fontSizeMedium*2.5).toFixed(0)
                 }
                 Label {
                     text: juomapros
-                    width: Theme.fontSizeExtraSmall*3
+                    width: (Theme.fontSizeMedium*2.5).toFixed(0)
                 }
 
             } //row
@@ -442,14 +489,19 @@ Page {
             id: column
 
             width: sivu.width
-            spacing: Theme.paddingSmall            
+            spacing: 2 //Theme.paddingSmall
 
             PageHeader {
                 title: qsTr("Demo")
             }
 
+            /*
             SectionHeader {
                 text: qsTr("values not saved, clock not running")
+            } // */
+
+            SectionHeader {
+                text: qsTr("drinker") + " & " + qsTr("starting point")
             }
 
             // sukupuoli ja paino
@@ -459,7 +511,11 @@ Page {
                     text: (vetta*100).toFixed(0)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 100}
-                    onTextChanged: vetta = text/100
+                    onTextChanged: {
+                        vetta = text/100
+                        paivitaPromillet()
+                        paivitaAjatRajoille()
+                    }
                     label: qsTr("water") + " [%]"
                     width: Theme.fontSizeExtraSmall*7
                 }
@@ -468,7 +524,12 @@ Page {
                     text: paino
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 1; top: 1000}
-                    onTextChanged: paino = text*1
+                    onTextChanged: {
+                        paino = text*1
+                        paivitaPromillet()
+                        paivitaAjatRajoille()
+                    }
+
                     label: qsTr("weight") + " [kg]"
                     width: Theme.fontSizeExtraSmall*7
                 }
@@ -497,9 +558,11 @@ Page {
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
                     onTextChanged: {
                         promilleja = text*1.0
+                        paivitaPromillet()
+                        paivitaAjatRajoille()
                     }
                     label: "[‰]"
-                    width: Theme.fontSizeExtraSmall*5
+                    width: (Theme.fontSizeMedium*3.5).toFixed(0) //Theme.fontSizeExtraSmall*5
                 }                
 
                 Label{
@@ -527,10 +590,11 @@ Page {
                             kello0.value = alkuhetki.toLocaleTimeString(Qt.locale(), kelloMuoto)
 
                             paivitaPromillet()
+                            paivitaAjatRajoille()
                         })
                     }
 
-                    width: Theme.fontSizeExtraSmall*7
+                    width: Theme.fontSizeMedium*5
                     value: pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
                     onClicked: {
                             openTimeDialog0()
@@ -553,11 +617,12 @@ Page {
                             value = alkuhetki.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
 
                             paivitaPromillet()
+                            paivitaAjatRajoille()
                         })
                     }
 
                     value: alkuhetki.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-                    width: sivu.width - kello.width - 3*Theme.paddingSmall
+                    width: Theme.fontSizeMedium*8 //sivu.width - kello.width - pohjat.width - Theme.fontSizeMedium*2 - 4*Theme.paddingSmall
                     onClicked: {
                             avaaPaivanValinta()
                     }
@@ -565,6 +630,10 @@ Page {
 
 
 
+            }
+
+            SectionHeader {
+                text: qsTr("current state at ") + " " + kello.value
             }
 
             Row { // promillet
@@ -624,10 +693,11 @@ Page {
                             value = pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
 
                             paivitaPromillet()
+                            paivitaAjatRajoille()
                         })
                     }
 
-                    width: Theme.fontSizeExtraSmall*8
+                    width: Theme.fontSizeSmall*6
                     value: pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
                     onClicked: {
                             openTimeDialog()
@@ -651,11 +721,12 @@ Page {
                             value = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
 
                             paivitaPromillet()
+                            paivitaAjatRajoille()
                         })
                     }
 
                     value: pvm.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-                    width: sivu.width - kello.width - 3*Theme.paddingSmall
+                    width: Theme.fontSizeSmall*8 //sivu.width - kello.width - 3*Theme.paddingSmall
                     onClicked: {
                             avaaPaivanValinta()
                     }
@@ -669,7 +740,7 @@ Page {
 
                 TextField {
                     id: txtJuoma
-                    width: Theme.fontSizeExtraSmall*8
+                    width: Theme.fontSizeMedium*6
                     readOnly: true
                     text: qsTr("beer")
                     onClicked: {
@@ -680,7 +751,7 @@ Page {
                 TextField {
                     id: txtMaara
                     label: "ml"
-                    width: Theme.fontSizeExtraSmall*4
+                    width: Theme.fontSizeMedium*3
                     readOnly: true
                     text: "500"
                     onClicked: {
@@ -691,7 +762,7 @@ Page {
                 TextField {
                     id: voltit
                     label: qsTr("vol-%")
-                    width: Theme.fontSizeExtraSmall*5
+                    width: (Theme.fontSizeMedium*3.5).toFixed(0)
                     readOnly: true
                     text: "4.7"
                     onClicked: {
@@ -700,7 +771,7 @@ Page {
                 }
 
                 Button { //add
-                    width: 100
+                    width: Theme.fontSizeMedium*4
 
                     text: qsTr("cheers!")
                     onClicked: {
@@ -740,19 +811,19 @@ Page {
 
                     Label {
                         text: qsTr("time")
-                        width: Theme.fontSizeExtraSmall*6
+                        width: (Theme.fontSizeMedium*3.5).toFixed(0)
                     }
                     Label {
                         text: qsTr("drink")
-                        width: Theme.fontSizeExtraSmall*8
+                        width: Theme.fontSizeMedium*7
                     }
                     Label {
                         text: "ml"
-                        width: Theme.fontSizeExtraSmall*3
+                        width: (Theme.fontSizeMedium*2.5).toFixed(0)
                     }
                     Label {
                         text: qsTr("vol-%")
-                        width: Theme.fontSizeExtraSmall*3
+                        width: (Theme.fontSizeMedium*2.5).toFixed(0)
                     }
                 }
 
@@ -770,4 +841,3 @@ Page {
     }
 
 }
-

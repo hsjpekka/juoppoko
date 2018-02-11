@@ -45,10 +45,8 @@ CoverBackground {
         promilleja.text = naytaPromillet()
         if (paaikkuna.msKunnossa.getTime() < new Date().getTime()){
             kunnossa.text = ""
-            //kunnossa.label = ""
         } else {
             kunnossa.text = paaikkuna.promilleRaja1 + qsTr(" ‰ at ") + paaikkuna.msKunnossa.toLocaleTimeString(Qt.locale(),"HH:mm")
-            //kunnossa.label = "at " + paaikkuna.msOkAt.toLocaleTimeString(Qt.locale(),"HH:MM")
         }
 
         return
@@ -61,8 +59,6 @@ CoverBackground {
         anchors.bottomMargin: 10
         width: parent.width*0.8
         height: width
-        //x: 0.25*width
-        //y: 0.5*height
         source: "tuoppi.png"
     }
 
@@ -82,17 +78,6 @@ CoverBackground {
         anchors.topMargin: Theme.fontSizeLarge
     }
 
-    /*
-    TextField {
-        id: ok
-        anchors.top: promilleja.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: "sober"
-        label: "at " + paaikkuna.msSoberAt.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-        readOnly: true
-
-    } // */
-
     TextField {
         id: juoma
         anchors.top: kunnossa.bottom
@@ -101,15 +86,13 @@ CoverBackground {
         horizontalAlignment: TextInput.AlignHCenter
         text: "" + paaikkuna.nykyinenJuoma()
         label: paaikkuna.nykyinenMaara() + " ml"
-        //width: Theme.fontSizeSmall*6
-        //width: font.pixelSize*6
-        width: parent.width*0.8//maxStrLen(text, label)*font.pixelSize
+        width: parent.width*0.8
         readOnly: true
     }
 
     Timer {
         id: updateTimer
-        interval: 5*60*1000 // min*s*ms
+        interval: 6*1000 // min*s*ms
         running: true
         repeat: true
         onTriggered: {
@@ -125,19 +108,12 @@ CoverBackground {
         CoverAction {
             iconSource: "image://theme/icon-cover-new"
             onTriggered: {
-                //paaikkuna.newDrink(new Date().getTime(), new Date().getTime(), 0.0, parseInt(paaikkuna.maara.text),
-                  //                 parseFloat(paaikkuna.voltit.text), paaikkuna.drink.text, "")
                 paaikkuna.uusiJuoma(new Date().getTime(), new Date().getTime(), 0.0, paaikkuna.nykyinenMaara(), paaikkuna.nykyinenProsentti(), juoma.text, "")
                 paaikkuna.paivitaAjatRajoille()
+                paivita()
             }
         }
-
-        //CoverAction {
-          //  iconSource: "image://theme/icon-cover-pause"
-        //}
     }
-
-    //Component.onCompleted: update()
 
 }
 

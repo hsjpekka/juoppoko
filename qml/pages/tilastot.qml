@@ -1,14 +1,14 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-//Dialog {
-Page {
-
+Dialog {
+    //id: sivu
     property int paiva: 24*60*60*1000 // ms
     property real tanaan: mlAikana(paiva) // paaikkuna.mlAikana(paiva)
     property real mlViikossa: mlAikana(7*paiva)
     property real mlKuussa: mlAikana(30*paiva) // paaikkuna.mlAikana(30*paiva)
-    //property real mlVuodessa:
+    property int valittuKuvaaja
+    property int ryyppyVrk
 
     function mlAikana(jakso) {
         var nyt = new Date().getTime()
@@ -46,6 +46,22 @@ Page {
 
     }
 
+    function kellonAika(hh,mm) {
+        var mj
+
+        if (hh < 10)
+            mj = "0" + hh + ":"
+        else
+            mj = "" + hh + ":"
+
+        if (mm <10 )
+            mj = mj + "0" + mm
+        else
+            mj = mj + mm
+
+        return mj
+    }
+
     //
     function korostukset() {
 
@@ -80,6 +96,45 @@ Page {
         return
     }
 
+    function valitsePaivaKartta() {
+        if (paivaKartta.checked) {
+            valittuKuvaaja = 0
+            viikkoKuvaaja.checked = false
+            paivaKuvaaja.checked = false
+        } else {
+            valittuKuvaaja = 1
+            viikkoKuvaaja.checked = true
+            paivaKuvaaja.checked = false
+        }
+        return
+    }
+
+    function valitsePaivaKuvaaja() {
+        if (paivaKuvaaja.checked) {
+            valittuKuvaaja = 2
+            viikkoKuvaaja.checked = false
+            paivaKartta.checked = false
+        } else {
+            valittuKuvaaja = 1
+            viikkoKuvaaja.checked = true
+            paivaKartta.checked = false
+        }
+        return
+    }
+
+    function valitseViikkoKuvaaja() {
+        if (viikkoKuvaaja.checked) {
+            valittuKuvaaja = 1
+            paivaKuvaaja.checked = false
+            paivaKartta.checked = false
+        } else {
+            valittuKuvaaja = 2
+            paivaKuvaaja.checked = true
+            paivaKartta.checked = false
+        }
+        return
+    }
+
     SilicaFlickable {
         height: column.height
         width: parent.width
@@ -90,13 +145,46 @@ Page {
             //anchors.leftMargin:
 
 //            DialogHeader {
-            PageHeader {
+            DialogHeader {
                 title: qsTr("Statistics")
             }
 
-                SectionHeader {
-                    text: qsTr("last 24 h")
+            SectionHeader {
+                text: qsTr("chart")
+            }
+
+            ComboBox {
+                label: qsTr("chart")
+                x: parent.width*0.2
+
+                menu: ContextMenu {
+                    id: drinkMenu
+                    MenuItem { text: qsTr("day grid") }
+                    MenuItem { text: qsTr("weekly consumption") }
+                    MenuItem { text: qsTr("daily consumption") }
                 }
+
+                currentIndex: valittuKuvaaja
+
+                onCurrentIndexChanged: {
+                    switch (currentIndex) {
+                    case 0:
+                        valittuKuvaaja = 0
+                        break
+                    case 1:
+                        valittuKuvaaja = 1
+                        break
+                    case 2:
+                        valittuKuvaaja = 2
+                        break
+                    }
+                }
+
+            } //combobox
+
+            SectionHeader {
+                text: qsTr("last 24 h")
+            }
 
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -109,16 +197,16 @@ Page {
             } // päivässä
 
 
-                SectionHeader {
-                    text: qsTr("last week")
-                }
+            SectionHeader {
+                text: qsTr("last week")
+            }
 
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 Label {
                     id: txtViikossa
                     color: Theme.primaryColor
-                    text: mlViikossa + " ml"
+                    text: mlViikossa.toFixed(1) + " ml"
                 }
 
                 Label {
@@ -134,9 +222,9 @@ Page {
             } // viikossa
 
 
-                SectionHeader {
-                    text: qsTr("last month")
-                }
+            SectionHeader {
+                text: qsTr("last month")
+            }
 
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -182,6 +270,39 @@ Page {
                 }                
 
             } // vuodessa
+
+            SectionHeader {
+                text: qsTr("drinking day ends at")
+            }
+
+            ValueButton {
+                id: kello
+                anchors.horizontalCenter: parent.horizontalCenter
+                property int valittuTunti: Math.floor(ryyppyVrk/60)
+                property int valittuMinuutti: ryyppyVrk - valittuTunti*60
+
+                function valitseAika() {
+                    var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                                    hourMode: DateTime.TwentyFourHours,
+                                    hour: valittuTunti,
+                                    minute: valittuMinuutti
+                                 })
+
+                    dialog.accepted.connect(function() {
+                        valittuTunti = dialog.hour
+                        valittuMinuutti = dialog.minute
+                        value = kellonAika(valittuTunti,valittuMinuutti)
+                        ryyppyVrk = valittuTunti*60 + valittuMinuutti
+                    })
+                }
+
+                width: Theme.fontSizeExtraSmall*8
+                value: kellonAika(valittuTunti,valittuMinuutti)
+                onClicked: {
+                        valitseAika()
+                }
+            }
+
 
         }
 

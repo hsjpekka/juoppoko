@@ -35,12 +35,17 @@ Dialog {
     property date aika
     property string nimi
     property string juomanKuvaus
-    property int maara
+    property real maara
+    property real maaraMuutos : 1
     property real vahvuus
-    property int mlLisays
+    property real mlLisays
     property real prosLisays
-    property int tauko : 1.0*1000 // ms
+    property int tauko : 0.8*1000 // ms
     property int i1: 0
+    property real yksikko: 1.0
+    property real ozus: 29.574
+    property real ozimp: 28.413
+    property string yksikkoTunnus: " mL"
     //anchors.fill: parent
 
     function laskeMuutos(mX, x0, Lx){ // mouseX, mouseArea.x, mouseArea.width
@@ -63,12 +68,14 @@ Dialog {
     }
 
     function muutaTilavuus() {
-        maara = Math.floor(maara/mlLisays)*mlLisays
+        var tarkkuus = 0.005
+
+        maara = Math.floor(maara/mlLisays + tarkkuus)*mlLisays
         maara = maara + mlLisays
         if (maara < 0)
             maara = 0
 
-        maaranNaytto.value = maara + " ml"
+        maaranNaytto.value = maara.toFixed(1) + yksikkoTunnus
 
         return
     }
@@ -117,6 +124,7 @@ Dialog {
             id: column
             spacing: Theme.paddingLarge
             width: parent.width
+            anchors.fill: parent
 
             DialogHeader {
                 title: qsTr("Drink")
@@ -210,7 +218,7 @@ Dialog {
 
 
                     // label: "clock"
-                    width: Theme.fontSizeExtraSmall*6
+                    width: Theme.fontSizeMedium*4 //ExtraSmall*6
                     value: aika.toLocaleTimeString(Qt.locale(),"HH:mm")
                     //readOnly: true
                     onClicked: openTimeDialog()
@@ -243,15 +251,91 @@ Dialog {
                 }//
             }
 
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.paddingLarge
+                spacing: Theme.paddingSmall
+
+                Label {
+                    height: yksikonValinta.height
+                    verticalAlignment: Text.AlignVCenter
+                    text: qsTr("unit" + ": ")
+                }
+
+                ComboBox { //tilavuusyksikkö
+                    id: yksikonValinta
+                    width: sivu.width*0.4
+
+                    menu: ContextMenu {
+                        //id: drinkMenu
+                        MenuItem { text: "mL" }
+                        MenuItem { text: "fl oz (US)" }
+                        MenuItem { text: "fl oz (EN)" }
+                        MenuItem { text: "pint (EN)" }
+                        MenuItem { text: "pint (US)" }
+                    }
+
+                    currentIndex: 0
+
+                    onCurrentIndexChanged: {
+                        switch (currentIndex) {
+                        case 0:
+                            yksikko = 1
+                            yksikkoTunnus = " mL"
+                            maaraMuutos = 1
+                            maara = 400
+                            break
+                        case 1:
+                            yksikko = ozus
+                            yksikkoTunnus = " oz"
+                            maaraMuutos = 0.1
+                            maara = 12
+                            break
+                        case 2:
+                            yksikko = ozimp
+                            yksikkoTunnus = " oz"
+                            maaraMuutos = 0.1
+                            maara = 14
+                            break
+                        case 3:
+                            yksikko = ozimp*20
+                            yksikkoTunnus = " pt"
+                            maaraMuutos = 0.1
+                            maara = 1
+                            break
+                        case 4:
+                            yksikko = ozus*16
+                            yksikkoTunnus = " pt"
+                            maaraMuutos = 0.1
+                            maara = 1
+                            break
+                        }
+
+                        yksikkoTxt.text = yksikko + " mL"
+                        maaranNaytto.value = maara + yksikkoTunnus
+
+                        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
+                    }
+
+                } //combobox
+
+                Label {
+                    id: yksikkoTxt
+                    height: yksikonValinta.height
+                    verticalAlignment: Text.AlignVCenter
+                    text: "1 ml"
+                }
+
+            }
+
+
             DetailItem {
                 id: maaranNaytto
                 label: qsTr("volume")
-                value: maara + " ml"
+                value: maara + yksikkoTunnus
             }
 
-            Label {
-                //id: volumeChange
-                //width: volumeLabel.width
+            Label { //tilavuus
                 text: "<<<    <<     <         >     >>    >>>"
                 font.pixelSize: Theme.fontSizeLarge
                 //anchors.fill: parent
@@ -262,7 +346,7 @@ Dialog {
                     preventStealing: true
 
                     onEntered: {
-                        mlLisays = laskeMuutos(mouseX, x, width)
+                        mlLisays = laskeMuutos(mouseX, x, width)*maaraMuutos
                         muutaTilavuus()
                         mlAjastin.running = true
                         mlAjastin.start
@@ -273,7 +357,7 @@ Dialog {
                     }
 
                     onPositionChanged: {
-                        mlLisays = laskeMuutos(mouseX, x, width)
+                        mlLisays = laskeMuutos(mouseX, x, width)*maaraMuutos
                     }
 
                 }
@@ -286,9 +370,7 @@ Dialog {
                 value: vahvuus.toFixed(1) + " vol-%"
             }
 
-            Label {
-                //id: alcChange
-                //width: volumeLabel.width
+            Label { //prosentit
                 text: "<<<    <<     <         >     >>    >>>"
                 font.pixelSize: Theme.fontSizeLarge
                 //anchors.fill: parent
@@ -333,6 +415,7 @@ Dialog {
         if (result == DialogResult.Accepted) {
             nimi = juoma.text
             juomanKuvaus = kuvaus.text
+            maara = maara*yksikko
 
         }
     }

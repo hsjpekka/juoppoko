@@ -89,6 +89,7 @@ Dialog {
                 onClicked: pageStack.push(Qt.resolvedUrl("tietoja.qml"))
 
             }
+
             MenuItem {
                 text: qsTr("restore")
                 onClicked: palautaAlkuarvot()
@@ -268,13 +269,13 @@ Dialog {
 
             }
 
-            /*Row { //paivaraja 1
+            Row { //paivaraja 1
 
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("alempi päiväraja")
-                    label: qsTr("promillea")
+                    text: qsTr("lower daily limit")
+                    label: qsTr("alcohol [ml]")
                 }
 
                 TextField {
@@ -288,13 +289,13 @@ Dialog {
 
             } // */
 
-            /*Row { //paivaraja 2
+            Row { //paivaraja 2
 
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
-                    text: qsTr("ylempi päiväraja")
-                    label: qsTr("promillea")
+                    text: qsTr("upper daily limit")
+                    label: qsTr("alcohol [ml]")
                 }
 
                 TextField {
