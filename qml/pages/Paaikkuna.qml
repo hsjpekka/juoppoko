@@ -1516,10 +1516,8 @@ Page {
 
     //tuplaa merkit ' ja "
     function vaihdaHipsut(mj) {
-        //console.log("vaihdaHipsut " + mj)
         mj = mj.replace(/'/g,"''")
         mj = mj.replace(/"/g,'""')
-        //mj.replace(//g,"`")
         //console.log("vaihdaHipsut2 " + mj)
 
         return mj
@@ -1714,8 +1712,6 @@ Page {
                 }
 
                 Column {
-                    //width: (mlViikkoPylvaanLeveys*3.5).toFixed() //lisäys
-                    //anchors.horizontalCenter: parent.horizontalCenter //lisäys
 
                     Rectangle {
                         id: mlViikkoPylvaanY
@@ -2341,9 +2337,7 @@ Page {
     }// SilicaFlickable
 
     Component.onCompleted: {
-        //var mj = "pageMargin " + Theme.horizontalPageMargin + " padding " + Theme.paddingMedium
         alkutoimet()
-        //console.log(mj)
     }
 }
 

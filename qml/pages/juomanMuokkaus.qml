@@ -186,58 +186,6 @@ Dialog {
             } // */
 
             Row {
-                //anchors.fill: parent
-
-                /*
-                ComboBox {
-                    //id: juoma
-                    width: sivu.width*0.4
-
-                    menu: ContextMenu {
-                        //id: drinkMenu
-                        MenuItem { text: qsTr("-drinks-") }
-                        MenuItem { text: qsTr("beer") }
-                        MenuItem { text: qsTr("wine") }
-                        MenuItem { text: qsTr("cocktail") }
-                        MenuItem { text: qsTr("schnaps") }
-                    }
-
-                    currentIndex: 0
-
-                    onCurrentIndexChanged: {
-                        switch (currentIndex) {
-                        case 0:
-                            break
-                        case 1:
-                            juoma.text = qsTr("beer")
-                            maara = 500
-                            vahvuus = 4.7
-                            break
-                        case 2:
-                            juoma.text = qsTr("wine")
-                            maara = 180
-                            vahvuus = 13
-                            break
-                        case 3:
-                            juoma.text = qsTr("cocktail")
-                            maara = 250
-                            vahvuus = 6.4
-                            break
-                        case 4:
-                            juoma.text = qsTr("schnaps")
-                            maara = 40
-                            vahvuus = 40
-                            break
-                        }
-
-                        maaranNaytto.value = maara + " ml"
-
-                        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
-                    }
-
-                } //combobox
-                // */
-
 
                 TextField {
                     id: juoma
@@ -246,10 +194,6 @@ Dialog {
                     placeholderText: qsTr("Drink")
                     readOnly: false
                     width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
-                    //width: sivu.width - yksikonValinta.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin - Theme.paddingLarge //sivu.width*0.4
-                    //anchors.leftMargin: Theme.paddingLarge
-                    //anchors.rightMargin: Theme.paddingLarge
-                    //x: drink.x + drink.width + parent.spacing
                 }
 
             } //row
@@ -312,28 +256,6 @@ Dialog {
                 }//
 
             }
-
-            /*
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.paddingLarge
-                spacing: Theme.paddingSmall
-
-                Label {
-                    height: yksikonValinta.height
-                    verticalAlignment: Text.AlignVCenter
-                    text: qsTr("unit" + ": ")
-                }
-
-                Label {
-                    id: yksikkoTxt
-                    height: yksikonValinta.height
-                    verticalAlignment: Text.AlignVCenter
-                    text: "1 ml"
-                }
-
-            }
-            // */
 
             Row {
                 spacing: Theme.paddingSmall
@@ -491,7 +413,6 @@ Dialog {
     }
 
     Component.onCompleted: {
-        //console.log("juomanMuokkaus " + tilavuusMitta)
         if (tilavuusMitta == 2) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
             asetaYksikotUsOz()
             yksikonValinta.currentIndex = tilavuusMitta - 1
@@ -507,7 +428,6 @@ Dialog {
         } else
             asetaYksikotMl()
 
-        //console.log("juomanMuokkaus-x " + maaraLabel.width + " " + maaranNaytto.width + " " + Theme.paddingSmall + " - " + Theme.horizontalPageMargin)
     }
 
     onDone: {
