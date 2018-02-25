@@ -30,23 +30,77 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Dialog {
-    id: sivu
+    id: sivu    
 
     property date aika
     property string nimi
     property string juomanKuvaus
     property real maara
     property real maaraMuutos : 1
+    property int maaraDesimaaleja: 0
     property real vahvuus
     property real mlLisays
     property real prosLisays
     property int tauko : 0.8*1000 // ms
     property int i1: 0
     property real yksikko: 1.0
-    property real ozus: 29.574
-    property real ozimp: 28.413
-    property string yksikkoTunnus: " mL"
+    property real ozUs: 29.574
+    property real pintUs: 16*ozUs
+    property real ozImp: 28.413
+    property real pintImp: 20*ozImp
+    property string yksikkoTunnus: " ml"
+    property int tilavuusMitta//: 1 // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
     //anchors.fill: parent
+
+    function asetaYksikotMl() {
+        maara = maara*yksikko
+        yksikko = 1
+        yksikkoTunnus = " mL"
+        maaraMuutos = 1
+        maaraDesimaaleja = 0
+        tilavuusMitta = 1
+        return
+    }
+
+    function asetaYksikotImpOz() {
+        maara = maara*yksikko/ozImp
+        yksikko = ozImp
+        yksikkoTunnus = " oz"
+        maaraMuutos = 0.1
+        maaraDesimaaleja = 1
+        tilavuusMitta = 3
+        return
+    }
+
+    function asetaYksikotImpPint() {
+        maara = maara*yksikko/pintImp
+        yksikko = pintImp
+        yksikkoTunnus = " pt"
+        maaraMuutos = 0.1
+        maaraDesimaaleja = 1
+        tilavuusMitta = 4
+        return
+    }
+
+    function asetaYksikotUsOz() {
+        maara = maara*yksikko/ozUs
+        yksikko = ozUs
+        yksikkoTunnus = " oz"
+        maaraMuutos = 0.1
+        maaraDesimaaleja = 1
+        tilavuusMitta = 2
+        return
+    }
+
+    function asetaYksikotUsPint() {
+        maara = maara*yksikko/pintUs
+        yksikko = pintUs
+        yksikkoTunnus = " pt"
+        maaraMuutos = 0.1
+        maaraDesimaaleja = 1
+        tilavuusMitta = 5
+        return
+    }
 
     function laskeMuutos(mX, x0, Lx){ // mouseX, mouseArea.x, mouseArea.width
         var arvo = 0, dx1
@@ -75,7 +129,8 @@ Dialog {
         if (maara < 0)
             maara = 0
 
-        maaranNaytto.value = maara.toFixed(1) + yksikkoTunnus
+        //maaranNaytto.value = maara.toFixed(1) + yksikkoTunnus
+        maaranNaytto.text = maara.toFixed(1) // + yksikkoTunnus
 
         return
     }
@@ -133,6 +188,7 @@ Dialog {
             Row {
                 //anchors.fill: parent
 
+                /*
                 ComboBox {
                     //id: juoma
                     width: sivu.width*0.4
@@ -180,12 +236,17 @@ Dialog {
                     }
 
                 } //combobox
+                // */
+
 
                 TextField {
                     id: juoma
                     text: nimi
+                    labelVisible: false
+                    placeholderText: qsTr("Drink")
                     readOnly: false
-                    width: sivu.width*0.4
+                    width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
+                    //width: sivu.width - yksikonValinta.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin - Theme.paddingLarge //sivu.width*0.4
                     //anchors.leftMargin: Theme.paddingLarge
                     //anchors.rightMargin: Theme.paddingLarge
                     //x: drink.x + drink.width + parent.spacing
@@ -218,7 +279,7 @@ Dialog {
 
 
                     // label: "clock"
-                    width: Theme.fontSizeMedium*4 //ExtraSmall*6
+                    width: Theme.fontSizeSmall*6 //ExtraSmall*6 //font.pixelSize*5 //
                     value: aika.toLocaleTimeString(Qt.locale(),"HH:mm")
                     //readOnly: true
                     onClicked: openTimeDialog()
@@ -244,13 +305,15 @@ Dialog {
                     //label: "Date"
                     value: aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
                     //text: aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-                    width: sivu.width - kello.width - 3*Theme.paddingSmall
+                    width: Theme.fontSizeSmall*8 //font.pixelSize*8
                     //readOnly: true
                     //font.pixelSize: Theme.fontSizeExtraSmall
                     onClicked: openDateDialog()
                 }//
+
             }
 
+            /*
             Row {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingLarge
@@ -262,63 +325,6 @@ Dialog {
                     text: qsTr("unit" + ": ")
                 }
 
-                ComboBox { //tilavuusyksikkö
-                    id: yksikonValinta
-                    width: sivu.width*0.4
-
-                    menu: ContextMenu {
-                        //id: drinkMenu
-                        MenuItem { text: "mL" }
-                        MenuItem { text: "fl oz (US)" }
-                        MenuItem { text: "fl oz (EN)" }
-                        MenuItem { text: "pint (EN)" }
-                        MenuItem { text: "pint (US)" }
-                    }
-
-                    currentIndex: 0
-
-                    onCurrentIndexChanged: {
-                        switch (currentIndex) {
-                        case 0:
-                            yksikko = 1
-                            yksikkoTunnus = " mL"
-                            maaraMuutos = 1
-                            maara = 400
-                            break
-                        case 1:
-                            yksikko = ozus
-                            yksikkoTunnus = " oz"
-                            maaraMuutos = 0.1
-                            maara = 12
-                            break
-                        case 2:
-                            yksikko = ozimp
-                            yksikkoTunnus = " oz"
-                            maaraMuutos = 0.1
-                            maara = 14
-                            break
-                        case 3:
-                            yksikko = ozimp*20
-                            yksikkoTunnus = " pt"
-                            maaraMuutos = 0.1
-                            maara = 1
-                            break
-                        case 4:
-                            yksikko = ozus*16
-                            yksikkoTunnus = " pt"
-                            maaraMuutos = 0.1
-                            maara = 1
-                            break
-                        }
-
-                        yksikkoTxt.text = yksikko + " mL"
-                        maaranNaytto.value = maara + yksikkoTunnus
-
-                        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
-                    }
-
-                } //combobox
-
                 Label {
                     id: yksikkoTxt
                     height: yksikonValinta.height
@@ -327,13 +333,86 @@ Dialog {
                 }
 
             }
+            // */
+
+            Row {
+                spacing: Theme.paddingSmall
+                x: 0.5*(sivu.width - maaraLabel.width - maaranNaytto.width - yksikonValinta.width - 2*spacing) //
+                //padding: Theme.paddingMedium
 
 
+                Label {
+                    id: maaraLabel
+                    text: qsTr("volume")
+                    width: font.pixelSize*4
+                    //anchors.verticalCenterOffset: 4
+                    height: yksikonValinta.height
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                Label {
+                    id: maaranNaytto
+                    width: font.pixelSize*3 //ExtraSmall*6
+                    text: maara.toFixed(maaraDesimaaleja)// + yksikkoTunnus
+                    //anchors.verticalCenterOffset: 0.3*font.pixelSize
+                    height: yksikonValinta.height
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignRight
+                }
+
+                ComboBox { //tilavuusyksikkö
+                    id: yksikonValinta
+                    //width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin - maaraLabel.width - maaranNaytto.width - 2*Theme.paddingMedium
+                    width: Theme.fontSizeSmall*7// font.pixelSize*8
+                    //height: Theme.fontSizeSmall
+
+                    menu: ContextMenu {
+                        //id: drinkMenu
+                        MenuItem { text: "mL" }
+                        MenuItem { text: "oz (US)" }
+                        MenuItem { text: "oz (EN)" }
+                        MenuItem { text: "pint (EN)" }
+                        MenuItem { text: "pint (US)" }
+                    }
+
+                    currentIndex: 0
+
+                    onCurrentIndexChanged: {
+                        switch (currentIndex) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
+                        case 0:
+                            asetaYksikotMl()
+                            break
+                        case 1:
+                            asetaYksikotUsOz()
+                            break
+                        case 2:
+                            asetaYksikotImpOz()
+                            break
+                        case 3:
+                            asetaYksikotImpPint()
+                            break
+                        case 4:
+                            asetaYksikotUsPint()
+                            break
+                        }
+
+                        //yksikkoTxt.text = yksikko + " mL"
+                        //maaranNaytto.value = maara.toFixed(maaraDesimaaleja) + yksikkoTunnus
+                        maaranNaytto.text = maara.toFixed(maaraDesimaaleja) // + yksikkoTunnus
+
+                        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
+                    }
+
+                } //combobox
+
+            }
+
+            /*
             DetailItem {
                 id: maaranNaytto
                 label: qsTr("volume")
-                value: maara + yksikkoTunnus
-            }
+                value: maara.toFixed(maaraDesimaaleja) + yksikkoTunnus
+            } // */
 
             Label { //tilavuus
                 text: "<<<    <<     <         >     >>    >>>"
@@ -409,6 +488,26 @@ Dialog {
 
 
         }//column
+    }
+
+    Component.onCompleted: {
+        //console.log("juomanMuokkaus " + tilavuusMitta)
+        if (tilavuusMitta == 2) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
+            asetaYksikotUsOz()
+            yksikonValinta.currentIndex = tilavuusMitta - 1
+        } else if (tilavuusMitta == 3) {
+            asetaYksikotImpOz()
+            yksikonValinta.currentIndex = tilavuusMitta - 1
+        } else if (tilavuusMitta == 4) {
+            asetaYksikotImpPint()
+            yksikonValinta.currentIndex = tilavuusMitta - 1
+        } else if (tilavuusMitta == 5) {
+            asetaYksikotUsPint()
+            yksikonValinta.currentIndex = tilavuusMitta - 1
+        } else
+            asetaYksikotMl()
+
+        //console.log("juomanMuokkaus-x " + maaraLabel.width + " " + maaranNaytto.width + " " + Theme.paddingSmall + " - " + Theme.horizontalPageMargin)
     }
 
     onDone: {

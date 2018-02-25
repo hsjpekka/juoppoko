@@ -252,26 +252,6 @@
         <translation>Juoma</translation>
     </message>
     <message>
-        <source>-drinks-</source>
-        <translation>-juomia-</translation>
-    </message>
-    <message>
-        <source>beer</source>
-        <translation>olut</translation>
-    </message>
-    <message>
-        <source>wine</source>
-        <translation>viini</translation>
-    </message>
-    <message>
-        <source>cocktail</source>
-        <translation>cocktail</translation>
-    </message>
-    <message>
-        <source>schnaps</source>
-        <translation>paukku</translation>
-    </message>
-    <message>
         <source>volume</source>
         <translation>tilavuus</translation>
     </message>
@@ -282,10 +262,6 @@
     <message>
         <source>some notes?</source>
         <translation>muuta?</translation>
-    </message>
-    <message>
-        <source>unit: </source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

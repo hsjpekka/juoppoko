@@ -33,7 +33,8 @@ import QtQuick.LocalStorage 2.0
 Page {
     id: sivu
 
-    anchors.leftMargin: 0.05*width
+    anchors.fill: parent
+    //anchors.leftMargin: 0.05*width
     property date pvm: new Date() // kello- ja päiväkohdissa oleva aika (sekunnit ja millisekunnit = 0.0, alustusta lukuunottamatta )
     property string kelloMuoto: "HH:mm"
     property real polttonopeus: 0.1267 // ml/kg/h -- 1 g/10 kg/h = 1.267 ml/10 kg/h
@@ -54,7 +55,7 @@ Page {
     property date msSelvana: new Date()
     property date msKunnossa: new Date()
     property string juomanKuvaus: ""
-    property int kuvaajanKorkeus: 121
+    property int kuvaajanKorkeus: height/8
     property int pikkuKirjainKoko: Theme.fontSizeExtraSmall //24
     property int isoKirjainKoko: Theme.fontSizeSmall //28
 
@@ -92,6 +93,10 @@ Page {
     property string tunnusVsRaja2: "vuosiraja2"
     property int vsRaja2: 20000 // ml alkoholia
     property bool luettuVsRaja2: false
+    property string tunnusTilavuusMitta: "tilavuusMitta"
+    property int arvoTilavuusMitta: 1 // juoman tilavuusyksikkö juomien syöttöikkunassa, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
+    property bool luettuYksikko: false
+
 
     //hakusana "paino"
     property int massa: 84
@@ -135,7 +140,7 @@ Page {
     function alkutoimet() {
         var ehto = 0               
 
-        console.log("alkutoimet: napin leveys " + kulautus.width + " / " + sivu.width)
+//        console.log("alkutoimet: napin leveys " + kulautus.width + " / " + sivu.width)
 
         aikaVyohyke = new Date().getTimezoneOffset()
 
@@ -384,6 +389,9 @@ Page {
     function lisaaDbJuodut(xid, hetki, mlVeressa, maara, vahvuus, juomanNimi, juomanKuvaus) {
 
         if(db == null) return;
+
+        juomanNimi = vaihdaHipsut(juomanNimi)
+        juomanKuvaus = vaihdaHipsut(juomanKuvaus)
 
         var komento = "INSERT INTO juodut (id, aika, veressa, tilavuus, prosenttia, juoma, kuvaus)" +
                 " VALUES (" + xid + ", " + hetki + ", " + mlVeressa + ", " + maara + ", " +
@@ -725,6 +733,10 @@ Page {
                         vrkVaihtuu = taulukko.rows[i].arvo;
                         luettuVrkVaihtuu = true;
                     }
+                    else if (taulukko.rows[i].asia == tunnusTilavuusMitta ) {
+                        arvoTilavuusMitta = taulukko.rows[i].arvo;
+                        luettuYksikko = true;
+                    }
                 }
 
                 if(taulukko.rows.length <= 0){
@@ -752,6 +764,9 @@ Page {
                         uusiAsetus(tunnusKuvaaja, nakyvaKuvaaja)
                     if (!luettuVrkVaihtuu)
                         uusiAsetus(tunnusVrkVaihdos, vrkVaihtuu)
+                    if (!luettuYksikko)
+                        uusiAsetus(tunnusTilavuusMitta, arvoTilavuusMitta)
+
                 }
 
             });
@@ -1020,6 +1035,9 @@ Page {
     }
 
     function muutaDbJuodut(xid, hetki, mlVeressa, maara, vahvuus, juomanNimi, juomanKuvaus) {
+        juomanNimi = vaihdaHipsut(juomanNimi)
+        juomanKuvaus = vaihdaHipsut(juomanKuvaus)
+
         var komento = "UPDATE juodut SET aika = " + hetki + ", veressa = " + mlVeressa + ", tilavuus = " + maara + ", prosenttia = " + vahvuus +", juoma = '"
                 + juomanNimi + "', kuvaus = '" + juomanKuvaus +"'  WHERE id = " + xid
         if(db == null) return;
@@ -1054,12 +1072,15 @@ Page {
         var pv0 = pvm.getDate(), kk0 = pvm.getMonth(), vs0 = pvm.getFullYear()
         var h0 = pvm.getHours(), m0 = pvm.getMinutes()
 
+        //console.log("muutaUusi " + tunnusTilavuusMitta + " " + arvoTilavuusMitta);
+
         var dialog = pageStack.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
                         "aika": pvm,
                         "nimi": txtJuoma.text,
                         "maara": txtMaara.text,
                         "vahvuus": voltit.text,
-                        "juomanKuvaus": juomanKuvaus
+                        "juomanKuvaus": juomanKuvaus,
+                        "tilavuusMitta": arvoTilavuusMitta
                      })
 
         dialog.accepted.connect(function() {
@@ -1084,8 +1105,15 @@ Page {
             voltit.text = (dialog.vahvuus).toFixed(1)
             juomanKuvaus = dialog.juomanKuvaus
 
+            if (dialog.tilavuusMitta != arvoTilavuusMitta) {
+                arvoTilavuusMitta = dialog.tilavuusMitta
+                paivitaAsetukset()
+            }
+
             return
         })
+
+        //console.log("muutaUusi-x " + tunnusTilavuusMitta + " " + arvoTilavuusMitta);
 
         return
     }
@@ -1100,10 +1128,11 @@ Page {
                         "nimi": lueJuomanTyyppi(qId),
                         "maara": vanhaMaara,
                         "vahvuus": vanhaVahvuus,
-                        "juomanKuvaus": juomanKuvaus
+                        "juomanKuvaus": juomanKuvaus,
+                        "tilavuusMitta": arvoTilavuusMitta
                      })
 
-        dialog.accepted.connect(function() {
+        dialog.accepted.connect(function() {            
             muutaJuoma(qId, dialog.aika.getTime(), parseFloat(lueMlVeressa(qId)), dialog.maara,
                         dialog.vahvuus, dialog.nimi, dialog.juomanKuvaus)
             juomanKuvaus = dialog.juomanKuvaus            
@@ -1111,7 +1140,10 @@ Page {
             paivitaPromillet()
             paivitaAjatRajoille()
             paivitaKuvaaja()
-
+            if (dialog.tilavuusMitta != arvoTilavuusMitta) {
+                arvoTilavuusMitta = dialog.tilavuusMitta
+                paivitaAsetukset()
+            }
         })
 
         return
@@ -1218,11 +1250,15 @@ Page {
                               "  WHERE asia = '" + tunnusKuvaaja + "'");
                 tx.executeSql("UPDATE asetukset SET arvo = " + vrkVaihtuu +
                               "  WHERE asia = '" + tunnusVrkVaihdos + "'");
+                tx.executeSql("UPDATE asetukset SET arvo = " + arvoTilavuusMitta +
+                              "  WHERE asia = '" + tunnusTilavuusMitta + "'");
             });
         } catch (err) {
             console.log("Error modifying asetukset-table in database: " + err);
             virheet = virheet + "Error modifying asetukset-table in database: " + err +" <br> "
         };
+
+        //console.log("paivitaAsetukset "  + arvoTilavuusMitta + " " + tunnusTilavuusMitta);
 
         return
     }
@@ -1412,6 +1448,8 @@ Page {
                               " VALUES ('" + tunnusKuvaaja + "', " + nakyvaKuvaaja +")" )
                 tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
                               " VALUES ('" + tunnusVrkVaihdos + "', " + vrkVaihtuu +")" )
+                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
+                              " VALUES ('" + tunnusTilavuusMitta + "', " + arvoTilavuusMitta +")" )
             })
         } catch (err) {
             console.log("Error adding to asetukset-table in database: " + err);
@@ -1423,6 +1461,7 @@ Page {
     }
 
     function uusiAsetus(tunnus, arvo){
+        //console.log("uusiAsetus " + tunnus + " " + arvo);
         if(db == null) return;
 
         try {
@@ -1473,6 +1512,17 @@ Page {
         kansi.update();
 
         return;
+    }
+
+    //tuplaa merkit ' ja "
+    function vaihdaHipsut(mj) {
+        //console.log("vaihdaHipsut " + mj)
+        mj = mj.replace(/'/g,"''")
+        mj = mj.replace(/"/g,'""')
+        //mj.replace(//g,"`")
+        //console.log("vaihdaHipsut2 " + mj)
+
+        return mj
     }
 
     // hetki = ms GMT
@@ -1987,7 +2037,8 @@ Page {
             SilicaListView {
                 id: kuvaaja
                 height: kuvaajanKorkeus + Theme.fontSizeExtraSmall + 7
-                width: sivu.width - 2*sivu.anchors.leftMargin //parent.width                
+                //width: sivu.width - 2*sivu.anchors.leftMargin //parent.width
+                width: sivu.width - 2*Theme.horizontalPageMargin
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: ListView.Horizontal
                 visible: (nakyvaKuvaaja < 0.5 || nakyvaKuvaaja > 1.5) ? false : true
@@ -2178,11 +2229,11 @@ Page {
             } // aika
 
             Row { //lisattava juoma
-                spacing: 2
+                spacing: 0
 
                 TextField {
                     id: txtJuoma
-                    width: Theme.fontSizeMedium*6 //Theme.fontSizeExtraSmall*8
+                    width: Theme.fontSizeMedium*5.8 //Theme.fontSizeExtraSmall*8
                     readOnly: true
                     text: qsTr("beer")
                     onClicked: {
@@ -2204,7 +2255,7 @@ Page {
                 TextField {
                     id: voltit
                     label: qsTr("vol-%")
-                    width: (Theme.fontSizeMedium*3.5).toFixed(0) //Theme.fontSizeExtraSmall*5
+                    width: (Theme.fontSizeMedium*3.7).toFixed(0) //Theme.fontSizeExtraSmall*5
                     readOnly: true
                     text: "4.7"
                     onClicked: {
@@ -2290,8 +2341,9 @@ Page {
     }// SilicaFlickable
 
     Component.onCompleted: {
-
+        //var mj = "pageMargin " + Theme.horizontalPageMargin + " padding " + Theme.paddingMedium
         alkutoimet()
+        //console.log(mj)
     }
 }
 
