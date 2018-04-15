@@ -660,8 +660,6 @@ Page {
         } else
             otsikonLeveys = leveys
 
-        //console.log("lisaaViikkoJaksoon - leveys " + leveys + " " + isoKirjainKoko + " " + Theme.fontSizeMedium)
-
         if ( (monesko >= sarja.count) || (sarja.count == 0) ) {
             vari = jaksonVari(maara)
             sarja.append({"mlViikkoPylvasArvo": maara*skaala, "mlViikkoPylvasAika": merkki, "mlViikkoPylvasTunnus": id, "mlViikkoPylvaanVari": vari,
@@ -1072,8 +1070,6 @@ Page {
         var pv0 = pvm.getDate(), kk0 = pvm.getMonth(), vs0 = pvm.getFullYear()
         var h0 = pvm.getHours(), m0 = pvm.getMinutes()
 
-        //console.log("muutaUusi " + tunnusTilavuusMitta + " " + arvoTilavuusMitta);
-
         var dialog = pageStack.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
                         "aika": pvm,
                         "nimi": txtJuoma.text,
@@ -1112,8 +1108,6 @@ Page {
 
             return
         })
-
-        //console.log("muutaUusi-x " + tunnusTilavuusMitta + " " + arvoTilavuusMitta);
 
         return
     }
@@ -1258,8 +1252,6 @@ Page {
             virheet = virheet + "Error modifying asetukset-table in database: " + err +" <br> "
         };
 
-        //console.log("paivitaAsetukset "  + arvoTilavuusMitta + " " + tunnusTilavuusMitta);
-
         return
     }
 
@@ -1402,26 +1394,6 @@ Page {
         return;
     }
 
-    function tyhjennaTaulukko(taulukko) {
-
-        if(db == null) return;
-
-        if (taulukko == ""){
-            taulukko = "juomari"
-        }
-
-        try {
-            db.transaction(function(tx){
-                    tx.executeSql('DELETE FROM ' + taulukko); // WHERE condition
-            });
-        } catch (err) {
-            console.log("Error deleting table " + taulukko + " in database: " + err);
-            virheet = virheet + "Error deleting tables in database: " + err +" <br> "
-        };
-
-        return
-    }
-
     function uusiAsetukset() {
 
         if(db == null) return;
@@ -1461,7 +1433,6 @@ Page {
     }
 
     function uusiAsetus(tunnus, arvo){
-        //console.log("uusiAsetus " + tunnus + " " + arvo);
         if(db == null) return;
 
         try {
@@ -1518,7 +1489,6 @@ Page {
     function vaihdaHipsut(mj) {
         mj = mj.replace(/'/g,"''")
         mj = mj.replace(/"/g,'""')
-        //console.log("vaihdaHipsut2 " + mj)
 
         return mj
     }

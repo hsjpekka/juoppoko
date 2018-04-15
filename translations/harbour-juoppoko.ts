@@ -234,15 +234,15 @@
     </message>
     <message>
         <source>drinker</source>
-        <translation type="unfinished"></translation>
+        <translation>juomari</translation>
     </message>
     <message>
         <source>starting point</source>
-        <translation type="unfinished"></translation>
+        <translation>pohjia</translation>
     </message>
     <message>
         <source>current state at </source>
-        <translation type="unfinished"></translation>
+        <translation>humalatila klo </translation>
     </message>
 </context>
 <context>
