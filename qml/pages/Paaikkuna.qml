@@ -2210,7 +2210,7 @@ Page {
                 TextField {
                     id: txtMaara
                     label: "ml"
-                    width: Theme.fontSizeMedium*3 //Theme.fontSizeExtraSmall*4
+                    width: Theme.fontSizeMedium*4 //Theme.fontSizeExtraSmall*4
                     readOnly: true
                     text: "500"
                     onClicked: {

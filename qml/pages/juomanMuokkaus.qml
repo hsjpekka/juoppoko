@@ -41,7 +41,8 @@ Dialog {
     property real vahvuus
     property real mlLisays
     property real prosLisays
-    property int tauko : 0.8*1000 // ms
+    property int tauko0 : 0.8*1000 // ms
+    property int tauko: tauko0
     property int i1: 0
     property real yksikko: 1.0
     property real ozUs: 29.574
@@ -107,16 +108,23 @@ Dialog {
         dx1 = mX-x0
         if (dx1 < 0.17*Lx){
             arvo = -100
+            tauko = tauko0*(0.3 + 0.8*dx1/(0.17*Lx))
         } else if (dx1 < 0.34*Lx){
             arvo = -10
+            tauko = tauko0*(0.3 + 0.8*(dx1-0.17*Lx)/(0.17*Lx))
         } else if (dx1 < 0.5*Lx){
             arvo = -1
+            tauko = tauko0*(0.3 + 0.8*(dx1-0.34*Lx)/(0.16*Lx))
         } else if (dx1 < 0.66*Lx){
             arvo = 1
+            tauko = tauko0*(1 - 0.8*(dx1-0.5*Lx)/(0.16*Lx))
         } else if (dx1 < 0.83*Lx){
             arvo = 10
-        } else
+            tauko = tauko0*(1 - 0.8*(dx1-0.66*Lx)/(0.17*Lx))
+        } else {
             arvo = 100
+            tauko = tauko0*(1 - 0.8*(dx1-0.83*Lx)/(0.17*Lx))
+        }
 
         return arvo
     }
@@ -185,8 +193,6 @@ Dialog {
                 title: qsTr("Drink")
             } // */
 
-            Row {
-
                 TextField {
                     id: juoma
                     text: nimi
@@ -195,9 +201,6 @@ Dialog {
                     readOnly: false
                     width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
                 }
-
-            } //row
-
 
             Row { // time
 
@@ -257,7 +260,7 @@ Dialog {
 
             }
 
-            Row {
+            Row { // määrä
                 spacing: Theme.paddingSmall
                 x: 0.5*(sivu.width - maaraLabel.width - maaranNaytto.width - yksikonValinta.width - 2*spacing) //
                 //padding: Theme.paddingMedium
@@ -329,21 +332,68 @@ Dialog {
 
             }
 
-            /*
-            DetailItem {
-                id: maaranNaytto
-                label: qsTr("volume")
-                value: maara.toFixed(maaraDesimaaleja) + yksikkoTunnus
-            } // */
+            Item { // määrän muutos
+                width: sivu.width
+                height: txtTilavuusMuutos1.height
 
-            Label { //tilavuus
-                text: "<<<    <<     <         >     >>    >>>"
-                font.pixelSize: Theme.fontSizeLarge
-                //anchors.fill: parent
-                anchors.horizontalCenter: parent.horizontalCenter
+                Row {
+                    x: sivu.anchors.leftMargin > 0 ? sivu.anchors.leftMargin : Theme.paddingLarge
+                    spacing: (sivu.width - 2*x - 6*txtTilavuusMuutos1.width)/5
+
+                    Label {
+                        id: txtTilavuusMuutos1
+                        text: "<<<"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: font.pixelSize*2
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        //id: txtTilavuusMuutos2
+                        text: "<<"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtTilavuusMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        //id: txtTilavuusMuutos3
+                        text: "<"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtTilavuusMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        //id: txtTilavuusMuutos4
+                        text: ">"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtTilavuusMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        //id: txtTilavuusMuutos5
+                        text: ">>"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtTilavuusMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        //id: txtTilavuusMuutos6
+                        text: ">>>"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtTilavuusMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                }// volumeChange */
 
                 MouseArea {
                     anchors.fill: parent
+                    width: sivu.width
+                    height: txtTilavuusMuutos1.height
                     preventStealing: true
 
                     onEntered: {
@@ -363,7 +413,7 @@ Dialog {
 
                 }
 
-            }// volumeChange */
+            }
 
             DetailItem {
                 id: prosenntienNaytto
@@ -371,11 +421,58 @@ Dialog {
                 value: vahvuus.toFixed(1) + " vol-%"
             }
 
-            Label { //prosentit
-                text: "<<<    <<     <         >     >>    >>>"
-                font.pixelSize: Theme.fontSizeLarge
-                //anchors.fill: parent
-                anchors.horizontalCenter: parent.horizontalCenter
+            Item { // tilavuuden muutos
+                width: sivu.width
+                height: txtProsMuutos1.height
+
+                Row { //tilavuus
+                    x: sivu.anchors.leftMargin > 0 ? sivu.anchors.leftMargin : Theme.paddingLarge
+                    spacing: (sivu.width - 2*x - 6*txtProsMuutos1.width)/5
+
+                    Label {
+                        id: txtProsMuutos1
+                        text: "<<<"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: font.pixelSize*2
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        text: "<<"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtProsMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        text: "<"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtProsMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        text: ">"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtProsMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        text: ">>"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtProsMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        text: ">>>"
+                        font.pixelSize: Theme.fontSizeLarge
+                        width: txtProsMuutos1.width
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                }
 
                 MouseArea {
                     anchors.fill: parent
@@ -391,7 +488,6 @@ Dialog {
                         prosAjastin.running = false
                         prosAjastin.stop
                     }
-
                     onPositionChanged: {
                         prosLisays = laskeMuutos(mouseX, x, width)/10
                     }
