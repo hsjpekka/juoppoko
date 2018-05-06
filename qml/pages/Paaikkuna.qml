@@ -29,6 +29,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
+import "../scripts/unTap.js" as UnTpd
 
 Page {
     id: sivu
@@ -75,6 +76,8 @@ Page {
     property string tunnusProm2: "ajoraja2"
     property real promilleRaja2: 1.0 // 1.0 = 1 promille
     property bool luettuPromilleRaja2: false
+    property string tunnusUnTappdToken: "untappdtoken"
+    property bool luettuUnTpToken: false
     property string tunnusVrkRaja1: "paivaraja1"
     property int vrkRaja1: 120 // ml alkoholia
     property bool luettuVrkRaja1: false
@@ -97,6 +100,10 @@ Page {
     property int arvoTilavuusMitta: 1 // juoman tilavuusyksikkö juomien syöttöikkunassa, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
     property bool luettuYksikko: false
 
+    property string beerId: "" // oluen unTappd-tunnus
+    property int beerStars: 0 // oluen maku
+    property string barId: "" // baarin unTappd-tunnus
+    property string baariNimi: ""
 
     //hakusana "paino"
     property int massa: 84
@@ -146,6 +153,7 @@ Page {
 
         avaaDb();
         lueAsetukset();
+        lueAsetukset2();
         ehto = lueJuomari();
 
         lueSuosikit();
@@ -176,6 +184,7 @@ Page {
             };
 
         luoDbAsetukset();
+        luoDbAsetukset2();
         luoDbJuomari();
         luoDbJuodut();
         luoDbSuosikit();
@@ -370,6 +379,12 @@ Page {
             vsRaja2 = dialog.vuosi2
 
             paivitaAsetukset()
+
+            paivitaAsetus2(tunnusUnTappdToken, UnTpd.unTpToken)
+            if (UnTpd.unTpToken == "")
+                unTappdrivi.visible = false
+            else
+                unTappdrivi.visible = true
         })
 
         return
@@ -491,8 +506,8 @@ Page {
             lisaaMlPaivaKuvaajaan(hetki - vrkVaihtuu*minuutti, maara, vahvuus)
         else if (nakyvaKuvaaja > 0.5)
             lisaaMlViikkoKuvaajaan(hetki - vrkVaihtuu*minuutti, maara, vahvuus)
-        else
-            lisaaPaiviaKuvaajaan(hetki - vrkVaihtuu*minuutti, maara, vahvuus)
+        //else //ei ruudukkoa
+            //lisaaPaiviaKuvaajaan(hetki - vrkVaihtuu*minuutti, maara, vahvuus)
 
         return
     }
@@ -555,6 +570,7 @@ Page {
         return
     }
 
+    /*
     // sarja = kuvaajan id, monesko = 0-N - järjestys kuvaajassa, merkki = pylvään alla näkyvä teksti,
     // id = piirrettävän pylvään tunnus, jakso = väliotsikko
     function lisaaPaiviaJaksoon(sarja, monesko, merkki, id, jakso, mlMa, mlTi, mlKe, mlTo, mlPe, mlLa, mlSu) {
@@ -594,7 +610,9 @@ Page {
 
         return
     }
+    // */
 
+    /*
     function lisaaPaiviaKuvaajaan(hetki, maara, vahvuus){
         var vk1, vkJuoma, i, pv1g = viikonPaiva(0), pvJuoma, vuosi = new Date(hetki).getFullYear()
         var mlMa = 0, mlTi = 0, mlKe = 0, mlTo = 0, mlPe = 0, mlLa = 0, mlSu = 0
@@ -640,7 +658,7 @@ Page {
 
         return
 
-    }
+    } // */
 
     // sarja = kuvaajan id, monesko = 0-N - järjestys kuvaajassa, maara = piirrettavan pylvaan korkeus, merkki = pylvään alla näkyvä teksti,
     // id = piirrettävän pylvään tunnus, jakso = väliotsikko
@@ -772,6 +790,38 @@ Page {
         } catch (err) {
             console.log("Error adding to juodut-table in database: " + err);
             virheet = virheet + "Error adding to juodut-table in database: " + err +" <br> "
+
+        }
+
+        return luettu
+    }
+
+    function lueAsetukset2() {
+        var luettu = 0
+
+        if(db == null) return luettu;
+
+        try {
+            db.transaction(function(tx) {
+                var taulukko  = tx.executeSql("SELECT asia, arvo FROM asetukset2");
+
+                while (luettu < taulukko.rows.length) {
+                    if (taulukko.rows[luettu].asia == tunnusUnTappdToken ){
+                        UnTpd.unTpToken = taulukko.rows[luettu].arvo;
+                        luettuUnTpToken = true;
+                    }
+
+                    luettu++;
+                }
+
+                if (!luettuUnTpToken)
+                    uusiAsetus2(tunnusUnTappdToken, "")
+
+            });
+
+        } catch (err) {
+            console.log("Error reading from asetukset2-table in database: " + err);
+            virheet = virheet + "Error reading from asetukset2-table in database: " + err +" <br> "
 
         }
 
@@ -912,6 +962,25 @@ Page {
         } catch (err) {
             console.log("Error creating asetukset-table in database: " + err);
             virheet = virheet + "Error creating asetukset-table in database: " + err +" <br> "
+        };
+
+        return
+    }
+
+    // asetukset2-tietokanta
+    // asia,    arvo
+    // string,  string
+    function luoDbAsetukset2() {
+
+        if(db == null) return;
+
+        try {
+            db.transaction(function(tx){
+                tx.executeSql('CREATE TABLE IF NOT EXISTS asetukset2 (asia TEXT, arvo TEXT)');
+            });
+        } catch (err) {
+            console.log("Error creating asetukset2-table in database: " + err);
+            virheet = virheet + "Error creating asetukset2-table in database: " + err +" <br> "
         };
 
         return
@@ -1220,8 +1289,22 @@ Page {
     }
 
     function paivitaAsetukset() {
+
         if(db == null) return;
 
+        paivitaAsetus(tunnusProm1, promilleRaja1);
+        paivitaAsetus(tunnusProm2, promilleRaja2)
+        paivitaAsetus(tunnusVrkRaja1, vrkRaja1)
+        paivitaAsetus(tunnusVrkRaja2, vrkRaja2)
+        paivitaAsetus(tunnusVkoRaja1, vkoRaja1)
+        paivitaAsetus(tunnusVkoRaja2, vkoRaja2)
+        paivitaAsetus(tunnusVsRaja1, vsRaja1)
+        paivitaAsetus(tunnusVsRaja2, vsRaja2)
+        paivitaAsetus(tunnusKuvaaja, nakyvaKuvaaja)
+        paivitaAsetus(tunnusVrkVaihdos, vrkVaihtuu)
+        paivitaAsetus(tunnusTilavuusMitta, arvoTilavuusMitta)
+
+        /*
         try {
             db.transaction(function(tx){
                 tx.executeSql("UPDATE asetukset SET arvo = " + promilleRaja1 +
@@ -1250,6 +1333,38 @@ Page {
         } catch (err) {
             console.log("Error modifying asetukset-table in database: " + err);
             virheet = virheet + "Error modifying asetukset-table in database: " + err +" <br> "
+        }; // */
+
+        return
+    }
+
+    function paivitaAsetus(tunnus, arvo) {
+        if(db == null) return;
+
+        try {
+            db.transaction(function(tx){
+                tx.executeSql("UPDATE asetukset SET arvo = " + arvo +
+                              "  WHERE asia = '" + tunnus + "'");
+            });
+        } catch (err) {
+            console.log("Error modifying asetukset-table in database: " + err);
+            virheet = virheet + "Error modifying asetukset-table in database: " + err +" <br> "
+        };
+
+        return
+    }
+
+    function paivitaAsetus2(tunnus, arvo) {
+        if(db == null) return;
+
+        try {
+            db.transaction(function(tx){
+                tx.executeSql("UPDATE asetukset2 SET arvo = '" + arvo +
+                              "'  WHERE asia = '" + tunnus + "'");
+            });
+        } catch (err) {
+            console.log("Error modifying asetukset2-table in database: " + err);
+            virheet = virheet + "Error modifying asetukset2-table in database: " + err +" <br> "
         };
 
         return
@@ -1398,35 +1513,17 @@ Page {
 
         if(db == null) return;
 
-        try {
-            db.transaction(function(tx){
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusProm1 + "', " + promilleRaja1 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusProm2 + "', " + promilleRaja2 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusVrkRaja1 + "', " + vrkRaja1 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusVrkRaja2 + "', " + vrkRaja2 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusVkoRaja1 + "', " + vkoRaja1 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusVkoRaja2 + "', " + vkoRaja2 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusVsRaja1 + "', " + vsRaja1 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusVsRaja2 + "', " + vsRaja2 +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusKuvaaja + "', " + nakyvaKuvaaja +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusVrkVaihdos + "', " + vrkVaihtuu +")" )
-                tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                              " VALUES ('" + tunnusTilavuusMitta + "', " + arvoTilavuusMitta +")" )
-            })
-        } catch (err) {
-            console.log("Error adding to asetukset-table in database: " + err);
-            virheet = virheet + "Error adding to asetukset-table in database: " + err +" <br> "
-        }
+        uusiAsetus(tunnusProm1,promilleRaja1);
+        uusiAsetus(tunnusProm2,promilleRaja2);
+        uusiAsetus(tunnusVrkRaja1,vrkRaja1);
+        uusiAsetus(tunnusVrkRaja2,vrkRaja2);
+        uusiAsetus(tunnusVkoRaja1,vkoRaja1);
+        uusiAsetus(tunnusVkoRaja2,vkoRaja2);
+        uusiAsetus(tunnusVsRaja1,vsRaja1);
+        uusiAsetus(tunnusVsRaja2,vsRaja2);
+        uusiAsetus(tunnusKuvaaja,nakyvaKuvaaja);
+        uusiAsetus(tunnusVrkVaihdos,vrkVaihtuu);
+        uusiAsetus(tunnusTilavuusMitta,arvoTilavuusMitta);
 
         return
 
@@ -1443,6 +1540,21 @@ Page {
         } catch (err) {
             console.log("Error adding to asetukset-table in database: " + err);
             virheet = virheet + "Error adding to asetukset-table in database: " + err +" <br> "
+        }
+        return
+    }
+
+    function uusiAsetus2(tunnus, arvo){
+        if(db == null) return;
+
+        try {
+            db.transaction(function(tx){
+                tx.executeSql("INSERT INTO asetukset2 (asia, arvo)" +
+                              " VALUES ('" + tunnus + "', '" + arvo +"')" )
+            })
+        } catch (err) {
+            console.log("Error adding to asetukset2-table in database: " + err);
+            virheet = virheet + "Error adding to asetukset2-table in database: " + err +" <br> "
         }
         return
     }
@@ -1845,6 +1957,7 @@ Page {
 
     }
 
+    /*
     Component {
         id: juomaPaivia
         ListItem {
@@ -1942,7 +2055,8 @@ Page {
             } //row
         }
     }
-
+    // */
+    /*
     Component {
         id: juomaPaiviaOtsikko
 
@@ -1957,7 +2071,7 @@ Page {
         }
 
     }
-
+    // */
 
     SilicaFlickable {
         id: ylaosa
@@ -2000,6 +2114,7 @@ Page {
                 title: qsTr("Drunkard?")
             }
 
+            // viikkokulutus
             SilicaListView {
                 id: kuvaaja
                 height: kuvaajanKorkeus + Theme.fontSizeExtraSmall + 7
@@ -2030,6 +2145,7 @@ Page {
 
             }
 
+            // päiväkulutus
             SilicaListView {
                 id: kuvaaja3
                 height: kuvaajanKorkeus + Theme.fontSizeExtraSmall + 7
@@ -2059,6 +2175,8 @@ Page {
 
             }
 
+            /*
+            // päiväkulutus ruudukkona
             SilicaListView {
                 id: kuvaaja2
                 height: kuvaajanKorkeus + Theme.fontSizeExtraSmall + 7
@@ -2077,7 +2195,7 @@ Page {
 
                 HorizontalScrollDecorator {}
 
-            }
+            } // */
 
             Row { // promillet
                 spacing: 10
@@ -2109,6 +2227,40 @@ Page {
                     readOnly: true
                 }
 
+            }
+
+            Row { // unTappd-valinnat
+                id: unTappdrivi
+                spacing: 0
+                visible: UnTpd.unTpToken == "" ? false : true
+
+                TextSwitch {
+                    id: checkinUnTappd
+                    checked: false
+                    enabled: beerId == "" ? false : true
+                    text: checked? qsTr("unTappd check in") : qsTr("don't check in")
+                    width: Theme.fontSizeMedium*7
+                }
+
+                TextField {
+                    id: txtBaari
+                    width: sivu.width - checkinUnTappd.width  - unTappdrivi.x - unTappdrivi.spacing
+                    label: qsTr("pub name")
+                    placeholderText: qsTr("click to select pub")
+                    text: ""
+                    readOnly: true
+                    onClicked: {
+                        var dialog = pageStack.push(Qt.resolvedUrl("unTpBaarit.qml"), {
+                                        baari: baariNimi,
+                                        barId: barId
+                                    })
+
+                        dialog.accepted.connect(function() {
+                            baariNimi = dialog.baari
+                            barId = dialog.barId
+                        })
+                    }
+                }
             }
 
             Row { // nykyinen aika
@@ -2202,6 +2354,7 @@ Page {
                     width: Theme.fontSizeMedium*5.8 //Theme.fontSizeExtraSmall*8
                     readOnly: true
                     text: qsTr("beer")
+                    label: beerStars > 0 ? "" + beerStars + "/5" : ""
                     onClicked: {
                         muutaUusi()
                     }
@@ -2310,5 +2463,3 @@ Page {
         alkutoimet()
     }
 }
-
-

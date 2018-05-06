@@ -30,6 +30,8 @@ Dialog {
     property real leveysVasen: 0.7
     property real leveysOikea: 0.3
 
+    property bool untapped: false
+
     function alkutoimet() {
         massa = massa0
         vetta = vetta0
@@ -104,6 +106,14 @@ Dialog {
             DialogHeader {
                 id: otsikko
                 title: qsTr("Data")
+            }
+
+            Button {
+                text: qsTr("set up unTappd")
+                x: 0.5*sivu.width-0.5*width
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("unTpKirjautuminen.qml"))
+                }
             }
 
             Row { //paino

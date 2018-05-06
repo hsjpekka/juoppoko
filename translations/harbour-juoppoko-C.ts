@@ -27,10 +27,6 @@
         <translation>vk</translation>
     </message>
     <message>
-        <source>su fr we mo</source>
-        <translation>su pe ke ma</translation>
-    </message>
-    <message>
         <source>info</source>
         <translation>tietoja</translation>
     </message>
@@ -77,6 +73,22 @@
     <message>
         <source>drink</source>
         <translation>juoma</translation>
+    </message>
+    <message>
+        <source>check in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pub name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>click to select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no checkin</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -168,6 +180,10 @@
     <message>
         <source>upper daily limit</source>
         <translation>ylempi päiväraja</translation>
+    </message>
+    <message>
+        <source>set up unTappd</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -336,6 +352,40 @@
     <message>
         <source>drinking day ends at</source>
         <translation>ryyppypäivä vaihtuu</translation>
+    </message>
+</context>
+<context>
+    <name>unTpBaarit</name>
+    <message>
+        <source>Beer provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>venue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpKirjautuminen</name>
+    <message>
+        <source>error: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unidentified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sign in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change user</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

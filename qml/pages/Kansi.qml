@@ -68,7 +68,7 @@ CoverBackground {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: Theme.fontSizeLarge
         text: naytaPromillet() //paaikkuna.calculatePermille(new Date().getTime()).toFixed(2) + " ‰"
-        font.pixelSize: Theme.fontSizeMedium
+        //font.pixelSize: Theme.fontSizeMedium
     }
 
     Label {

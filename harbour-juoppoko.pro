@@ -35,7 +35,16 @@ DISTFILES += \
     qml/harbour-juoppoko.qml \
     qml/pages/tilastot.qml \
     qml/pages/demolaskuri.qml \
-    qml/scripts/scripts.js
+    qml/scripts/scripts.js \
+    qml/pages/unTpBaarit.qml
+
+DEFINES += \
+     UTPD_ID=\"\\\"$${_CL_ID}\\\"\" \
+     UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\" \
+     CB_URL=\"\\\"$${_CB_URL}\\\"\" \
+     FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\" \
+     FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\" \
+     FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\"
 
 # to disable building translations every time, comment out the
 # following CONFIG line
