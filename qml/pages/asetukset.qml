@@ -80,7 +80,7 @@ Dialog {
 
     SilicaFlickable {
         id: ylaosa
-        anchors.fill: sivu
+        anchors.fill: parent
         height: sivu.height
         contentHeight: column.height
 

@@ -21,6 +21,8 @@ Page {
         var kysely = UnTpd.getUserInfo("","true");
         var async = true, sync = false;
 
+        hetkinen.running = true
+
         xhttp.onreadystatechange = function() {
             console.log("lueKayttajanTiedot - " + xhttp.readyState + " - " + xhttp.status)
             if (xhttp.readyState == 4){
@@ -32,20 +34,34 @@ Page {
                 } else if (xhttp.status == 500) {
                     label1.text = vastaus.meta.error_detail
                 } else {
-                    label1.text = qsTr("error: ") + xhttp.status + ", " + xhttp.statusText
+                    label1.text = qsTr("user info: ") + xhttp.status + ", " + xhttp.statusText
                 }
+
+                hetkinen.running = false
             }
         }
         xhttp.open("GET",kysely,async);
         xhttp.send();
 
-        console.log("unTpKirjautuminen - lueKayttajanTiedot - xhttp.responseText")
+        //console.log("unTpKirjautuminen - lueKayttajanTiedot - xhttp.responseText")
 
     }
 
     Column {
         id: column
         anchors.fill: parent
+
+        PageHeader {
+            title: qsTr("UnTappd account")
+        }
+
+        BusyIndicator {
+            id: hetkinen
+            size: BusyIndicatorSize.Medium
+            anchors.horizontalCenter: parent.horizontalCenter
+            running: false
+            visible: running
+        }
 
         TextField {
             id: label1
@@ -114,7 +130,7 @@ Page {
                     xhttp.send();
 
                 } else {
-                    console.log("unTpKirjautuminen - rivi 117")
+                    console.log("unTpKirjautuminen - rivi 117" + UnTpd.unTpToken)
                 }
             }
         } // */

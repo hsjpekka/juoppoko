@@ -50,7 +50,6 @@ ApplicationWindow
 
     Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta
         UnTpd.unTpOsoite = "https://api.untappd.com/v4"
-        UnTpd.unTpToken = ""
         UnTpd.unTpdId = Qt.application.arguments[args-6]
         UnTpd.unTpdSecret = Qt.application.arguments[args-5]
         UnTpd.callbackURL = Qt.application.arguments[args-4]
@@ -58,10 +57,12 @@ ApplicationWindow
         UnTpd.fSqSecret = Qt.application.arguments[args-2]
         UnTpd.fSqVersion = Qt.application.arguments[args-1]
 
+        /*
         var viesti = "ep " + UnTpd.unTpOsoite + " utpId " + UnTpd.unTpdId + " utpSecret " + UnTpd.unTpdSecret
                 + " cbUrl " + UnTpd.callbackURL + " 4Id " + UnTpd.fSqId + " 4Secret " + UnTpd.fSqSecret
                 + " 4v " + UnTpd.fSqVersion
-        console.log(viesti)
+        //console.log(viesti)
+        // */
 
     }
 }

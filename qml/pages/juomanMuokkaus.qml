@@ -28,6 +28,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../scripts/unTap.js" as UnTpd
 
 Dialog {
     id: sivu    
@@ -51,7 +52,8 @@ Dialog {
     property real pintImp: 20*ozImp
     property string yksikkoTunnus: " ml"
     property int tilavuusMitta//: 1 // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
-    //anchors.fill: parent
+    property int olutId: 0
+    property int tahtia: 0
 
     function asetaYksikotMl() {
         maara = maara*yksikko
@@ -179,6 +181,8 @@ Dialog {
 
     SilicaFlickable {
         anchors.fill: parent
+        height: sivu.height
+        //height: column.height
         contentHeight: column.height
 
         VerticalScrollDecorator {}
@@ -187,13 +191,44 @@ Dialog {
             id: column
             spacing: Theme.paddingLarge
             width: parent.width
-            anchors.fill: parent
+            //anchors.fill: parent
 
             DialogHeader {
                 title: qsTr("Drink")
             } // */
 
-                TextField {
+            Row { //etsi untappedistä
+                x: Theme.paddingLarge
+                spacing: Theme.paddingLarge
+
+                Image {
+                    id: valitunEtiketti
+                    source: "./tuoppi.png"
+                    width: Theme.fontSizeMedium*3
+                    height: width
+                }
+
+                Button {
+                    id: avaanUnTappd
+                    text: qsTr("search UnTappd")
+                    visible: (UnTpd.unTpToken == "") ? false : true
+                    //anchors.horizontalCenter: sivu.anchors.horizontalCenter
+                    //x: 0.5*(sivu.width - width)
+                    onClicked: {
+                        var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
+                            "olut": juoma.text } )
+                        dialog.accepted.connect( function() {
+                            juoma.text = dialog.olut
+                            vahvuus = dialog.vahvuus
+                            olutId = dialog.olutId
+                            valitunEtiketti.source = UnTpd.oluenEtiketti
+                            console.log("column height " + column.height)
+                        })
+                    }
+                }
+            }
+
+            TextField {
                     id: juoma
                     text: nimi
                     labelVisible: false
@@ -201,6 +236,120 @@ Dialog {
                     readOnly: false
                     width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
                 }
+
+            Row { //arvostelu
+                id: tahtiaRivi
+                visible: (olutId > 0) ? true : false
+                x: Theme.paddingLarge
+                spacing: (sivu.width - 2*x - 5*arvostelu1.width - 4*arvostelu15.width)/8
+
+                IconButton {
+                    id: arvostelu1
+                    highlighted: (tahtia >= 1) ? true : false
+                    icon.source: (tahtia >= 1) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 1)
+                            tahtia = 0
+                        else
+                            tahtia = 1
+                    }
+                }
+                IconButton {
+                    id: arvostelu15
+                    highlighted: (tahtia >= 2) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 2)
+                            tahtia = 0
+                        else
+                            tahtia = 2
+                    }
+                }
+                IconButton {
+                    id: arvostelu2
+                    highlighted: (tahtia >= 3) ? true : false
+                    icon.source: (tahtia >= 3) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 3)
+                            tahtia = 0
+                        else
+                            tahtia = 3
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu25
+                    highlighted: (tahtia >= 4) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 4)
+                            tahtia = 0
+                        else
+                            tahtia = 4
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu3
+                    highlighted: (tahtia >= 5) ? true : false
+                    icon.source: (tahtia >= 5) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 5)
+                            tahtia = 0
+                        else
+                            tahtia = 5
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu35
+                    highlighted: (tahtia >= 6) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 6)
+                            tahtia = 0
+                        else
+                            tahtia = 6
+                    }
+                }
+                IconButton {
+                    id: arvostelu4
+                    highlighted: (tahtia >= 7) ? true : false
+                    icon.source: (tahtia >= 7) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 7)
+                            tahtia = 0
+                        else
+                            tahtia = 7
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu45
+                    highlighted: (tahtia >= 8) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 8)
+                            tahtia = 0
+                        else
+                            tahtia = 8
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu5
+                    highlighted: (tahtia == 9) ? true : false
+                    icon.source: (tahtia >= 9) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 9)
+                            tahtia = 0
+                        else
+                            tahtia = 9
+
+                    }
+                }
+
+            } //arvostelu
 
             Row { // time
 
@@ -501,14 +650,15 @@ Dialog {
                 text: juomanKuvaus
                 readOnly: false
                 width: parent.width
-                placeholderText: qsTr("some notes?")
+                label: (olutId > 0) ? qsTr("shout!") : qsTr("some notes?")
+                placeholderText: label
             }
-
 
         }//column
     }
 
     Component.onCompleted: {
+        console.log("column height " + column.height)
         if (tilavuusMitta == 2) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
             asetaYksikotUsOz()
             yksikonValinta.currentIndex = tilavuusMitta - 1
@@ -524,16 +674,20 @@ Dialog {
         } else
             asetaYksikotMl()
 
+        valitunEtiketti.source = UnTpd.oluenEtiketti
+        if (UnTpd.oluenId > 0)
+            kuvaus.text = UnTpd.shout
+
     }
 
     onDone: {
         if (result == DialogResult.Accepted) {
             nimi = juoma.text
             juomanKuvaus = kuvaus.text
+            if (olutId > 0)
+                UnTpd.shout = kuvaus.text
             maara = maara*yksikko
-
         }
     }
 
 }
-

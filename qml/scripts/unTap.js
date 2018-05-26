@@ -10,6 +10,17 @@ var callbackURL = ""
 var fSqId = ""
 var fSqSecret = ""
 var fSqVersion = ""
+var oluetSuosionMukaan = true
+var oluenNimi = ""
+var oluenEtiketti = ""
+var oluenPanimo = ""
+var oluenTyyppi = ""
+var oluenVahvuus = 0.0
+var oluenId = 0
+var postFoursquare = false
+var postFacebook = false
+var postTwitter = false
+var shout = ""
 
 //post-komennot: addComment, removeComment, checkIn, toast
 //get-komennot: muut
@@ -51,6 +62,56 @@ function addToWishList(targetId) { //(address1, auth, targetId)
     var endPoint = "/user/wishlist/add";
     var wishAddBeer = "&bid=" + targetId;
     var query = unTpOsoite + endPoint + "?" + userAut() + wishAddBeer;
+
+    return query;
+}
+
+function checkIn(beerId, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare) { //(address1, auth, beerId, venueId, lat, lng, shout, rating, fbook, twitter, fsquare)
+    //post
+    //bid (int, required) - The numeric beer ID you want to check into. //"&bid=32"
+
+    //gmt_offset (string, required) - The numeric value of hours the user is away from the GMT (Greenwich Mean Time), such as -5.//"&gmt_offset=1.5"
+    //timezone (string, required) - The timezone of the user, such as EST or PST //"&timezone=EEST"
+
+    //foursquare_id (string, optional) - The MD5 hash ID of the Venue you want to attach the beer checkin. This HAS TO BE the MD5 non-numeric hash from the foursquare v2.
+    //geolat (int, optional) - The numeric Latitude of the user. This is required if you add a location.//"&geolat=32"
+    //geolng (int, optional) - The numeric Longitude of the user. This is required if you add a location. //"&geolng=32"
+    //shout (string, optional) - The text you would like to include as a comment of the checkin. Max of 140 characters. //"&shout=Good beer"
+    //rating (int, optional) - The rating score you would like to add for the beer. This can only be 1 to 5 (half ratings are included). You can't rate a beer a 0. //"&rating=3.5"
+    //facebook (string, optional) - If you want to push this check-in to the users' Facebook account, pass this value as "on", default is "off" //"&facebook=off"
+    //twitter (string, optional) - If you want to push this check-in to the users' Twitter account, pass this value as "on", default is "off" //"&twitter=off"
+    //foursquare (string, optional) - If you want to push this check-in to the users' Foursquare account, pass this value as "on", default is "off". You must include a location for this to enabled. //"&foursquare=off"
+
+    //authentication required
+
+    var endpoint = "/checkin/add";
+
+    var pvm = new Date();
+    var gmtOffset = "&gmt_offset=" + (pvm.getTimezoneOffset()/60).toFixed(1);
+    var tt = pvm.toString();
+    var m0 = tt.indexOf("(");
+    var m1 = tt.lastIndexOf(")");
+    var tzone = (m0 > 0) ? tt.slice(m0+1,m1) : "GMT";
+    var timezone = "&timezone=" + tzone;
+
+    var query = unTpOsoite + endpoint + "?" + userAut();
+
+    query += "&bid=" + beerId + gmtOffset + timezone;
+
+    if (position) {
+        query += "&geolat=" + lat;
+        query += "&geolng=" + lng;
+    }
+    if (shout != "")
+        query += "&shout=" + shout;
+    if (rating > 0)
+        query += "&rating=" + rating;
+    if (fbook != "")
+        query += "&facebook=" + fbook;
+    if (twitter != "")
+        query += "&twitter=" + twitter;
+    if (fsquare != "")
+        query += "&foursquare=" + fsquare;
 
     return query;
 }
@@ -152,7 +213,7 @@ function getBeerInfo(targetId, compact) { //(address1, appReg, auth, targetId, c
         query += "&compact=" + compact
     };
 
-    return getMethod();
+    return query;
 }
 
 function getBreweryFeed(breweryId, maxId, minId, limit) { // (address1, appReg, auth, breweryId, maxId, minId, limit)
@@ -415,7 +476,7 @@ function getVenueFeed(venueId, maxId, minId, limit) { //(address1, appReg, auth,
 }
 
 function getVenueInfo(targetId, compact) { //(address1, appReg, auth, targetId, compact)
-    //VENUE_ID (int, required) - The Venue ID that you want to display checkins
+    //VENUE_ID (int, required) - The Venue ID that you want to display s
     //compact (string, optional) - You can pass "true" here only show the venue infomation, and remove the "checkins", "media", "top_beers", etc attributes
                             //"&compact=true"
     //authentication not required
@@ -444,56 +505,6 @@ function lookupFoursquare(targetId) { //(address1, appReg, auth, targetId)
         query +=  appAut()
     else
         query +=  userAut();
-
-    return query;
-}
-
-function checkIn(beerId, venueId, lat, lng, shout, rating, fbook, twitter, fsquare) { //(address1, auth, beerId, venueId, lat, lng, shout, rating, fbook, twitter, fsquare)
-    //post
-    //bid (int, required) - The numeric beer ID you want to check into. //"&bid=32"
-
-    //gmt_offset (string, required) - The numeric value of hours the user is away from the GMT (Greenwich Mean Time), such as -5.//"&gmt_offset=1.5"
-    //timezone (string, required) - The timezone of the user, such as EST or PST //"&timezone=EEST"
-
-    //foursquare_id (string, optional) - The MD5 hash ID of the Venue you want to attach the beer checkin. This HAS TO BE the MD5 non-numeric hash from the foursquare v2.
-    //geolat (int, optional) - The numeric Latitude of the user. This is required if you add a location.//"&geolat=32"
-    //geolng (int, optional) - The numeric Longitude of the user. This is required if you add a location. //"&geolng=32"
-    //shout (string, optional) - The text you would like to include as a comment of the checkin. Max of 140 characters. //"&shout=Good beer"
-    //rating (int, optional) - The rating score you would like to add for the beer. This can only be 1 to 5 (half ratings are included). You can't rate a beer a 0. //"&rating=3.5"
-    //facebook (string, optional) - If you want to push this check-in to the users' Facebook account, pass this value as "on", default is "off" //"&facebook=off"
-    //twitter (string, optional) - If you want to push this check-in to the users' Twitter account, pass this value as "on", default is "off" //"&twitter=off"
-    //foursquare (string, optional) - If you want to push this check-in to the users' Foursquare account, pass this value as "on", default is "off". You must include a location for this to enabled. //"&foursquare=off"
-
-    //authentication required
-
-    var endpoint = "/checkin/add";
-
-    var pvm = new Date();
-    var gmtOffset = "&gmt_offset=" + (pvm.getTimezoneOffset()/60).toFixed(1);
-    var tt = pvm.toString();
-    var m0 = tt.indexOf("(");
-    var m1 = tt.lastIndexOf(")");
-    var tzone = (m0 > 0) ? tt.slice(m0+1,m1) : "GMT";
-    var timezone = "&timezone=" + tzone;
-
-    var query = unTpOsoite + endpoint + "?" + userAut();
-
-    query += "&bid=" + beerId + gmtOffset + timezone;
-
-    if (lat > 0)
-        query += "&geolat=" + lat;
-    if (lng > 0)
-        query += "&geolng=" + lng;
-    if (shout != "")
-        query += "&shout=" + shout;
-    if (rating > 0)
-        query += "&rating=" + rating;
-    if (fbook != "")
-        query += "&facebook=" + fbook;
-    if (twitter != "")
-        query += "&twitter=" + twitter;
-    if (fsquare != "")
-        query += "&foursquare=" + fsquare;
 
     return query;
 }

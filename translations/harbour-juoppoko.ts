@@ -75,19 +75,15 @@
         <translation>juoma</translation>
     </message>
     <message>
-        <source>check in</source>
+        <source>unTappd check in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>pub name</source>
+        <source>don&apos;t check in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>click to select</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>no checkin</source>
+        <source>more</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -279,6 +275,14 @@
         <source>some notes?</source>
         <translation>muuta?</translation>
     </message>
+    <message>
+        <source>search UnTappd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>shout!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>tietoja</name>
@@ -301,6 +305,49 @@
     <message>
         <source>Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>
         <translation>Yli 4.0 ‰ alkoholipitoisuus voi aiheuttaa kooman tai olla tappava. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
+    </message>
+</context>
+<context>
+    <name>tietojaOluesta</name>
+    <message>
+        <source>abv</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ibu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>monthly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>getting beer info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>me</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>drinkers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no beer selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -366,11 +413,58 @@
     </message>
 </context>
 <context>
-    <name>unTpKirjautuminen</name>
+    <name>unTpCheckIn</name>
     <message>
-        <source>error: </source>
+        <source>check-in details</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>pub</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>post to facebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not to facebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>post to twitter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no tweeting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>post to foursquare</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not to foursquare</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>long</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>alt</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpKirjautuminen</name>
     <message>
         <source>username</source>
         <translation type="unfinished"></translation>
@@ -385,6 +479,37 @@
     </message>
     <message>
         <source>change user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>user info: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UnTappd account</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpOluet</name>
+    <message>
+        <source>Beers in unTappd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>order by popularity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>alphabetical order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>selected beer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>search text</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
