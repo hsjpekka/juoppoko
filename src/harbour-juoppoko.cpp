@@ -37,7 +37,7 @@
 
 int main(int argc, char *argv[])
 {
-    char *strings[argc+6]; // + s1-s6
+    char *strings[argc+7]; // + s1-s6
     char *s1 = UTPD_ID;
     char *s2 = UTPD_SECRET;
     char *s3 = CB_URL;

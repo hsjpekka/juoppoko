@@ -36,7 +36,8 @@ DISTFILES += \
     qml/pages/tilastot.qml \
     qml/pages/demolaskuri.qml \
     qml/scripts/scripts.js \
-    qml/pages/unTpBaarit.qml
+    qml/pages/unTpBaarit.qml \
+    qml/scripts/tietokanta.js
 
 DEFINES += \
      UTPD_ID=\"\\\"$${_CL_ID}\\\"\" \
@@ -45,6 +46,8 @@ DEFINES += \
      FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\" \
      FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\" \
      FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\"
+
+QT += positioning
 
 # to disable building translations every time, comment out the
 # following CONFIG line

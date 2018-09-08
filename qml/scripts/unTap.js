@@ -2,26 +2,43 @@
 
 var queryLimit = 25
 
-var unTpOsoite = ""
-var unTpToken = ""
-var unTpdId = ""
-var unTpdSecret = ""
+var unTpOsoite = "https://api.untappd.com/v4" // url
+var unTpToken = "" // käyttäjän valtuutus
+var unTpdId = "" // ohjelman clientId
+var unTpdSecret = "" // ohjelman salasana
 var callbackURL = ""
-var fSqId = ""
-var fSqSecret = ""
-var fSqVersion = ""
 var oluetSuosionMukaan = true
 var oluenNimi = ""
 var oluenEtiketti = ""
 var oluenPanimo = ""
 var oluenTyyppi = ""
 var oluenVahvuus = 0.0
+var oluenHappamuus = 0
 var oluenId = 0
 var postFoursquare = false
 var postFacebook = false
 var postTwitter = false
 var shout = ""
+var programName = ""
+var newBadges
+var newBadgesSet = false
 
+function setBeer(beerId){
+    if (beerId != oluenId) {
+        oluenId = beerId
+        oluenNimi = ""
+        oluenEtiketti = ""
+        oluenPanimo = ""
+        oluenTyyppi = ""
+        oluenVahvuus = 0.0
+        shout = ""
+    }
+
+    return
+}
+
+//
+// ======= UnTappd API ==========
 //post-komennot: addComment, removeComment, checkIn, toast
 //get-komennot: muut
 
@@ -40,33 +57,29 @@ function acceptFriend(targetId) {// (address1, auth, targetId) {
     var endpoint = "/friend/accept/"+ targetId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    return query;
+    return encodeURI(query);
 }
 
-function addComment(targetId, comment) { //(address1, auth, targetId, comment)
-    //post
+function addComment(targetId) { //(address1, auth, targetId, comment)
+    //post-string "&comment=" + comment
     // CHECKIN_ID (int, required) - The checkin id of the check-in you want to add the comment.//"32"
     //comment (string, required) - The text of the comment you want to add. Max of 140 characters.//"&comment=Tou!"
     var endpoint = "/checkin/addcomment/"+ targetId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    if (comment == "") return;
-
-    query += "&comment=" + comment;
-
-    return query;
+    return encodeURI(query);
 }
 
 function addToWishList(targetId) { //(address1, auth, targetId)
     //bid (int, required) - The numeric BID of the beer you want to add your list. //"&bid=32"
     var endPoint = "/user/wishlist/add";
-    var wishAddBeer = "&bid=" + targetId;
-    var query = unTpOsoite + endPoint + "?" + userAut() + wishAddBeer;
+    var wishBeer = "&bid=" + targetId;
+    var query = unTpOsoite + endPoint + "?" + userAut() + wishBeer;
 
-    return query;
+    return encodeURI(query);
 }
 
-function checkIn(beerId, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare) { //(address1, auth, beerId, venueId, lat, lng, shout, rating, fbook, twitter, fsquare)
+function checkInPart1() {
     //post
     //bid (int, required) - The numeric beer ID you want to check into. //"&bid=32"
 
@@ -86,17 +99,35 @@ function checkIn(beerId, venueId, position, lat, lng, shout, rating, fbook, twit
 
     var endpoint = "/checkin/add";
 
+    var address = unTpOsoite + endpoint + "?" + userAut();
+
+    return encodeURI(address);
+}
+
+function checkInPart2(beerId, tzone, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare) { //(address1, auth, beerId, venueId, lat, lng, shout, rating, fbook, twitter, fsquare)
+    //post
+    //bid (int, required) - The numeric beer ID you want to check into. //"&bid=32"
+
+    //gmt_offset (string, required) - The numeric value of hours the user is away from the GMT (Greenwich Mean Time), such as -5.//"&gmt_offset=1.5"
+    //timezone (string, required) - The timezone of the user, such as EST or PST //"&timezone=EEST"
+
+    //foursquare_id (string, optional) - The MD5 hash ID of the Venue you want to attach the beer checkin. This HAS TO BE the MD5 non-numeric hash from the foursquare v2.
+    //geolat (int, optional) - The numeric Latitude of the user. This is required if you add a location.//"&geolat=32"
+    //geolng (int, optional) - The numeric Longitude of the user. This is required if you add a location. //"&geolng=32"
+    //shout (string, optional) - The text you would like to include as a comment of the checkin. Max of 140 characters. //"&shout=Good beer"
+    //rating (int, optional) - The rating score you would like to add for the beer. This can only be 1 to 5 (half ratings are included). You can't rate a beer a 0. //"&rating=3.5"
+    //facebook (string, optional) - If you want to push this check-in to the users' Facebook account, pass this value as "on", default is "off" //"&facebook=off"
+    //twitter (string, optional) - If you want to push this check-in to the users' Twitter account, pass this value as "on", default is "off" //"&twitter=off"
+    //foursquare (string, optional) - If you want to push this check-in to the users' Foursquare account, pass this value as "on", default is "off". You must include a location for this to enabled. //"&foursquare=off"
+
+    //authentication required
+
     var pvm = new Date();
-    var gmtOffset = "&gmt_offset=" + (pvm.getTimezoneOffset()/60).toFixed(1);
-    var tt = pvm.toString();
-    var m0 = tt.indexOf("(");
-    var m1 = tt.lastIndexOf(")");
-    var tzone = (m0 > 0) ? tt.slice(m0+1,m1) : "GMT";
+    var gmtOffset = "&gmt_offset=" + (-pvm.getTimezoneOffset()/60).toFixed(1)//toFixed(1);
     var timezone = "&timezone=" + tzone;
+    var query = ""
 
-    var query = unTpOsoite + endpoint + "?" + userAut();
-
-    query += "&bid=" + beerId + gmtOffset + timezone;
+    query += "bid=" + beerId + gmtOffset + timezone;
 
     if (position) {
         query += "&geolat=" + lat;
@@ -113,7 +144,7 @@ function checkIn(beerId, venueId, position, lat, lng, shout, rating, fbook, twit
     if (fsquare != "")
         query += "&foursquare=" + fsquare;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getActivityFeed(maxId, minId, limit) { //(address1, auth, maxId, minId, limit)
@@ -137,7 +168,7 @@ function getActivityFeed(maxId, minId, limit) { //(address1, auth, maxId, minId,
         query += "&limit=" + limit
     };
 
-    return query;
+    return encodeURI(query);
 }
 
 function getBadges(targetName, offset, limit) { //(address1, appReg, auth, targetName, offset, limit)
@@ -163,7 +194,7 @@ function getBadges(targetName, offset, limit) { //(address1, appReg, auth, targe
         query += "&limit=" + limit
     };
 
-    return query;
+    return encodeURI(query);
 }
 
 function getBeerFeed(beerId, maxId, minId, limit) { //(address1, appReg, auth, beerId, maxId, minId, limit)
@@ -191,7 +222,7 @@ function getBeerFeed(beerId, maxId, minId, limit) { //(address1, appReg, auth, b
         query += "&limit=" + limit
     };
 
-    return query;
+    return encodeURI(query);
 }
 
 function getBeerInfo(targetId, compact) { //(address1, appReg, auth, targetId, compact)
@@ -213,7 +244,7 @@ function getBeerInfo(targetId, compact) { //(address1, appReg, auth, targetId, c
         query += "&compact=" + compact
     };
 
-    return query;
+    return encodeURI(query);
 }
 
 function getBreweryFeed(breweryId, maxId, minId, limit) { // (address1, appReg, auth, breweryId, maxId, minId, limit)
@@ -241,7 +272,7 @@ function getBreweryFeed(breweryId, maxId, minId, limit) { // (address1, appReg, 
     if (limit > 0)
         query += "&limit=" + limit
 
-    return query;
+    return encodeURI(query);
 }
 
 function getBreweryInfo(targetId, compact) { //(address1, appReg, auth, targetId, compact)
@@ -262,7 +293,7 @@ function getBreweryInfo(targetId, compact) { //(address1, appReg, auth, targetId
     if (compact != "")
         query += "&compact=" + compact;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getFriendsInfo(targetName, offset, limit) { //(address1, appReg, auth, targetName, offset, limit)
@@ -287,7 +318,7 @@ function getFriendsInfo(targetName, offset, limit) { //(address1, appReg, auth, 
     if (limit > 0)
         query += "&limit=" + limit;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getNotifications(offset, limit) { //(address1, auth, offset, limit)
@@ -304,7 +335,7 @@ function getNotifications(offset, limit) { //(address1, auth, offset, limit)
     if (limit > 0)
         query += "&limit=" + limit;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getPendingFriends(offset, limit) { //(address1, auth, offset, limit)
@@ -320,7 +351,7 @@ function getPendingFriends(offset, limit) { //(address1, auth, offset, limit)
     if (limit > 0)
         query += "&limit=" + limit;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getPubFeed(lat, lng, radius, unit, maxId, minId, limit) { //(address1, appReg, auth, lat, lng, radius, unit, maxId, minId, limit)
@@ -359,7 +390,7 @@ function getPubFeed(lat, lng, radius, unit, maxId, minId, limit) { //(address1, 
     if (limit > 0)
         query += "&limit=" + limit;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getUserBeers(targetName, offset, limit, sort) { //(address1, appReg, auth, targetName, offset, limit, sort)
@@ -395,7 +426,7 @@ function getUserBeers(targetName, offset, limit, sort) { //(address1, appReg, au
     if (sort != "")
         query += "&sort=" + sort;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getUserFeed(targetName, maxId, minId, limit) { //(address1, appReg, auth, targetName, maxId, minId, limit)
@@ -423,7 +454,7 @@ function getUserFeed(targetName, maxId, minId, limit) { //(address1, appReg, aut
     if (limit > 0)
         query += "&limit=" + limit;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getUserInfo(targetName, compact) { //(address1, appReg, auth, targetName, compact)
@@ -443,7 +474,7 @@ function getUserInfo(targetName, compact) { //(address1, appReg, auth, targetNam
     if (compact != "")
         query += "&compact=" + compact;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getVenueFeed(venueId, maxId, minId, limit) { //(address1, appReg, auth, venueId, maxId, minId, limit)
@@ -472,7 +503,7 @@ function getVenueFeed(venueId, maxId, minId, limit) { //(address1, appReg, auth,
     if (limit > 0)
         query += "&limit=" + limit;
 
-    return query;
+    return encodeURI(query);
 }
 
 function getVenueInfo(targetId, compact) { //(address1, appReg, auth, targetId, compact)
@@ -492,7 +523,7 @@ function getVenueInfo(targetId, compact) { //(address1, appReg, auth, targetId, 
     if (compact != "")
         query += "&compact=" + compact;
 
-    return query;
+    return encodeURI(query);
 }
 
 function lookupFoursquare(targetId) { //(address1, appReg, auth, targetId)
@@ -506,7 +537,7 @@ function lookupFoursquare(targetId) { //(address1, appReg, auth, targetId)
     else
         query +=  userAut();
 
-    return query;
+    return encodeURI(query);
 }
 
 function rejectFriend(targetId) { //(address1, auth, targetId)
@@ -514,16 +545,16 @@ function rejectFriend(targetId) { //(address1, auth, targetId)
     var endpoint = "/friend/reject/"+ targetId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    return query;
+    return encodeURI(query);
 }
 
 function removeComment(targetId) { //(address1, auth, targetId)
-    //post
+    //post-string not used
     // COMMENT_ID (int, required) - The checkin id of the check-in you want to add the comment.//"32"
     var endpoint = "/checkin/deletecomment/"+ targetId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    return query;
+    return encodeURI(query);
 }
 
 function removeFriend(targetId) { //(address1, auth, targetId)
@@ -531,7 +562,7 @@ function removeFriend(targetId) { //(address1, auth, targetId)
     var endpoint = "/friend/remove/"+ targetId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    return query;
+    return encodeURI(query);
 }
 
 function removeFromWishList(targetId) { //(address1, auth, targetId)
@@ -540,7 +571,7 @@ function removeFromWishList(targetId) { //(address1, auth, targetId)
     var wishRemoveBeer = "&bid=" + targetId;
     var query = unTpOsoite + endPoint + "?" + userAut() + wishRemoveBeer;
 
-    return query;
+    return encodeURI(query);
 }
 
 function requestFriend(targetId) { //(address1, auth, targetId)
@@ -549,7 +580,7 @@ function requestFriend(targetId) { //(address1, auth, targetId)
     var endpoint = "/friend/request/" + targetId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    return query;
+    return encodeURI(query);
 }
 
 function searchBeer(qString, offset, limit, sort) { //(address1, appReg, auth, qString, offset, limit, sort)
@@ -580,7 +611,7 @@ function searchBeer(qString, offset, limit, sort) { //(address1, appReg, auth, q
     if (sort != "")
         query += "&sort=" + sort;
 
-    return query;
+    return encodeURI(query);
 }
 
 function searchBrewery(qString, offset, limit) { //(address1, appReg, auth, qString, offset, limit)
@@ -605,16 +636,16 @@ function searchBrewery(qString, offset, limit) { //(address1, appReg, auth, qStr
     if (limit > 0)
         query += "&limit=" + limit;
 
-    return query;
+    return encodeURI(query);
 }
 
 function toast(targetId) { //(address1, auth, targetId)
-    //post
+    //post-string not used
     //CHECKIN_ID (int, required) - The checkin ID of checkin you want to toast //"32"
     //authentication required
 
     var endpoint = "/checkin/toast/" + targetId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    return query;
+    return encodeURI(query);
 }

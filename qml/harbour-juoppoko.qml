@@ -30,7 +30,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "pages"
 import "scripts/unTap.js" as UnTpd
-
+import "scripts/foursqr.js" as FourSqr
 ApplicationWindow
 {
     id: app
@@ -49,20 +49,13 @@ ApplicationWindow
     property int args: Qt.application.arguments.length
 
     Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta
-        UnTpd.unTpOsoite = "https://api.untappd.com/v4"
         UnTpd.unTpdId = Qt.application.arguments[args-6]
         UnTpd.unTpdSecret = Qt.application.arguments[args-5]
         UnTpd.callbackURL = Qt.application.arguments[args-4]
-        UnTpd.fSqId = Qt.application.arguments[args-3]
-        UnTpd.fSqSecret = Qt.application.arguments[args-2]
-        UnTpd.fSqVersion = Qt.application.arguments[args-1]
-
-        /*
-        var viesti = "ep " + UnTpd.unTpOsoite + " utpId " + UnTpd.unTpdId + " utpSecret " + UnTpd.unTpdSecret
-                + " cbUrl " + UnTpd.callbackURL + " 4Id " + UnTpd.fSqId + " 4Secret " + UnTpd.fSqSecret
-                + " 4v " + UnTpd.fSqVersion
-        //console.log(viesti)
-        // */
+        FourSqr.appId = Qt.application.arguments[args-3]
+        FourSqr.appSecret = Qt.application.arguments[args-2]
+        FourSqr.fsqrVersion = Qt.application.arguments[args-1]
+        UnTpd.programName = Qt.application.arguments[0]
 
     }
 }

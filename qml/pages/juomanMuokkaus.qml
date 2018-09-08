@@ -35,6 +35,7 @@ Dialog {
 
     property date aika
     property string nimi
+    property string nimi0
     property string juomanKuvaus
     property real maara
     property real maaraMuutos : 1
@@ -154,7 +155,7 @@ Dialog {
         if (vahvuus > 100)
             vahvuus = 100
 
-        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
+        prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%"
 
         return
     }
@@ -180,7 +181,8 @@ Dialog {
     }
 
     SilicaFlickable {
-        anchors.fill: parent
+        //anchors.fill: parent
+        width: sivu.width
         height: sivu.height
         //height: column.height
         contentHeight: column.height
@@ -209,33 +211,57 @@ Dialog {
                 }
 
                 Button {
-                    id: avaanUnTappd
+                    id: avaaUnTappd
                     text: qsTr("search UnTappd")
-                    visible: (UnTpd.unTpToken == "") ? false : true
-                    //anchors.horizontalCenter: sivu.anchors.horizontalCenter
-                    //x: 0.5*(sivu.width - width)
                     onClicked: {
-                        var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
-                            "olut": juoma.text } )
-                        dialog.accepted.connect( function() {
-                            juoma.text = dialog.olut
-                            vahvuus = dialog.vahvuus
-                            olutId = dialog.olutId
-                            valitunEtiketti.source = UnTpd.oluenEtiketti
-                            console.log("column height " + column.height)
-                        })
+                        //if (UnTpd.unTpToken == "") {
+                        //    pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
+                        //} else {
+                            var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
+                                "olut": juoma.text, "vahvuus": vahvuus} )
+                            dialog.accepted.connect( function() {
+                                juoma.text = dialog.olut
+                                nimi0 = dialog.olut
+                                vahvuus = dialog.vahvuus
+                                olutId = dialog.olutId
+                                valitunEtiketti.source = UnTpd.oluenEtiketti
+                                tahtiaRivi.visible = (olutId > 0) ? true : false
+                                //console.log("avaaUnTappd: olutId " + olutId)
+                            })
+                        }
+
                     }
-                }
+                //}
             }
 
-            TextField {
+            Row {
+                TextField {
                     id: juoma
-                    text: nimi
+                    text: nimi0
                     labelVisible: false
                     placeholderText: qsTr("Drink")
                     readOnly: false
-                    width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
+                    width: sivu.width - tyhjennaHaku.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
+                    onTextChanged: {
+                        olutId = 0
+                        tahtiaRivi.visible = false
+                    }
                 }
+
+                IconButton {
+                    id: tyhjennaHaku
+                    icon.source: "image://theme/icon-m-clear"
+                    //width: Theme.fontSizeMedium*3
+                    onClicked: {
+                        //juoma.text = ""
+                        nimi0 = ""
+                        olutId = 0
+                        tahtiaRivi.visible = false
+                        valitunEtiketti.source = "tuoppi.png"
+                    }
+                }
+
+            }
 
             Row { //arvostelu
                 id: tahtiaRivi
@@ -414,7 +440,6 @@ Dialog {
                 x: 0.5*(sivu.width - maaraLabel.width - maaranNaytto.width - yksikonValinta.width - 2*spacing) //
                 //padding: Theme.paddingMedium
 
-
                 Label {
                     id: maaraLabel
                     text: qsTr("volume")
@@ -474,7 +499,7 @@ Dialog {
                         //maaranNaytto.value = maara.toFixed(maaraDesimaaleja) + yksikkoTunnus
                         maaranNaytto.text = maara.toFixed(maaraDesimaaleja) // + yksikkoTunnus
 
-                        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
+                        //prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%"
                     }
 
                 } //combobox
@@ -565,7 +590,7 @@ Dialog {
             }
 
             DetailItem {
-                id: prosenntienNaytto
+                id: prosenttienNaytto
                 label: qsTr("alcohol")
                 value: vahvuus.toFixed(1) + " vol-%"
             }
@@ -658,7 +683,6 @@ Dialog {
     }
 
     Component.onCompleted: {
-        console.log("column height " + column.height)
         if (tilavuusMitta == 2) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
             asetaYksikotUsOz()
             yksikonValinta.currentIndex = tilavuusMitta - 1
@@ -674,9 +698,13 @@ Dialog {
         } else
             asetaYksikotMl()
 
+        //console.log("olutId + tahtia: " + olutId + " " + tahtia + " " + nimi)
+
+        if (olutId > 0)
+            tahtiaRivi.visible = true
+
         valitunEtiketti.source = UnTpd.oluenEtiketti
-        if (UnTpd.oluenId > 0)
-            kuvaus.text = UnTpd.shout
+        nimi0 = nimi
 
     }
 
@@ -684,6 +712,11 @@ Dialog {
         if (result == DialogResult.Accepted) {
             nimi = juoma.text
             juomanKuvaus = kuvaus.text
+            if (nimi0 != nimi){ // nimi0 = joko juodut-tietokantaan talletettu tai untappedista haettu
+                olutId = 0
+                UnTpd.setBeer(olutId)
+            }
+
             if (olutId > 0)
                 UnTpd.shout = kuvaus.text
             maara = maara*yksikko
