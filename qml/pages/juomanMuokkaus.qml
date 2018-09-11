@@ -28,12 +28,14 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../scripts/unTap.js" as UnTpd
 
 Dialog {
     id: sivu    
 
     property date aika
     property string nimi
+    property string nimi0
     property string juomanKuvaus
     property real maara
     property real maaraMuutos : 1
@@ -51,7 +53,8 @@ Dialog {
     property real pintImp: 20*ozImp
     property string yksikkoTunnus: " ml"
     property int tilavuusMitta//: 1 // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
-    //anchors.fill: parent
+    property int olutId: 0
+    property int tahtia: 0
 
     function asetaYksikotMl() {
         maara = maara*yksikko
@@ -152,7 +155,7 @@ Dialog {
         if (vahvuus > 100)
             vahvuus = 100
 
-        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
+        prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%"
 
         return
     }
@@ -178,7 +181,10 @@ Dialog {
     }
 
     SilicaFlickable {
-        anchors.fill: parent
+        //anchors.fill: parent
+        width: sivu.width
+        height: sivu.height
+        //height: column.height
         contentHeight: column.height
 
         VerticalScrollDecorator {}
@@ -187,20 +193,189 @@ Dialog {
             id: column
             spacing: Theme.paddingLarge
             width: parent.width
-            anchors.fill: parent
+            //anchors.fill: parent
 
             DialogHeader {
                 title: qsTr("Drink")
             } // */
 
+            Row { //etsi untappedistä
+                x: Theme.paddingLarge
+                spacing: Theme.paddingLarge
+
+                Image {
+                    id: valitunEtiketti
+                    source: "./tuoppi.png"
+                    width: Theme.fontSizeMedium*3
+                    height: width
+                }
+
+                Button {
+                    id: avaaUnTappd
+                    text: qsTr("search UnTappd")
+                    onClicked: {
+                        //if (UnTpd.unTpToken == "") {
+                        //    pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
+                        //} else {
+                            var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
+                                "olut": juoma.text, "vahvuus": vahvuus} )
+                            dialog.accepted.connect( function() {
+                                juoma.text = dialog.olut
+                                nimi0 = dialog.olut
+                                vahvuus = dialog.vahvuus
+                                olutId = dialog.olutId
+                                valitunEtiketti.source = UnTpd.oluenEtiketti
+                                tahtiaRivi.visible = (olutId > 0) ? true : false
+                                //console.log("avaaUnTappd: olutId " + olutId)
+                            })
+                        }
+
+                    }
+                //}
+            }
+
+            Row {
                 TextField {
                     id: juoma
-                    text: nimi
+                    text: nimi0
                     labelVisible: false
                     placeholderText: qsTr("Drink")
                     readOnly: false
-                    width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
+                    width: sivu.width - tyhjennaHaku.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
+                    onTextChanged: {
+                        olutId = 0
+                        tahtiaRivi.visible = false
+                    }
                 }
+
+                IconButton {
+                    id: tyhjennaHaku
+                    icon.source: "image://theme/icon-m-clear"
+                    //width: Theme.fontSizeMedium*3
+                    onClicked: {
+                        //juoma.text = ""
+                        nimi0 = ""
+                        olutId = 0
+                        tahtiaRivi.visible = false
+                        valitunEtiketti.source = "tuoppi.png"
+                    }
+                }
+
+            }
+
+            Row { //arvostelu
+                id: tahtiaRivi
+                visible: (olutId > 0) ? true : false
+                x: Theme.paddingLarge
+                spacing: (sivu.width - 2*x - 5*arvostelu1.width - 4*arvostelu15.width)/8
+
+                IconButton {
+                    id: arvostelu1
+                    highlighted: (tahtia >= 1) ? true : false
+                    icon.source: (tahtia >= 1) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 1)
+                            tahtia = 0
+                        else
+                            tahtia = 1
+                    }
+                }
+                IconButton {
+                    id: arvostelu15
+                    highlighted: (tahtia >= 2) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 2)
+                            tahtia = 0
+                        else
+                            tahtia = 2
+                    }
+                }
+                IconButton {
+                    id: arvostelu2
+                    highlighted: (tahtia >= 3) ? true : false
+                    icon.source: (tahtia >= 3) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 3)
+                            tahtia = 0
+                        else
+                            tahtia = 3
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu25
+                    highlighted: (tahtia >= 4) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 4)
+                            tahtia = 0
+                        else
+                            tahtia = 4
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu3
+                    highlighted: (tahtia >= 5) ? true : false
+                    icon.source: (tahtia >= 5) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 5)
+                            tahtia = 0
+                        else
+                            tahtia = 5
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu35
+                    highlighted: (tahtia >= 6) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 6)
+                            tahtia = 0
+                        else
+                            tahtia = 6
+                    }
+                }
+                IconButton {
+                    id: arvostelu4
+                    highlighted: (tahtia >= 7) ? true : false
+                    icon.source: (tahtia >= 7) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 7)
+                            tahtia = 0
+                        else
+                            tahtia = 7
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu45
+                    highlighted: (tahtia >= 8) ? true : false
+                    icon.source: "image://theme/icon-s-favorite"
+                    onClicked: {
+                        if (tahtia == 8)
+                            tahtia = 0
+                        else
+                            tahtia = 8
+
+                    }
+                }
+                IconButton {
+                    id: arvostelu5
+                    highlighted: (tahtia == 9) ? true : false
+                    icon.source: (tahtia >= 9) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
+                    onClicked: {
+                        if (tahtia == 9)
+                            tahtia = 0
+                        else
+                            tahtia = 9
+
+                    }
+                }
+
+            } //arvostelu
 
             Row { // time
 
@@ -265,7 +440,6 @@ Dialog {
                 x: 0.5*(sivu.width - maaraLabel.width - maaranNaytto.width - yksikonValinta.width - 2*spacing) //
                 //padding: Theme.paddingMedium
 
-
                 Label {
                     id: maaraLabel
                     text: qsTr("volume")
@@ -325,7 +499,7 @@ Dialog {
                         //maaranNaytto.value = maara.toFixed(maaraDesimaaleja) + yksikkoTunnus
                         maaranNaytto.text = maara.toFixed(maaraDesimaaleja) // + yksikkoTunnus
 
-                        prosenntienNaytto.value = vahvuus.toFixed(1) + " vol-%"
+                        //prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%"
                     }
 
                 } //combobox
@@ -416,7 +590,7 @@ Dialog {
             }
 
             DetailItem {
-                id: prosenntienNaytto
+                id: prosenttienNaytto
                 label: qsTr("alcohol")
                 value: vahvuus.toFixed(1) + " vol-%"
             }
@@ -501,9 +675,9 @@ Dialog {
                 text: juomanKuvaus
                 readOnly: false
                 width: parent.width
-                placeholderText: qsTr("some notes?")
+                label: (olutId > 0) ? qsTr("shout!") : qsTr("some notes?")
+                placeholderText: label
             }
-
 
         }//column
     }
@@ -524,16 +698,29 @@ Dialog {
         } else
             asetaYksikotMl()
 
+        //console.log("olutId + tahtia: " + olutId + " " + tahtia + " " + nimi)
+
+        if (olutId > 0)
+            tahtiaRivi.visible = true
+
+        valitunEtiketti.source = UnTpd.oluenEtiketti
+        nimi0 = nimi
+
     }
 
     onDone: {
         if (result == DialogResult.Accepted) {
             nimi = juoma.text
             juomanKuvaus = kuvaus.text
-            maara = maara*yksikko
+            if (nimi0 != nimi){ // nimi0 = joko juodut-tietokantaan talletettu tai untappedista haettu
+                olutId = 0
+                UnTpd.setBeer(olutId)
+            }
 
+            if (olutId > 0)
+                UnTpd.shout = kuvaus.text
+            maara = maara*yksikko
         }
     }
 
 }
-

@@ -1,25 +1,26 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../scripts/scripts.js" as Apuja
 
 Dialog {
-    //id: sivu
+    id: sivu
     property int paiva: 24*60*60*1000 // ms
     property real tanaan: mlAikana(paiva) // paaikkuna.mlAikana(paiva)
     property real mlViikossa: mlAikana(7*paiva)
     property real mlKuussa: mlAikana(30*paiva) // paaikkuna.mlAikana(30*paiva)
-    property int valittuKuvaaja
+    property int valittuKuvaaja // 0 - viikkokulutus, 1 - paivakulutus, oli 2 - paivaruudukko
     property int ryyppyVrk
 
-    function mlAikana(jakso) {
+    function mlAikana(jakso) { // jakso = ms nykyhetkestä (tai tulevasta juoman hetkestä)
         var nyt = new Date().getTime()
         var ml = 0
-        var i = paaikkuna.juomienMaara() - 1
+        var i = Apuja.juomienMaara() - 1
 
-        if (paaikkuna.lueJuomanAika(i) > nyt)
-            nyt = paaikkuna.lueJuomanAika(i)
+        if ( Apuja.juomanAika(i) > nyt)
+            nyt = Apuja.juomanAika(i)
 
-        while ( (i >=0 ) && (paaikkuna.lueJuomanAika(i) >= nyt - jakso)){
-            ml = ml + paaikkuna.lueJuomanMaara(i)*paaikkuna.lueJuomanVahvuus(i)/100
+        while ( (i >=0 ) && (Apuja.juomanAika(i) >= nyt - jakso)){
+            ml = ml + Apuja.juomanTilavuus(i)*Apuja.juomanVahvuus(i)/100
             i--
         }
 
@@ -29,13 +30,13 @@ Dialog {
     function mlVuodessa() {
         var nyt = new Date().getTime()
         var suhde = 1
-        var i = paaikkuna.juomienMaara() - 1
+        var i = Apuja.juomienMaara() - 1
 
-        if (paaikkuna.lueJuomanAika(i) > nyt)
-            nyt = paaikkuna.lueJuomanAika(i)
+        if (Apuja.juomanAika(i) > nyt)
+            nyt = Apuja.juomanAika(i)
 
-        if (paaikkuna.lueJuomanAika(0) > nyt - 365*paiva){
-            suhde = (nyt-paaikkuna.lueJuomanAika(0))/(365*paiva)
+        if (Apuja.juomanAika(0) > nyt - 365*paiva){
+            suhde = (nyt-Apuja.juomanAika(0))/(365*paiva)
             if (suhde < 1/52)
                 suhde = 1/52
 
@@ -96,55 +97,15 @@ Dialog {
         return
     }
 
-    function valitsePaivaKartta() {
-        if (paivaKartta.checked) {
-            valittuKuvaaja = 0
-            viikkoKuvaaja.checked = false
-            paivaKuvaaja.checked = false
-        } else {
-            valittuKuvaaja = 1
-            viikkoKuvaaja.checked = true
-            paivaKuvaaja.checked = false
-        }
-        return
-    }
-
-    function valitsePaivaKuvaaja() {
-        if (paivaKuvaaja.checked) {
-            valittuKuvaaja = 2
-            viikkoKuvaaja.checked = false
-            paivaKartta.checked = false
-        } else {
-            valittuKuvaaja = 1
-            viikkoKuvaaja.checked = true
-            paivaKartta.checked = false
-        }
-        return
-    }
-
-    function valitseViikkoKuvaaja() {
-        if (viikkoKuvaaja.checked) {
-            valittuKuvaaja = 1
-            paivaKuvaaja.checked = false
-            paivaKartta.checked = false
-        } else {
-            valittuKuvaaja = 2
-            paivaKuvaaja.checked = true
-            paivaKartta.checked = false
-        }
-        return
-    }
-
     SilicaFlickable {
-        height: column.height
-        width: parent.width
+        height: sivu.height
+        contentHeight: column.height
+        width: sivu.width
 
         Column {
             id: column
-            width: parent.width
-            //anchors.leftMargin:
+            width: sivu.width
 
-//            DialogHeader {
             DialogHeader {
                 title: qsTr("Statistics")
             }
@@ -159,12 +120,12 @@ Dialog {
 
                 menu: ContextMenu {
                     id: drinkMenu
-                    MenuItem { text: qsTr("day grid") }
+                    //MenuItem { text: qsTr("day grid") }
                     MenuItem { text: qsTr("weekly consumption") }
                     MenuItem { text: qsTr("daily consumption") }
                 }
 
-                currentIndex: valittuKuvaaja
+                currentIndex: (valittuKuvaaja > 1.5) ? 0 : valittuKuvaaja
 
                 onCurrentIndexChanged: {
                     switch (currentIndex) {
@@ -174,9 +135,9 @@ Dialog {
                     case 1:
                         valittuKuvaaja = 1
                         break
-                    case 2:
-                        valittuKuvaaja = 2
-                        break
+                    //case 2:
+                      //  valittuKuvaaja = 2
+                        //break
                     }
                 }
 
@@ -303,7 +264,6 @@ Dialog {
                 }
             }
 
-
         }
 
     }
@@ -313,4 +273,3 @@ Dialog {
     }
 
 }
-

@@ -16,103 +16,103 @@
     </message>
     <message>
         <source>request not initialized</source>
-        <translation></translation>
+        <translation ></translation>
     </message>
     <message>
         <source>server connection established</source>
-        <translation></translation>
+        <translation ></translation>
     </message>
     <message>
         <source>request received</source>
-        <translation></translation>
+        <translation ></translation>
     </message>
     <message>
         <source>processing request</source>
-        <translation></translation>
+        <translation ></translation>
     </message>
     <message>
         <source>request finished</source>
-        <translation></translation>
+        <translation ></translation>
     </message>
     <message>
         <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
+        <translation >lähetetään kyselyä</translation>
     </message>
     <message>
         <source>delete</source>
-        <translation>poista</translation>
+        <translation >poista</translation>
     </message>
     <message>
         <source>deleting</source>
-        <translation>poistaa</translation>
+        <translation >poistaa</translation>
     </message>
     <message>
         <source>modify</source>
-        <translation>muokkaa</translation>
+        <translation >muokkaa</translation>
     </message>
     <message>
         <source>info</source>
-        <translation>tietoja</translation>
+        <translation >tietoja</translation>
     </message>
     <message>
         <source>unTappd</source>
-        <translation></translation>
+        <translation ></translation>
     </message>
     <message>
         <source>settings</source>
-        <translation>asetukset</translation>
+        <translation >asetukset</translation>
     </message>
     <message>
         <source>demo</source>
-        <translation>demo</translation>
+        <translation ></translation>
     </message>
     <message>
         <source>Drunkard?</source>
-        <translation>Juoppoko</translation>
+        <translation >Juoppoko</translation>
     </message>
     <message>
         <source>BAC</source>
-        <translation>veressä</translation>
+        <translation >veressä</translation>
     </message>
     <message>
         <source>sober at</source>
-        <translation>selvänä</translation>
+        <translation >selvänä</translation>
     </message>
     <message>
         <source> ‰ at</source>
-        <translation> ‰ klo</translation>
+        <translation > ‰ klo</translation>
     </message>
     <message>
         <source>beer</source>
-        <translation>olut</translation>
+        <translation >olut</translation>
     </message>
     <message>
         <source>vol-%</source>
-        <translation>til-%</translation>
+        <translation >til-%</translation>
     </message>
     <message>
         <source>check in</source>
-        <translation>kirjaa</translation>
+        <translation >kirjaa</translation>
     </message>
     <message>
         <source>don&apos;t check in</source>
-        <translation>älä kirjaa</translation>
+        <translation >älä kirjaa</translation>
     </message>
     <message>
         <source>no location</source>
-        <translation>ei sijaintia</translation>
+        <translation >ei sijaintia</translation>
     </message>
     <message>
         <source>cheers!</source>
-        <translation>skåål!</translation>
+        <translation >skåål!</translation>
     </message>
     <message>
         <source>time</source>
-        <translation>aika</translation>
+        <translation >aika</translation>
     </message>
     <message>
         <source>drink</source>
-        <translation>juoma</translation>
+        <translation >juoma</translation>
     </message>
 </context>
 <context>
@@ -156,6 +156,10 @@
     <message>
         <source>other</source>
         <translation>muu</translation>
+    </message>
+    <message>
+        <source>calculate limits</source>
+        <translation>laske rajat</translation>
     </message>
     <message>
         <source>lower limit</source>
@@ -202,16 +206,8 @@
         <translation>unTappd-tili</translation>
     </message>
     <message>
-        <source>My measures</source>
-        <translation>Mittani</translation>
-    </message>
-    <message>
-        <source>set limits</source>
-        <translation>aseta rajat</translation>
-    </message>
-    <message>
-        <source>calculate limits</source>
-        <translation>laske rajat</translation>
+        <source>Data</source>
+        <translation >Tiedot</translation>
     </message>
 </context>
 <context>
@@ -337,7 +333,7 @@
     <message>
         <source>The default limits are from 
  %1 according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
-        <translation>Oletusrajat ovat lähteestä %1, jonka mukaan matalan riskin raja on naisille 7 annosta viikossa ja miehille 14. Lisääntyneen riskin raja on 16 annosta naisille ja 24 miehille. </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -410,8 +406,8 @@
         <translation>Ansiomerkit</translation>
     </message>
     <message>
-        <source>show new ones</source>
-        <translation>näytä uusimmat</translation>
+        <source>show latests</source>
+        <translation>näytä viimeisimmät</translation>
     </message>
     <message>
         <source>show all</source>
@@ -419,7 +415,7 @@
     </message>
     <message>
         <source>Local Badge</source>
-        <translation>paikallinen merkki</translation>
+        <translation>paikallinen tunnus</translation>
     </message>
     <message>
         <source>Depressing.</source>
@@ -431,11 +427,11 @@
     </message>
     <message>
         <source>show descriptions</source>
-        <translation>näytä kuvaukset</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>hide descriptions</source>
-        <translation>piilota kuvaukset</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -453,7 +449,7 @@
     <name>unTpCheckIn</name>
     <message>
         <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
+        <translation type="unfinished">lähetetään kyselyä</translation>
     </message>
     <message>
         <source>request not initialized</source>
@@ -473,162 +469,190 @@
     </message>
     <message>
         <source>Satellite</source>
-        <translation>satelliitti</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation>ei käytettävissä</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Non-satellite</source>
-        <translation>ei satelliiteistä</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Multiple</source>
-        <translation>monipaikanteinen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>source error</source>
-        <translation>lähdevirhe</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>check-in details</source>
-        <translation>kirjauksen yksityiskohdat</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>positioning</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>search text</source>
-        <translation>hakusanat</translation>
+        <translation type="unfinished">hakusanat</translation>
     </message>
     <message>
         <source>starting search</source>
-        <translation>hakua aloitetaan</translation>
+        <translation type="unfinished">hakua aloitetaan</translation>
+    </message>
+    <message>
+        <source>post to facebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not to facebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>post to twitter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no tweeting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>post to foursquare</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not to foursquare</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>search settings</source>
-        <translation>hakuasetukset</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>radius %1</source>
-        <translation>säde %1</translation>
-    </message>
-    <message>
-        <source>radius not limited</source>
-        <translation>sädettä ei rajattu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>show all places</source>
-        <translation>näytä kaikki</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>None found.</source>
-        <translation>Ei löytöjä.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Better luck next time.</source>
-        <translation>Parempi onni ensi kerralla.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>postings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>defaults to lat: %1, long: %2</source>
-        <translation>oletukset: lev. %1, pit. %2</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>lat: %1, long: %2, alt: %3</source>
-        <translation>lev. %1, pit. %2, korkeus %3</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>limit to Foursquare categories %1 and %2</source>
-        <translation>rajaa haku Foursquaren luokkiin %1 ja %2</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>timestamp</source>
-        <translation>määrityshetki</translation>
+        <source>no postings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>unTpKayttaja</name>
     <message>
         <source>user info: </source>
-        <translation>tietoja käyttäjästä:</translation>
+        <translation type="unfinished">tietoja käyttäjästä:</translation>
     </message>
     <message>
         <source>UnTappd account</source>
-        <translation>UnTappd-tili</translation>
+        <translation type="unfinished">UnTappd-tili</translation>
     </message>
     <message>
         <source>username</source>
-        <translation>käyttäjä</translation>
+        <translation type="unfinished">käyttäjä</translation>
     </message>
     <message>
         <source>unidentified</source>
-        <translation>tuntematon</translation>
+        <translation type="unfinished">tuntematon</translation>
     </message>
     <message>
         <source>sign in</source>
-        <translation>kirjaudu</translation>
+        <translation type="unfinished">kirjaudu</translation>
     </message>
     <message>
         <source>change user</source>
-        <translation>muuta käyttäjä</translation>
+        <translation type="unfinished">muuta käyttäjä</translation>
     </message>
     <message>
         <source>badges</source>
-        <translation>ansiomerkit</translation>
+        <translation type="unfinished">ansiomerkit</translation>
     </message>
     <message>
         <source>friends</source>
-        <translation>kavereita</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>checkins</source>
-        <translation>kirjauksia</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>beers</source>
-        <translation>oluita</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>beers created</source>
-        <translation>oluita luotu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>photos</source>
-        <translation>kuvia</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No badges!</source>
-        <translation>Ei merkkejä!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No friends!</source>
-        <translation>Ei kavereita!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No checkins!</source>
-        <translation>Ei kirjauksia!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>NO BEERS!</source>
-        <translation>EI OLUITA!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No photos.</source>
-        <translation>Ei kuvia.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>followed</source>
-        <translation>seurattuja</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No biograph.</source>
-        <translation>Ei henkilökuvausta.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No beers created.</source>
-        <translation>Ei luotuja oluita.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>None followed.</source>
-        <translation>Ei seurattuja.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -691,15 +715,15 @@
     </message>
     <message>
         <source>remove from wish-list</source>
-        <translation>poista toivelistalta</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>log in UnTappd</source>
-        <translation>kirjaudu UnTappdiin</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Seems like you haven&apos;t logged in UnTappd. That may limit the number of queries per day.</source>
-        <translation>Et näytä kirjautuneen UnTappdiin. Se saattaa rajata kyselyjen päivittäistä määrää.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -782,7 +806,7 @@
     </message>
     <message>
         <source>remove from wish-list</source>
-        <translation>poista toivelistalta</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

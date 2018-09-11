@@ -11,72 +11,108 @@
 <context>
     <name>Paaikkuna</name>
     <message>
+        <source>wk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>posting query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>delete</source>
-        <translation>poista</translation>
+        <translation type="unfinished">poista</translation>
     </message>
     <message>
         <source>deleting</source>
-        <translation>poistaa</translation>
+        <translation type="unfinished">poistaa</translation>
     </message>
     <message>
         <source>modify</source>
-        <translation>muokkaa</translation>
-    </message>
-    <message>
-        <source>wk</source>
-        <translation>vk</translation>
-    </message>
-    <message>
-        <source>su fr we mo</source>
-        <translation>su pe ke ma</translation>
+        <translation type="unfinished">muokkaa</translation>
     </message>
     <message>
         <source>info</source>
-        <translation>tietoja</translation>
+        <translation type="unfinished">tietoja</translation>
+    </message>
+    <message>
+        <source>unTappd</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>settings</source>
-        <translation>asetukset</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>demo</source>
-        <translation>demo</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Drunkard?</source>
-        <translation>Juoppoko</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>BAC</source>
-        <translation>veressä</translation>
+        <translation type="unfinished">veressä</translation>
     </message>
     <message>
         <source>sober at</source>
-        <translation>selvänä</translation>
+        <translation type="unfinished">selvänä</translation>
     </message>
     <message>
         <source> ‰ at</source>
-        <translation> ‰ klo</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>beer</source>
-        <translation>olut</translation>
+        <translation type="unfinished">olut</translation>
     </message>
     <message>
         <source>vol-%</source>
-        <translation>til-%</translation>
+        <translation type="unfinished">til-%</translation>
+    </message>
+    <message>
+        <source>check in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>don&apos;t check in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>cheers!</source>
-        <translation>skåål!</translation>
+        <translation type="unfinished">skåål!</translation>
     </message>
     <message>
         <source>time</source>
-        <translation>aika</translation>
+        <translation type="unfinished">aika</translation>
     </message>
     <message>
         <source>drink</source>
-        <translation>juoma</translation>
+        <translation type="unfinished">juoma</translation>
     </message>
 </context>
 <context>
@@ -88,10 +124,6 @@
     <message>
         <source>restore</source>
         <translation>palauta</translation>
-    </message>
-    <message>
-        <source>Data</source>
-        <translation>Arvot</translation>
     </message>
     <message>
         <source>weight</source>
@@ -124,10 +156,6 @@
     <message>
         <source>other</source>
         <translation>muu</translation>
-    </message>
-    <message>
-        <source>calculate limits</source>
-        <translation>laske rajat</translation>
     </message>
     <message>
         <source>lower limit</source>
@@ -168,6 +196,22 @@
     <message>
         <source>upper daily limit</source>
         <translation>ylempi päiväraja</translation>
+    </message>
+    <message>
+        <source>set up unTappd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>set limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>My measures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>calculate limits</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -249,31 +293,31 @@
     <name>juomanMuokkaus</name>
     <message>
         <source>Drink</source>
-        <translation>Juoma</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>search UnTappd</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>volume</source>
-        <translation>tilavuus</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>alcohol</source>
-        <translation>prosentteja</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>shout!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>some notes?</source>
-        <translation>muuta?</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>tietoja</name>
-    <message>
-        <source>The default limits are from </source>
-        <translation>Oletusrajat ovat sivulta </translation>
-    </message>
-    <message>
-        <source>according to which a safe limit for women is 7 portions weekly, for men 14. Limit of increased risk is 16 portions for women and 24 for men. </source>
-        <translation>jonka mukaan kohtuukäytön raja on naisille 7 annosta viikossa ja miehille 14, ja riskiraja naisille 16 ja miehille 24 annosta. </translation>
-    </message>
     <message>
         <source>Here the values are expected to depend only on the amount of water in body, not on sex.</source>
         <translation>Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.</translation>
@@ -283,8 +327,17 @@
         <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
     </message>
     <message>
-        <source>Blood alcohol content above 4.0 ‰ may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>
-        <translation>Yli 4.0 ‰ alkoholipitoisuus voi aiheuttaa kooman tai olla tappava. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
+        <source>Info about UnTappd: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High blood alcohol content may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The default limits are from 
+ %1 according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -330,12 +383,406 @@
         <translation>päiväkulutus</translation>
     </message>
     <message>
-        <source>day grid</source>
-        <translation>päiväruudukko</translation>
-    </message>
-    <message>
         <source>drinking day ends at</source>
         <translation>ryyppypäivä vaihtuu</translation>
+    </message>
+</context>
+<context>
+    <name>unTpAnsiomerkit</name>
+    <message>
+        <source>request not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Badges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>show all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Badge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depressing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No badges during this session!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>show descriptions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hide descriptions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>show new ones</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpBaarit</name>
+    <message>
+        <source>Beer provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>venue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpCheckIn</name>
+    <message>
+        <source>posting query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Satellite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Non-satellite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>source error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>check-in details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>search text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>search settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>radius %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>show all places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Better luck next time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>defaults to lat: %1, long: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lat: %1, long: %2, alt: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>limit to Foursquare categories %1 and %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>radius not limited</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpKayttaja</name>
+    <message>
+        <source>user info: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UnTappd account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unidentified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sign in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>badges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>friends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>checkins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>beers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>beers created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>photos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No badges!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No friends!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No checkins!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO BEERS!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No photos.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>followed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No biograph.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No beers created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None followed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpOluet</name>
+    <message>
+        <source>request not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beers in unTappd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>selected beer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>search text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no beer selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>add to wish-list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ibu %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change to alphabetical order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change to order by popularity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>posting query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>remove from wish-list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>log in UnTappd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seems like you haven&apos;t logged in UnTappd. That may limit the number of queries per day.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpTietojaOluesta</name>
+    <message>
+        <source>no beer selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>add to wish-list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>getting beer info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>me</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>drinkers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>monthly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>wishlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>my rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>abv %1 %, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ibu %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is in my</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is not in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>remove from wish-list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

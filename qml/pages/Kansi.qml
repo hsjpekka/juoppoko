@@ -28,6 +28,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../scripts/scripts.js" as Apuja
 
 CoverBackground {
     id: kansi
@@ -67,8 +68,8 @@ CoverBackground {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: Theme.fontSizeLarge
-        text: naytaPromillet() //paaikkuna.calculatePermille(new Date().getTime()).toFixed(2) + " ‰"
-        font.pixelSize: Theme.fontSizeMedium
+        //text: naytaPromillet() //paaikkuna.calculatePermille(new Date().getTime()).toFixed(2) + " ‰"
+        //font.pixelSize: Theme.fontSizeMedium
     }
 
     Label {
@@ -108,12 +109,13 @@ CoverBackground {
         CoverAction {
             iconSource: "image://theme/icon-cover-new"
             onTriggered: {
-                paaikkuna.uusiJuoma(new Date().getTime(), new Date().getTime(), 0.0, paaikkuna.nykyinenMaara(), paaikkuna.nykyinenProsentti(), juoma.text, "")
+                paaikkuna.uusiJuoma(new Date().getTime(), new Date().getTime(), paaikkuna.nykyinenMaara(), paaikkuna.nykyinenProsentti(), juoma.text, "", paaikkuna.olutId)
                 paaikkuna.paivitaAjatRajoille()
                 paivita()
             }
         }
     }
 
+    Component.onCompleted: paivita()
 }
 

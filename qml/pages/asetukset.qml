@@ -30,6 +30,8 @@ Dialog {
     property real leveysVasen: 0.7
     property real leveysOikea: 0.3
 
+    property bool untapped: false
+
     function alkutoimet() {
         massa = massa0
         vetta = vetta0
@@ -66,9 +68,11 @@ Dialog {
         // 24 annosta ~ 364 ml,  85.5 kg * 75% * 5.5 = 352 ml
         // 16 annosta ~ 243 ml,  70.4 kg * 65% * 5.5 = 251 ml
         vk2txt.text = (massa*vetta*5.5).toFixed(0)
+        day2text.text = (massa*vetta*5.5*0.5).toFixed(0)
 
         // alempi naisten kohtuukäytöstä 7 annosta viikossa
         vk1txt.text = (massa*vetta*2.3).toFixed(0)
+        day1text.text = (massa*vetta*2.3*0.5).toFixed(0)
 
         vs1txt.text = (massa*vetta*2.3*52).toFixed(0)
 
@@ -78,7 +82,7 @@ Dialog {
 
     SilicaFlickable {
         id: ylaosa
-        anchors.fill: sivu
+        anchors.fill: parent
         height: sivu.height
         contentHeight: column.height
 
@@ -94,6 +98,15 @@ Dialog {
                 text: qsTr("restore")
                 onClicked: palautaAlkuarvot()
             }
+
+            MenuItem {
+                text: qsTr("set up unTappd")
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
+                }
+            }
+
+
         }
 
         VerticalScrollDecorator {}
@@ -103,7 +116,7 @@ Dialog {
 
             DialogHeader {
                 id: otsikko
-                title: qsTr("Data")
+                title: qsTr("My measures")
             }
 
             Row { //paino
@@ -121,7 +134,11 @@ Dialog {
                     text: massa
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 1; top: 1000}
-                    onTextChanged: massa = massaTxt.text*1
+                    onTextChanged: {
+                        massa = massaTxt.text*1
+                        if (!oletusRajat.checked)
+                            laskeRajat()
+                    }
                 }
             }
 
@@ -139,7 +156,12 @@ Dialog {
                     text: (kunto*100).toFixed(0)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 1; top: 1000}
-                    onTextChanged: kunto = parseFloat(kuntoTxt.text/100)
+                    //onTextChanged: kunto = parseFloat(kuntoTxt.text/100)
+                    onTextChanged: {
+                        kunto = kuntoTxt.text/100
+                        if (!oletusRajat.checked)
+                            laskeRajat()
+                    }
                 }
             } //maksa
 
@@ -155,8 +177,10 @@ Dialog {
                     id: paloTxt
                     width: leveysOikea*sivu.width
                     readOnly: true
-                    text: (palonopeus*0.7894*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " g/h"
-                    label: (palonopeus*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " ml/h"
+                    text: (palonopeus*0.7894*kuntoTxt.text/100*massaTxt.text).toFixed(1) + " g/h"
+                    //text: (palonopeus*0.7894*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " g/h"
+                    label: (palonopeus*kuntoTxt.text/100*massaTxt.text).toFixed(1) + " ml/h"
+                    //label: (palonopeus*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " ml/h"
                 }
             } //palonopeus
 
@@ -211,7 +235,11 @@ Dialog {
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     readOnly: true
                     text: (vetta*100).toFixed(0)
-                    onTextChanged: vetta = nesteTxt.text/100
+                    onTextChanged: {
+                        vetta = nesteTxt.text/100
+                        if (!oletusRajat.checked)
+                            laskeRajat()
+                    }
                     //onAccepted: {
                     //    nesteprosentti = kehonnesteprosentti.text
                     //}
@@ -220,17 +248,22 @@ Dialog {
 
             } //nesteprosentti
 
-            Button {
-                text: qsTr("calculate limits")
+            TextSwitch {
+                id: oletusRajat
+                checked: true
+                text: checked ? qsTr("set limits") : qsTr("calculate limits")
                 onClicked: {
-                    laskeRajat()
+                    if (!checked)
+                        laskeRajat()
                 }
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Row { //promilleraja 1
+                //visible: oletusRajat.checked
 
                 TextField {
+                    id: ap23
                     width: leveysVasen*sivu.width
                     readOnly: true
                     text: qsTr("lower limit")
@@ -240,16 +273,18 @@ Dialog {
                 TextField {
                     id: prom1txt
                     width: leveysOikea*sivu.width
-                    text: prom10.toFixed(2)
+                    readOnly: !oletusRajat.checked
+                    text: Number(prom10).toLocaleString(Qt.locale())//prom10.toFixed(2)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
-                    onTextChanged: prom1 = parseFloat(text)
+                    //onTextChanged: prom1 = parseFloat(text)
+                    onTextChanged: prom1 = Number.fromLocaleString(Qt.locale(),text)
                 }
-
 
             }
 
             Row { //promilleraja 2
+                //visible: oletusRajat.checked
 
                 TextField {
                     width: leveysVasen*sivu.width
@@ -261,15 +296,17 @@ Dialog {
                 TextField {
                     id: prom2txt
                     width: leveysOikea*sivu.width
-                    text: prom20.toFixed(2)
+                    readOnly: !oletusRajat.checked
+                    text: Number(prom20).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
-                    onTextChanged: prom2 = parseFloat(text)
+                    onTextChanged: prom2 = Number.fromLocaleString(Qt.locale(),text)
                 }
 
             }
 
             Row { //paivaraja 1
+                //visible: oletusRajat.checked
 
                 TextField {
                     width: leveysVasen*sivu.width
@@ -281,15 +318,17 @@ Dialog {
                 TextField {
                     id: day1text
                     width: leveysOikea*sivu.width
+                    readOnly: !oletusRajat.checked
                     text: paiva10
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 500}
-                    onTextChanged: paiva1 = day1text.text*1
+                    onTextChanged: paiva1 = text*1
                 }
 
             } // */
 
             Row { //paivaraja 2
+                //visible: oletusRajat.checked
 
                 TextField {
                     width: leveysVasen*sivu.width
@@ -301,6 +340,7 @@ Dialog {
                 TextField {
                     id: day2text
                     width: leveysOikea*sivu.width
+                    readOnly: !oletusRajat.checked
                     text: paiva20
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 500}
@@ -311,6 +351,7 @@ Dialog {
             // */
 
             Row { //viikkoraja 1
+                //visible: oletusRajat.checked
 
                 TextField {
                     width: leveysVasen*sivu.width
@@ -322,6 +363,7 @@ Dialog {
                 TextField {
                     id: vk1txt
                     width: leveysOikea*sivu.width
+                    readOnly: !oletusRajat.checked
                     text: viikko10
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 500}
@@ -331,6 +373,7 @@ Dialog {
             }
 
             Row { //viikkoraja 2
+                //visible: oletusRajat.checked
 
                 TextField {
                     width: leveysVasen*sivu.width
@@ -342,6 +385,7 @@ Dialog {
                 TextField {
                     id: vk2txt
                     width: leveysOikea*sivu.width
+                    readOnly: !oletusRajat.checked
                     text: viikko20
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 3500}
@@ -351,6 +395,7 @@ Dialog {
             }
 
             Row { //vuosiraja 1
+                //visible: oletusRajat.checked
 
                 TextField {
                     width: leveysVasen*sivu.width
@@ -362,6 +407,7 @@ Dialog {
                 TextField {
                     id: vs1txt
                     width: leveysOikea*sivu.width
+                    readOnly: !oletusRajat.checked
                     text: vuosi10
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 20000}
@@ -371,6 +417,7 @@ Dialog {
             }
 
             Row { //vuosiraja 2
+                //visible: oletusRajat.checked
 
                 TextField {
                     width: leveysVasen*sivu.width
@@ -382,6 +429,7 @@ Dialog {
                 TextField {
                     id: vs2txt
                     width: leveysOikea*sivu.width
+                    readOnly: !oletusRajat.checked
                     text: vuosi20
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 50000}
@@ -392,8 +440,9 @@ Dialog {
 
         }// column
 
-        Component.onCompleted: {
-            alkutoimet()
-        }
+    }
+
+    Component.onCompleted: {
+        alkutoimet()
     }
 }

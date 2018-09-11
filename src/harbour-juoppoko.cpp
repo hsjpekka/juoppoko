@@ -37,6 +37,31 @@
 
 int main(int argc, char *argv[])
 {
-    return SailfishApp::main(argc, argv);
-}
+    char *strings[argc+7]; // + s1-s6
+    char *s1 = UTPD_ID;
+    char *s2 = UTPD_SECRET;
+    char *s3 = CB_URL;
+    char *s4 = FSQ_ID;
+    char *s5 = FSQ_SECRET;
+    char *s6 = FSQ_VERSION;
 
+    int i=0;
+    for (i=0; i<argc; i++){
+        strings[i] = argv[i];
+    }
+
+    strings[argc] = s1;
+    argc++;
+    strings[argc] = s2;
+    argc++;
+    strings[argc] = s3;
+    argc++;
+    strings[argc] = s4;
+    argc++;
+    strings[argc] = s5;
+    argc++;
+    strings[argc] = s6;
+    argc++;
+
+    return SailfishApp::main(argc, strings);
+}

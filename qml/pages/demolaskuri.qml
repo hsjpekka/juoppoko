@@ -535,11 +535,11 @@ Page {
                 }
 
                 TextField {
-                    text: promilleRaja1
+                    text: Number(promilleRaja1).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
                     onTextChanged: {
-                        promilleRaja1 = text*1.0
+                        promilleRaja1 = Number.fromLocaleString(Qt.locale(),text)
                         paivitaAjatRajoille()
                     }
                     label: qsTr("limit") + " [‰]"
@@ -553,11 +553,11 @@ Page {
 
                 TextField {
                     id: pohjat
-                    text: promilleja.toFixed(2)
+                    text: Number(promilleja).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
                     onTextChanged: {
-                        promilleja = text*1.0
+                        promilleja = Number.fromLocaleString(Qt.locale(),text)
                         paivitaPromillet()
                         paivitaAjatRajoille()
                     }
@@ -783,6 +783,12 @@ Page {
 
                     }
                 }
+            }
+
+            Separator{
+                x: Theme.paddingLarge
+                width: sivu.width - 2*x
+                color: Theme.secondaryColor
             }
 
             SilicaListView {
