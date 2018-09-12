@@ -40,12 +40,12 @@ DISTFILES += \
     qml/scripts/tietokanta.js
 
 DEFINES += \
-     UTPD_ID=\"\\\"$${_CL_ID}\\\"\" \
-     UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\" \
-     CB_URL=\"\\\"$${_CB_URL}\\\"\" \
-     FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\" \
-     FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\" \
-     FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\"
+     "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"" \
+     "UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\"" \
+     "CB_URL=\"\\\"$${_CB_URL}\\\"\"" \
+     "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
+     "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
+     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\""
 
 QT += positioning
 
