@@ -117,7 +117,9 @@ function juomanId(i){
     var id = 0
     if ((i >= 0) && (i < juotu.length))
         id = juotu[i].juomaId
-    //console.log("aika " + ms + " " + id)
+    //console.log("juoman id " + id)
+    if (id === null)
+        id = 0
     return id
 }
 

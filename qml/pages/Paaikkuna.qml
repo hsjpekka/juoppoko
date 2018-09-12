@@ -200,6 +200,7 @@ Page {
             txtMaara.text = lueJuomanMaara(juomat.count-1)
             voltit.text = lueJuomanVahvuus(juomat.count-1)
             //olutId = lueOluenId(juomat.count-1)
+            //console.log("juomia" + juomat.count)
             olutId = lueOluenId(juomat.count-1)
         }
 
@@ -2675,7 +2676,7 @@ Page {
                         paivitaKuvaaja()
                         //positionViewAtBeginning()
                     }
-                    console.log("onMoveEnd " + kuvaajanEkaVko)
+                    //console.log("onMoveEnd " + kuvaajanEkaVko)
                 } // */
 
                 HorizontalScrollDecorator {}
@@ -2864,11 +2865,10 @@ Page {
 
             Row { // unTappd-valinnat
                 id: unTappdrivi
-                x: Theme.paddingSmall
+                x: luettuUnTpToken? Theme.paddingSmall : 0.5*(sivu.width - kulautus.width)
                 //spacing: (column.width - checkinUnTappd.width - kulautus.width - Theme.paddingMedium)
                 //spacing: (column.width - 2*x - txtBaari.width - kirjataankoUnTpd.width - kirjausAsetukset.width)/2
                 spacing: (column.width - 2*x - txtBaari.width - kulautus.width - kirjausAsetukset.width)/2
-                visible: luettuUnTpToken
                 //spacing: 0
 
                 //*
@@ -2876,6 +2876,7 @@ Page {
                     id: kirjausAsetukset
                     //icon.source: "image://theme/icon-s-setting"
                     icon.source: "image://theme/icon-m-whereami"
+                    visible: luettuUnTpToken
                     onClicked: {
                         var dialog = pageStack.push(Qt.resolvedUrl("unTpCheckIn.qml"))
 
@@ -2902,6 +2903,7 @@ Page {
                     label: (baariId == "")? qsTr("no location") : baariNimi
                     color: Theme.highlightColor
                     readOnly: true
+                    visible: luettuUnTpToken
                     width: column.width - kulautus.width -
                            kirjausAsetukset.width - 2*unTappdrivi.x
 
@@ -2932,7 +2934,6 @@ Page {
 
             } // untappd
 
-
             /*
             Button {
                 text: "nappi"
@@ -2957,7 +2958,7 @@ Page {
 
             Separator {
                 width: 0.9*sivu.width
-                anchors.horizontalCenter: parent.horizontalCenter
+                x: 0.05*sivu.width
                 color: Theme.secondaryColor
             }
 

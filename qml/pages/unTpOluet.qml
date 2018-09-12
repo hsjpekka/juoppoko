@@ -15,6 +15,7 @@ Dialog {
 
     property bool hakuMuuttuu: false
     property int hakunro: 0
+    property bool hakuvirhe: false
     property int oluitaPerHaku: 25
     property int valittuOlut: 0
 
@@ -51,9 +52,11 @@ Dialog {
 
                 if (xhttp.status == 200) {
                     //console.log(xhttp.responseText)
+                    hakuvirhe = false
                     paivitaHaetut(vastaus)
                 } else {
                     console.log("search beer: " + xhttp.status + ", " + xhttp.statusText)
+                    hakuvirhe = true
                 }
 
                 hetkinen.running = false
@@ -64,7 +67,7 @@ Dialog {
         xhttp.open("GET", kysely, true)
         xhttp.send();
 
-        return
+        return xhttp.status
     }
 
     function haunAloitus(hakuteksti) {
@@ -397,7 +400,7 @@ Dialog {
                 id: unTpdViestit
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("starting search")
-                visible: hetkinen.running
+                visible: (hetkinen.running || hakuvirhe)
             }
 
             Item { // valittu juoma

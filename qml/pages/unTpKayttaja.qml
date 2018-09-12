@@ -143,7 +143,7 @@ Dialog {
                 repeat = false
                 tarkistaUnTp()
             }
-            console.log("untptarkistus")
+            //console.log("untptarkistus")
         }
     }
 
