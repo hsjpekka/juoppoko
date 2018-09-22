@@ -305,7 +305,7 @@ function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
 }
 
 function lueTkJuomari() {
-    var riveja = 0, massa = 0, vetta = 0, kunto = 0, keho = []
+    var riveja = 0, massa = 80, vetta = 75, kunto = 100, keho = []
 
     try {
         tkanta.transaction(function(tx) {
@@ -322,8 +322,11 @@ function lueTkJuomari() {
         console.log("lueJuomari: " + err);
     }
 
-    if (riveja < 0.5)
-        keho = uusiJuomari()
+    if (riveja < 0.5){
+        keho[0] = -1
+        keho[1] = -1
+        keho[2] = -1
+    }
     else {
         keho[0] = massa
         keho[1] = vetta
@@ -600,6 +603,7 @@ function uusiAsetus2(tunnus, arvo){
 function uusiJuomari(massa, vetta, kunto, aika) {
 
     if(tkanta === null) return;
+    console.log("uusi ms, kg, L, %:" + aika + ", " + massa + ", " + vetta + ", " + kunto)
 
     try {
         tkanta.transaction(function(tx){

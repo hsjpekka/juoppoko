@@ -183,9 +183,13 @@ Page {
 
         keho = Tkanta.lueTkJuomari();
 
-        massa = keho[0];
-        vetta = keho[1];
-        kunto = keho[2];
+        if (keho[0] < 1 ){
+            kysyAsetukset()
+        } else {
+            massa = keho[0];
+            vetta = keho[1];
+            kunto = keho[2];
+        }
 
         //lueSuosikit();
         lueJuodut(true, pvm.getTime() - 365*vrk, pvm.getTime());
