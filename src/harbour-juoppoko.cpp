@@ -34,6 +34,8 @@
 
 #include <sailfishapp.h>
 
+//#include <iostream>
+//using namespace std;
 
 int main(int argc, char *argv[])
 {
@@ -48,19 +50,20 @@ int main(int argc, char *argv[])
     int i=0;
     for (i=0; i<argc; i++){
         strings[i] = argv[i];
+        //cout << "i= " << i << " " << argv[i] << "\n";
     }
 
-    strings[argc] = s1;
+    strings[argc] = s1; // unTappd appId
     argc++;
-    strings[argc] = s2;
+    strings[argc] = s2; // unTappd salasana
     argc++;
-    strings[argc] = s3;
+    strings[argc] = s3; // redirectUrl
     argc++;
-    strings[argc] = s4;
+    strings[argc] = s4; // 4square appId
     argc++;
-    strings[argc] = s5;
+    strings[argc] = s5; // 4square salasana
     argc++;
-    strings[argc] = s6;
+    strings[argc] = s6; // 4square versio (päivämäärä)
     argc++;
 
     return SailfishApp::main(argc, strings);
