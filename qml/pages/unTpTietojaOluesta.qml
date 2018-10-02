@@ -236,6 +236,7 @@ Page {
                 id: leveystesti
                 text: otsikko.title
                 font.pixelSize: Theme.fontSizeLarge
+                color: Theme.highlightDimmerColor
                 visible: false
             }
 
@@ -245,6 +246,7 @@ Page {
                 width: sivu.width - 2*x
                 text: otsikko.title // + " " + (sivu.width/(otsikko.title.length*Theme.fontSizeLarge)).toFixed(2)
                 //visible: ( sivu.width < 0.37*(otsikko.title.length*Theme.fontSizeLarge) ) ? true : false
+                color: Theme.secondaryHighlightColor
                 visible: (leveystesti.width > sivu.width) ? true : false
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
@@ -276,6 +278,7 @@ Page {
 
             Label {
                 id: unTpdViestit
+                color: Theme.secondaryHighlightColor
                 visible: hetkinen.running
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -297,6 +300,7 @@ Page {
                         id: olutTyyppi
                         //readOnly: true
                         text: "oluen tyyppi"
+                        color: Theme.highlightColor
                         width: column.width - etiketti.width - etiketti.x - etikettiRivi.spacing
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         //x: txtPanimo.x + Theme.paddingLarge
@@ -305,13 +309,15 @@ Page {
                     Label {
                         id: oluenArvot
                         text: "prosentit ja happamuus"
+                        color: Theme.secondaryHighlightColor
                     }
 
                     Label {
                         id: txtPanimo
                         //readOnly: true
                         width: column.width - etiketti.width - etiketti.x - etikettiRivi.spacing
-                        text: "panimo"                        
+                        text: "panimo"
+                        color: Theme.highlightColor
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
 
@@ -328,7 +334,8 @@ Page {
                     visible: kirjautunut
                     text: qsTr("me")
                     label: qsTr("me")
-                    width: sivu.width/3
+                    color: Theme.highlightColor
+                    width: sivu.width*0.3
                 }
 
                 TextField {
@@ -337,15 +344,17 @@ Page {
                     visible: kirjautunut
                     text: toive ? qsTr("is in my") : qsTr("is not in")
                     label: qsTr("wishlist")
-                    width: sivu.width/3
+                    color: Theme.highlightColor
+                    width: sivu.width*0.3
                 }
 
                 TextField {
                     id: arviot
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("my rating")
                     label: qsTr("others")
-                    width: sivu.width/3
+                    width: sivu.width*0.4
                 }
 
             } //row
@@ -359,7 +368,8 @@ Page {
                     readOnly: true
                     text: qsTr("drinkers")
                     label: qsTr("drinkers")
-                    width: sivu.width/3
+                    color: Theme.highlightColor
+                    width: sivu.width*0.3
                 }
 
                 TextField {
@@ -367,7 +377,8 @@ Page {
                     readOnly: true
                     text: qsTr("monthly")
                     label: qsTr("monthly")
-                    width: sivu.width/3
+                    color: Theme.highlightColor
+                    width: sivu.width*0.3
                 }
 
                 TextField {
@@ -375,7 +386,8 @@ Page {
                     readOnly: true
                     text: qsTr("total")
                     label: qsTr("total")
-                    width: sivu.width/3
+                    color: Theme.highlightColor
+                    width: sivu.width*0.4
                 }
 
             } //row
@@ -384,6 +396,7 @@ Page {
                 id: kuvaus
                 width: sivu.width
                 text: qsTr("description")
+                color: Theme.highlightColor
                 readOnly: true
                 //horizontalAlignment: TextEdit.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -392,7 +405,14 @@ Page {
             Label {
                 id: maa
                 text: " "
+                color: Theme.highlightColor
                 x: 0.5*(sivu.width - width)
+            }
+
+            Rectangle {
+                width: 12
+                height: 4
+                color: "transparent"
             }
 
             Button {

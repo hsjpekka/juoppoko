@@ -34,36 +34,35 @@
 
 #include <sailfishapp.h>
 
-//#include <iostream>
-//using namespace std;
-
 int main(int argc, char *argv[])
 {
-    char *strings[argc+7]; // + s1-s6
-    char *s1 = UTPD_ID;
-    char *s2 = UTPD_SECRET;
-    char *s3 = CB_URL;
-    char *s4 = FSQ_ID;
-    char *s5 = FSQ_SECRET;
-    char *s6 = FSQ_VERSION;
-
+    char *strings[argc+7]; // + s1-s7
+    char *s1 = JUOPPOKO_VERSION;
+    char *s2 = UTPD_ID;
+    char *s3 = UTPD_SECRET;
+    char *s4 = CB_URL;
+    char *s5 = FSQ_ID;
+    char *s6 = FSQ_SECRET;
+    char *s7 = FSQ_VERSION;
     int i=0;
+
     for (i=0; i<argc; i++){
         strings[i] = argv[i];
-        //cout << "i= " << i << " " << argv[i] << "\n";
     }
 
-    strings[argc] = s1; // unTappd appId
+    strings[argc] = s1; // program version
     argc++;
-    strings[argc] = s2; // unTappd salasana
+    strings[argc] = s2; // unTappd appId
     argc++;
-    strings[argc] = s3; // redirectUrl
+    strings[argc] = s3; // unTappd salasana
     argc++;
-    strings[argc] = s4; // 4square appId
+    strings[argc] = s4; // redirectUrl
     argc++;
-    strings[argc] = s5; // 4square salasana
+    strings[argc] = s5; // 4square appId
     argc++;
-    strings[argc] = s6; // 4square versio (päivämäärä)
+    strings[argc] = s6; // 4square salasana
+    argc++;
+    strings[argc] = s7; // 4square versio (päivämäärä)
     argc++;
 
     return SailfishApp::main(argc, strings);

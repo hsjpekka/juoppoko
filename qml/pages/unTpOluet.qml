@@ -285,6 +285,7 @@ Dialog {
 
                 TextField {
                     text: oluenMerkki
+                    color: Theme.secondaryColor
                     label: panimo
                     readOnly: true
                     width: sivu.width - x
@@ -296,26 +297,31 @@ Dialog {
 
                 Label {
                     text: unTpId
+                    color: Theme.secondaryColor
                     visible: false
                 }
 
                 Label {
                     text: olutTyyppi
+                    color: Theme.secondaryColor
                     visible: false
                 }
 
                 Label {
                     text: alkoholia
+                    color: Theme.secondaryColor
                     visible: false
                 }
 
                 Label {
                     text: happamuus
+                    color: Theme.secondaryColor
                     visible: false
                 }
 
                 Label {
                     text: toive
+                    color: Theme.secondaryColor
                     visible: false
                 }
 
@@ -382,6 +388,7 @@ Dialog {
 
                 TextArea {
                     width: sivu.width - 2*huomatusRivi.x - huomatusRivi.spacing - suljeHuomautus.width
+                    color: Theme.secondaryHighlightColor
                     text: qsTr("Seems like you haven't logged in UnTappd. " +
                                "That may limit the number of queries per day.")
                     readOnly: true
@@ -400,6 +407,7 @@ Dialog {
                 id: unTpdViestit
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("starting search")
+                color: Theme.secondaryColor
                 visible: (hetkinen.running || hakuvirhe)
             }
 
@@ -422,7 +430,7 @@ Dialog {
                 TextField {
                     id: valittuOlutMerkki
                     placeholderText: qsTr("selected beer")
-                    color: Theme.highlightColor
+                    color: Theme.primaryColor
                     readOnly: true
                     width: valittuRivi.width - valitunEtiketti.width
                     x: valitunEtiketti.x + valitunEtiketti.width + Theme.paddingSmall
@@ -432,7 +440,7 @@ Dialog {
                 TextField{
                     id: valitunTietoja
                     width: valittuRivi.width - valitunEtiketti.width
-                    color: Theme.highlightColor
+                    color: Theme.primaryColor
                     readOnly: true
                     text: " "
                     x: valittuOlutMerkki.x

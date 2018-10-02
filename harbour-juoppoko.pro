@@ -45,7 +45,8 @@ DEFINES += \
      "CB_URL=\"\\\"$${_CB_URL}\\\"\"" \
      "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
      "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
-     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\""
+     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\"" \
+     "JUOPPOKO_VERSION=\"\\\"2.1\\\"\""
 
 QT += positioning
 

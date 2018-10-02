@@ -151,7 +151,7 @@ Dialog {
                 anchors.horizontalCenter: parent.horizontalCenter
                 Label {
                     id: txtPaivassa
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: tanaan.toFixed(1) + " ml"                    
                 }
 
@@ -166,17 +166,17 @@ Dialog {
                 anchors.horizontalCenter: parent.horizontalCenter
                 Label {
                     id: txtViikossa
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: mlViikossa.toFixed(1) + " ml"
                 }
 
                 Label {
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: qsTr(", equals to ")
                 }
 
                 Label {
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: (mlViikossa*52/1000).toFixed(1) + " l " + qsTr("in year")
                 }
 
@@ -191,17 +191,17 @@ Dialog {
                 anchors.horizontalCenter: parent.horizontalCenter
                 Label {
                     id: txtKuussa
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: mlKuussa.toFixed(1) + " ml"
                 }
 
                 Label {
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: qsTr(", equals to ")
                 }
 
                 Label {
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: (mlKuussa/30*365/1000).toFixed(1) + " l " + qsTr("in year")
                 }
 
@@ -216,17 +216,17 @@ Dialog {
                 anchors.horizontalCenter: parent.horizontalCenter
                 Label {
                     id: txtVuodessa
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: (mlVuodessa()/1000).toFixed(1) + " l"
                 }
 
                 Label {
-                    //color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: qsTr(", equals to ")
                 }
 
                 Label {
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     text: (mlVuodessa()/52).toFixed(1) + " ml " + qsTr("in week")
                 }                
 
@@ -239,6 +239,7 @@ Dialog {
             ValueButton {
                 id: kello
                 anchors.horizontalCenter: parent.horizontalCenter
+                valueColor: Theme.primaryColor
                 property int valittuTunti: Math.floor(ryyppyVrk/60)
                 property int valittuMinuutti: ryyppyVrk - valittuTunti*60
 

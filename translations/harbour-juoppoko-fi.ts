@@ -508,14 +508,6 @@
         <translation>hakuasetukset</translation>
     </message>
     <message>
-        <source>radius %1</source>
-        <translation>säde %1</translation>
-    </message>
-    <message>
-        <source>radius not limited</source>
-        <translation>sädettä ei rajattu</translation>
-    </message>
-    <message>
         <source>show all places</source>
         <translation>näytä kaikki</translation>
     </message>
@@ -542,6 +534,14 @@
     <message>
         <source>timestamp</source>
         <translation>määrityshetki</translation>
+    </message>
+    <message>
+        <source>radius</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not limited</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -629,6 +629,13 @@
     <message>
         <source>None followed.</source>
         <translation>Ei seurattuja.</translation>
+    </message>
+</context>
+<context>
+    <name>unTpKirjautuminen</name>
+    <message>
+        <source></source>
+        <translation></translation>
     </message>
 </context>
 <context>

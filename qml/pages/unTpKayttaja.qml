@@ -56,7 +56,7 @@ Dialog {
 
         if (vastaus.user.stats.total_badges > 0){
             merkkeja.text = qsTr("badges") + " ..."
-            merkkeja.color = Theme.highlightColor
+            merkkeja.color = Theme.primaryColor
         }
         merkkeja.label = vastaus.user.stats.total_badges
 
@@ -198,6 +198,8 @@ Dialog {
                     label: qsTr("username")
                     //text: kayttaja
                     placeholderText: qsTr("unidentified")
+                    placeholderColor: Theme.secondaryHighlightColor
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 
@@ -223,6 +225,8 @@ Dialog {
                 id: kuvaus
                 width: sivu.width
                 placeholderText: qsTr("No biograph.")
+                placeholderColor: Theme.secondaryHighlightColor
+                color: Theme.highlightColor
                 readOnly: true
             }
 
@@ -231,15 +235,19 @@ Dialog {
                 TextField {
                     id: kirjauksia
                     placeholderText: qsTr("No checkins!")
+                    placeholderColor: Theme.secondaryHighlightColor
                     width: sivu.width*0.33
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 
                 TextField {
                     id: oluita
                     placeholderText: qsTr("NO BEERS!")
+                    placeholderColor: Theme.secondaryHighlightColor
                     width: sivu.width*0.33
                     horizontalAlignment: TextInput.AlignHCenter
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 
@@ -247,6 +255,7 @@ Dialog {
                     id: merkkeja
                     placeholderText: qsTr("No badges!")
                     width: sivu.width*0.33
+                    placeholderColor: Theme.secondaryHighlightColor
                     readOnly: true
                     onClicked: {
                         if (text != "")
@@ -262,13 +271,17 @@ Dialog {
                 TextField {
                     id: kavereita
                     placeholderText: qsTr("No friends!")
+                    placeholderColor: Theme.secondaryHighlightColor
                     width: sivu.width*0.45
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 
                 TextField {
                     id: seurattavia
                     placeholderText: qsTr("None followed.")
+                    placeholderColor: Theme.secondaryHighlightColor
+                    color: Theme.highlightColor
                     readOnly: true
                     width: sivu.width*0.45
                 }
@@ -281,6 +294,8 @@ Dialog {
                 TextField {
                     id: luodutOluet
                     placeholderText: qsTr("No beers created.")
+                    placeholderColor: Theme.secondaryHighlightColor
+                    color: Theme.highlightColor
                     readOnly: true
                     width: sivu.width*0.45
                 }
@@ -288,7 +303,9 @@ Dialog {
                 TextField {
                     id: kuvia
                     placeholderText: qsTr("No photos.")
+                    placeholderColor: Theme.secondaryHighlightColor
                     width: sivu.width*0.45
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 

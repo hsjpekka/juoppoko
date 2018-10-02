@@ -126,6 +126,7 @@ Dialog {
                     readOnly: true
                     text: qsTr("weight")
                     label: "kg"
+                    color: Theme.highlightColor
                 }
 
                 TextField {
@@ -148,6 +149,7 @@ Dialog {
                     readOnly: true
                     text: qsTr("lever %")
                     label: qsTr("100% - healthy")
+                    color: Theme.highlightColor
                 }
 
                 TextField {
@@ -169,6 +171,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("alcohol burning rate")
                     label: "1 g/h /10 kg"
                 }
@@ -177,6 +180,7 @@ Dialog {
                     id: paloTxt
                     width: leveysOikea*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: (palonopeus*0.7894*kuntoTxt.text/100*massaTxt.text).toFixed(1) + " g/h"
                     //text: (palonopeus*0.7894*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " g/h"
                     label: (palonopeus*kuntoTxt.text/100*massaTxt.text).toFixed(1) + " ml/h"
@@ -233,6 +237,7 @@ Dialog {
                     width: leveysOikea*sivu.width
                     validator: IntValidator {bottom: 1; top: 100}
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     readOnly: true
                     text: (vetta*100).toFixed(0)
                     onTextChanged: {
@@ -265,6 +270,7 @@ Dialog {
                 TextField {
                     id: ap23
                     width: leveysVasen*sivu.width
+                    color: Theme.highlightColor
                     readOnly: true
                     text: qsTr("lower limit")
                     label: qsTr("BAC - [‰]")
@@ -274,6 +280,7 @@ Dialog {
                     id: prom1txt
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: Number(prom10).toLocaleString(Qt.locale())//prom10.toFixed(2)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
@@ -289,6 +296,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("upper limit")
                     label: qsTr("BAC - [‰]")
                 }
@@ -297,6 +305,7 @@ Dialog {
                     id: prom2txt
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: Number(prom20).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
@@ -311,6 +320,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("lower daily limit")
                     label: qsTr("alcohol [ml]")
                 }
@@ -319,6 +329,7 @@ Dialog {
                     id: day1text
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: paiva10
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 500}
@@ -333,6 +344,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("upper daily limit")
                     label: qsTr("alcohol [ml]")
                 }
@@ -341,6 +353,7 @@ Dialog {
                     id: day2text
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: paiva20
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 500}
@@ -356,6 +369,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("lower weekly limit")
                     label: qsTr("alcohol [ml]")
                 }
@@ -364,6 +378,7 @@ Dialog {
                     id: vk1txt
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: viikko10
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 500}
@@ -378,6 +393,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("upper weekly limit")
                     label: qsTr("alcohol [ml]")
                 }
@@ -386,6 +402,7 @@ Dialog {
                     id: vk2txt
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: viikko20
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 3500}
@@ -400,6 +417,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("lower yearly limit")
                     label: qsTr("alcohol [ml]")
                 }
@@ -408,6 +426,7 @@ Dialog {
                     id: vs1txt
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: vuosi10
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 20000}
@@ -422,6 +441,7 @@ Dialog {
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
+                    color: Theme.highlightColor
                     text: qsTr("upper yearly limit")
                     label: qsTr("alcohol [ml]")
                 }
@@ -430,6 +450,7 @@ Dialog {
                     id: vs2txt
                     width: leveysOikea*sivu.width
                     readOnly: !oletusRajat.checked
+                    color: readOnly ? Theme.highlightColor : Theme.primaryColor
                     text: vuosi20
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 50000}

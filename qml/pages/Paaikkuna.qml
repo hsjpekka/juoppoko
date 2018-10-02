@@ -1296,17 +1296,20 @@ Page {
     function muutaAjanKirjasin() {
 
         if (kelloKay == false){
-            kello.valueColor = Theme.secondaryHighlightColor
+            kello.valueColor = Theme.secondaryColor
+            //kello.valueColor = Theme.highlightColor
 
         } else {
-            kello.valueColor = Theme.highlightColor
+            kello.valueColor = Theme.primaryColor
+            //kello.valueColor = Theme.highlightColor
         }
 
         if (paivyriKay == false){
-            paivays.valueColor = Theme.secondaryHighlightColor
-
+            //paivays.valueColor = Theme.highlightColor
+            paivays.valueColor = Theme.secondaryColor
         } else {
-            paivays.valueColor = Theme.highlightColor
+            //paivays.valueColor = Theme.highlightColor
+            paivays.valueColor = Theme.primaryColor
         }
 
         return
@@ -1409,6 +1412,10 @@ Page {
             tarkistaUnTpd()
 
             olutId = dialog.olutId
+            if (olutId <= 0){
+                kirjaaUnTp = false
+            }
+
             arvostelu = dialog.tahtia
 
             //console.log("muutaUusi: olutId = " + olutId)
@@ -1727,14 +1734,17 @@ Page {
 
         // huomion keräys, jos promilleRajat ylittyvät
         if ( prml < promilleRaja1 ) {
-            txtPromilleja.color = Theme.primaryColor
+            //txtPromilleja.color = Theme.highlightDimmerColor
             txtPromilleja.font.pixelSize = Theme.fontSizeMedium
+            txtPromilleja.font.bold = false
         } else if( prml < promilleRaja2 ) {
-            txtPromilleja.color = Theme.highlightColor
+            //txtPromilleja.color = Theme.highlightColor
             txtPromilleja.font.pixelSize = Theme.fontSizeMedium
+            txtPromilleja.font.bold = true
         } else {
-            txtPromilleja.color = Theme.highlightColor
+            //txtPromilleja.color = Theme.highlightColor
             txtPromilleja.font.pixelSize = Theme.fontSizeLarge
+            txtPromilleja.font.bold = true
         }
 
         if (nytMs > msKunnossa.getTime()) // verrataan hetkeä nytMs listan viimeisen juoman jälkeiseen hetkeen
@@ -2198,44 +2208,53 @@ Page {
                     text: tunnus
                     visible: false
                     width: 0
+                    color: Theme.highlightColor
                 }
                 //Label {
                 //    text: aikaMs
                 //    visible: false
                 //    width: 0
+                //    color: Theme.highlightColor
                 //}
 
                 //Label {
                 //    text: mlVeressa
                 //    visible: false
                 //    width: 0
+                //    color: Theme.highlightColor
                 //}
                 Label {
                     text: juomaaika
                     width: (Theme.fontSizeMedium*3.5).toFixed(0) //ExtraSmall*6
+                    color: Theme.highlightColor
                 }
                 Label {
                     text: juomanimi
                     width: Theme.fontSizeMedium*7 //ExtraSmall*8
                     truncationMode: TruncationMode.Fade
+                    color: Theme.highlightColor
                 }
                 Label {
                     text: juomamaara
                     width: (Theme.fontSizeMedium*2.5).toFixed(0) //ExtraSmall*3
+                    color: Theme.highlightColor
                 }
                 Label {
                     text: juomapros
                     width: (Theme.fontSizeMedium*2.5).toFixed(0) //ExtraSmall*3
+                    color: Theme.highlightColor
                 }
                 //Label {
                 //    text: kuvaus
                 //    visible: false
                 //    width: 0
+                //    color: Theme.highlightColor
                 //}
                 //Label {
                 //    text: oluenId
                 //    visible: false
                 //    width: 0
+                //    color: Theme.highlightColor
                 //}
 
             } //row
@@ -2264,6 +2283,7 @@ Page {
                     rotation: 90
                     visible: jaksoNakyvissa
                     width: font.pixelSize
+                    color: Theme.highlightColor
                 }
 
                 Column {
@@ -2295,6 +2315,7 @@ Page {
                         anchors.horizontalCenter: parent.horizontalCenter
                         //width: (mlViikkoPylvaanLeveys*2.5).toFixed() //mlViikkoPylvaanLeveys
                         horizontalAlignment: Text.AlignHCenter
+                        color: Theme.highlightColor
                     } //
 
                     Label {                        
@@ -2302,6 +2323,7 @@ Page {
                         visible: false
                         height: 0
                         width: (mlViikkoPylvaanLeveys*1.2).toFixed() //mlViikkoPylvaanLeveys
+                        color: Theme.highlightColor
                     } //
 
                 }//column
@@ -2321,6 +2343,7 @@ Page {
                 height: kuvaajanKorkeus*0.5*(vkoRaja2 - vkoRaja1)/(0.5*(vkoRaja2+vkoRaja1))
                 font.pixelSize: Theme.fontSizeExtraSmall
                 width: (pikkuKirjainKoko*1.2).toFixed() //31
+                color: Theme.highlightColor
             }
             Rectangle {
                 height: kuvaajanKorkeus*vkoRaja1/(0.5*(vkoRaja2+vkoRaja1))
@@ -2335,6 +2358,7 @@ Page {
                 text: qsTr("wk")
                 font.pixelSize: Theme.fontSizeExtraSmall
                 anchors.horizontalCenter: parent.horizontalCenter
+                color: Theme.highlightColor
             }
 
         }
@@ -2360,6 +2384,7 @@ Page {
                     rotation: 90
                     visible: jaksoNakyvissa
                     width: font.pixelSize
+                    color: Theme.highlightColor
                 }
 
                 Column {
@@ -2386,12 +2411,14 @@ Page {
                         text: mlPaivaPylvasAika
                         font.pixelSize: Theme.fontSizeExtraSmall
                         anchors.horizontalCenter: parent.horizontalCenter
+                        color: Theme.highlightColor
                     } //
                     Label {
                         text: mlPaivaPylvasTunnus //viikkoa tai paivaa ajankohdasta 1970.1.1 00:00
                         visible: false
                         height: 0
                         width: mlPaivaPylvaanLeveys
+                        color: Theme.highlightColor
                     } //
                 }//column
             } //row
@@ -2410,6 +2437,7 @@ Page {
                 height: kuvaajanKorkeus*0.5*(vrkRaja2 - vrkRaja1)/(0.5*(vrkRaja2+vrkRaja1))
                 font.pixelSize: Theme.fontSizeExtraSmall
                 width: pikkuKirjainKoko //25
+                color: Theme.highlightColor
             }
             Rectangle {
                 height: kuvaajanKorkeus*vrkRaja1/(0.5*(vrkRaja2+vrkRaja1))
@@ -2424,6 +2452,7 @@ Page {
                 text: ""
                 font.pixelSize: Theme.fontSizeExtraSmall
                 anchors.horizontalCenter: parent.horizontalCenter
+                color: Theme.highlightColor
             }
 
         }
@@ -2557,7 +2586,8 @@ Page {
             MenuItem {
                 text: qsTr("info")
                 onClicked:
-                    pageStack.push(Qt.resolvedUrl("tietoja.qml"))
+                    pageStack.push(Qt.resolvedUrl("tietoja.qml"), {
+                                       "versio": app.versio})
             }
 
             MenuItem {
@@ -2717,7 +2747,7 @@ Page {
                     text: "X ‰"
                     label: qsTr("BAC")
                     font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 
@@ -2727,6 +2757,7 @@ Page {
                     label: qsTr("sober at")
                     font.pixelSize: Theme.fontSizeSmall
                     width: Theme.fontSizeSmall*6
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 
@@ -2736,6 +2767,7 @@ Page {
                     label: promilleRaja1.toFixed(1) + qsTr(" ‰ at")
                     font.pixelSize: Theme.fontSizeSmall
                     width: Theme.fontSizeSmall*8
+                    color: Theme.highlightColor
                     readOnly: true
                 }
 
@@ -2744,7 +2776,7 @@ Page {
             Row { // nykyinen aika
                 x: (column.width - kello.width - paivays.width)/3
 
-                spacing: x
+                spacing: (column.width - x - kello.width - paivays.width - sivu.anchors.rightMargin)
 
                 ValueButton {
                     id: kello
@@ -2772,6 +2804,7 @@ Page {
                         })
                     }
 
+                    valueColor: Theme.primaryColor
                     width: Theme.fontSizeSmall*6
                     value: pvm.toLocaleTimeString(Qt.locale(),kelloMuoto)
                     onClicked: {
@@ -2789,6 +2822,8 @@ Page {
                 ValueButton {
                     id: paivays
                     property date valittuPaiva: pvm
+
+                    valueColor: Theme.primaryColor
 
                     function avaaPaivanValinta() {
                         var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
@@ -2833,7 +2868,7 @@ Page {
                     width: sivu.width - txtMaara.width - voltit.width
                     //width: Theme.fontSizeMedium*5.8 //Theme.fontSizeExtraSmall*8
                     readOnly: true
-                    color: Theme.highlightColor
+                    color: Theme.primaryColor
                     text: qsTr("beer")
                     label: arvostelu > 0 ? "      " + (arvostelu/2+0.5).toFixed(1) + "/5" : " "
                     onClicked: {
@@ -2846,7 +2881,7 @@ Page {
                     label: "ml"
                     //width: Theme.fontSizeMedium*4 //Theme.fontSizeExtraSmall*4
                     readOnly: true
-                    color: Theme.highlightColor
+                    color: Theme.primaryColor
                     text: "500"
                     onClicked: {
                         muutaUusi()
@@ -2857,7 +2892,7 @@ Page {
                     id: voltit
                     label: qsTr("vol-%")
                     readOnly: true
-                    color: Theme.highlightColor
+                    color: Theme.primaryColor
                     text: "4.7"
                     width: Theme.fontSizeMedium*4
                     onClicked: {
@@ -2881,6 +2916,7 @@ Page {
                     //icon.source: "image://theme/icon-s-setting"
                     icon.source: "image://theme/icon-m-whereami"
                     visible: luettuUnTpToken
+                    enabled: olutId > 0 ? true : false
                     onClicked: {
                         var dialog = pageStack.push(Qt.resolvedUrl("unTpCheckIn.qml"))
 
@@ -2905,9 +2941,11 @@ Page {
                     id: txtBaari
                     text: kirjaaUnTp? qsTr("check in") : qsTr("don't check in")
                     label: (baariId == "")? qsTr("no location") : baariNimi
-                    color: Theme.highlightColor
+                    color: enabled? Theme.primaryColor : Theme.highlightDimmerColor
                     readOnly: true
                     visible: luettuUnTpToken
+                    enabled: olutId > 0 ? true : false
+
                     width: column.width - kulautus.width -
                            kirjausAsetukset.width - 2*unTappdrivi.x
 
@@ -2958,12 +2996,13 @@ Page {
                 id: unTpdViestit
                 visible: hetkinen.running
                 anchors.horizontalCenter: parent.horizontalCenter
+                color: Theme.secondaryHighlightColor
             }
 
             Separator {
                 width: 0.9*sivu.width
                 x: 0.05*sivu.width
-                color: Theme.secondaryColor
+                color: Theme.highlightDimmerColor
             }
 
             SilicaListView {
@@ -2993,18 +3032,22 @@ Page {
                     Label {
                         text: qsTr("time")
                         width: (Theme.fontSizeMedium*3.5).toFixed(0)
+                        color: Theme.highlightColor
                     }
                     Label {
                         text: qsTr("drink")
                         width: Theme.fontSizeMedium*7
+                        color: Theme.highlightColor
                     }
                     Label {
                         text: "ml"
                         width: (Theme.fontSizeMedium*2.5).toFixed(0)
+                        color: Theme.highlightColor
                     }
                     Label {
                         text: qsTr("vol-%")
                         width: (Theme.fontSizeMedium*2.5).toFixed(0)
+                        color: Theme.highlightColor
                     }
                 }
 

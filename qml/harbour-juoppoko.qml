@@ -34,6 +34,8 @@ import "scripts/foursqr.js" as FourSqr
 ApplicationWindow
 {
     id: app
+    property string versio: ""
+    property int args: Qt.application.arguments.length
 
     Paaikkuna {
         id: paaikkuna
@@ -46,16 +48,15 @@ ApplicationWindow
     initialPage: paaikkuna
     cover: kansi
 
-    property int args: Qt.application.arguments.length
-
-    Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta
+    Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta        
+        UnTpd.programName = Qt.application.arguments[0]
+        versio = Qt.application.arguments[args-7]
         UnTpd.unTpdId = Qt.application.arguments[args-6]
         UnTpd.unTpdSecret = Qt.application.arguments[args-5]
         UnTpd.callbackURL = Qt.application.arguments[args-4]
         FourSqr.appId = Qt.application.arguments[args-3]
         FourSqr.appSecret = Qt.application.arguments[args-2]
         FourSqr.fsqrVersion = Qt.application.arguments[args-1]
-        UnTpd.programName = Qt.application.arguments[0]
 
     }
 }

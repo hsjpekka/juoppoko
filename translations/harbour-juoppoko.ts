@@ -508,10 +508,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>radius %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>show all places</source>
         <translation type="unfinished"></translation>
     </message>
@@ -540,7 +536,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>radius not limited</source>
+        <source>radius</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not limited</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -629,6 +629,13 @@
     <message>
         <source>None followed.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>unTpKirjautuminen</name>
+    <message>
+        <source></source>
+        <translation></translation>
     </message>
 </context>
 <context>

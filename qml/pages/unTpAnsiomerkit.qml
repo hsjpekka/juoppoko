@@ -80,15 +80,17 @@ Page {
         return
     }
 
+    /*
     function kuvaustenNaytto(arvo) {
         var i = 0, N = isotMerkit.count
         while (i < N) {
-            isotMerkit.get(i).merkinKuvaus.visible = arvo
+            //console.log("ansiomerkit, kuvaustenNaytto " + i + ", " + arvo + ", " + isotMerkit.get(i).merkinKuvaus.visible)
+            //isotMerkit.get(i).merkinKuvaus.visible = arvo
             i++
         }
 
         return
-    }
+    } // */
 
     function lisaaIsoMerkki(merkki, nimi, kuvaus, paivays){
         var mj= kuvaus + "\n \n" + paivays
@@ -183,6 +185,7 @@ Page {
                     text: nimi
                     x: 0.5*(sivu.width - width)
                     font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.highlightColor
                 }
 
                 Image {
@@ -198,6 +201,7 @@ Page {
                     width: sivu.width - reunus*2
                     readOnly: true
                     visible: naytaKuvaus
+                    color: Theme.highlightColor
                     horizontalAlignment: TextEdit.AlignHCenter
                     x: 0.5*(sivu.width - width)
                 }
@@ -314,7 +318,7 @@ Page {
                 text: naytaKuvaus? qsTr("hide descriptions") : qsTr("show descriptions")
                 onClicked: {
                     naytaKuvaus = !naytaKuvaus
-                    kuvaustenNaytto(naytaKuvaus)
+                    //kuvaustenNaytto(naytaKuvaus)
                 }
             }
         }
@@ -341,6 +345,7 @@ Page {
             Label {
                 id: unTpdViestit
                 text: "..."
+                color: Theme.secondaryHighlightColor
                 visible: hetkinen.running
                 anchors.horizontalCenter: sarake.horizontalCenter
                 //x: 0.5*(sivu.width - width)

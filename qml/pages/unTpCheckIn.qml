@@ -254,8 +254,10 @@ Dialog {
         id: baarienTiedot
         ListItem {
             id: baarinTiedot
-            height: Theme.fontSizeMedium*3
+            //height: Theme.fontSizeMedium*3
+            height: baarinNimi.height
             width: sivu.width
+            //highlightedColor: Theme.highlightColor
             onClicked: {
                 valittuBaari = baariLista.indexAt(mouseX,y+mouseY)
                 kopioiBaari(valittuBaari)
@@ -265,28 +267,44 @@ Dialog {
                 x: Theme.paddingLarge
                 width: sivu.width - 2*x
 
-                Image {
-                    id: baarinIkoni
-                    source: kuvake
-                    //height: Theme.fontSizeMedium*3.3
-                    //width: height:
+                Rectangle {
+                    height: baarinIkoni.height + 2*border.width
+                    width: height
+                    border.width: 1
+                    radius: 5
+                    color: "transparent"
+                    border.color: (baarinId.text == baarinTunnus) ? Theme.highlightColor : "transparent"
+
+                    Image {
+                        id: baarinIkoni
+                        source: kuvake
+
+                        //height: Theme.fontSizeMedium*3.3
+                        //width: height:
+                    }
+
                 }
 
                 Label {
+                    id: baarinId
                     text: baariId
                     visible: false
                 }
 
                 TextField {
+                    id: baarinNimi
                     text: nimi
                     label: tyyppi
                     readOnly: true
                     width: sivu.width - baarinIkoni.width - 2*Theme.paddingLarge
                     //width: 0.5*sivu.width - x
+                    //color: baarinTiedot.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    color: (baarinId.text == baarinTunnus) ? Theme.highlightColor : Theme.primaryColor
                     onClicked: {
                         valittuBaari = baariLista.indexAt(mouseX,baarinTiedot.y+0.5*height)
                         kopioiBaari(valittuBaari)
                     }
+                    //z: -1
                 }
 
                 Label {
@@ -434,7 +452,7 @@ Dialog {
                         text: ""
                         label: qsTr("timestamp") + ": " + paikkatieto.position.timestamp
                         //wrapMode: Text.WordWrap
-                        color: Theme.secondaryColor
+                        color: Theme.highlightColor
                         readOnly: true
                         width: sivu.width
                         visible: asetuksenNakyvat
@@ -447,15 +465,19 @@ Dialog {
                     ComboBox {
                         id: etaisyys
                         visible: asetuksenNakyvat
+                        label: qsTr("radius")
 
                         //width: Theme.fontSizeSmall*7// font.pixelSize*8
 
                         menu: ContextMenu {
                             //id: drinkMenu
-                            MenuItem { text: qsTr("radius %1").arg("50 m") }
-                            MenuItem { text: qsTr("radius %1").arg("500 m") }
-                            MenuItem { text: qsTr("radius %1").arg("2 km") }
-                            MenuItem { text: qsTr("radius not limited") }
+                            MenuItem { text: "50 m" }
+                            MenuItem { text: "500 m" }
+                            MenuItem { text: "2 km" }
+                            //MenuItem { text: qsTr("radius %1").arg("50 m") }
+                            //MenuItem { text: qsTr("radius %1").arg("500 m") }
+                            //MenuItem { text: qsTr("radius %1").arg("2 km") }
+                            MenuItem { text: qsTr("not limited") }
                         }
 
                         currentIndex: 0
@@ -501,6 +523,7 @@ Dialog {
                 TextField {
                     id: txtBaari
                     width: sivu.width - kuvaBaari.width - valittuRivi.x - valittuRivi.spacing
+                    color: Theme.highlightColor
                     readOnly: true
                     //x: Theme.paddingLarge
                 }
@@ -552,6 +575,7 @@ Dialog {
                 id: fourSqrViestit
                 x: 0.5*(sivu.width - width)
                 text: qsTr("starting search")
+                color: Theme.secondaryHighlightColor
                 visible: hetkinen.running
             }
 
@@ -561,6 +585,7 @@ Dialog {
                         - txtBaari.height - hakurivi.height - 3*column.spacing
                 width: sivu.width
                 clip: true
+                highlightFollowsCurrentItem: true
 
                 model: ListModel {
                     id: loydetytBaarit

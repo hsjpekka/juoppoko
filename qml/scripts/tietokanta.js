@@ -603,7 +603,7 @@ function uusiAsetus2(tunnus, arvo){
 function uusiJuomari(massa, vetta, kunto, aika) {
 
     if(tkanta === null) return;
-    console.log("uusi ms, kg, L, %:" + aika + ", " + massa + ", " + vetta + ", " + kunto)
+    //console.log("uusi ms, kg, L, %:" + aika + ", " + massa + ", " + vetta + ", " + kunto)
 
     try {
         tkanta.transaction(function(tx){

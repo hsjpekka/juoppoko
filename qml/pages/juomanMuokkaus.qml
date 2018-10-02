@@ -380,6 +380,7 @@ Dialog {
             Row { // time
 
                 spacing: Theme.paddingSmall
+                x: 0.5*(sivu.width - kello.width - paivaotsikko.width - spacing)
 
                 ValueButton {
                     id: kello
@@ -403,6 +404,7 @@ Dialog {
                     // label: "clock"
                     width: Theme.fontSizeSmall*6 //ExtraSmall*6 //font.pixelSize*5 //
                     value: aika.toLocaleTimeString(Qt.locale(),"HH:mm")
+                    valueColor: Theme.primaryColor
                     //readOnly: true
                     onClicked: openTimeDialog()
                 }
@@ -426,6 +428,7 @@ Dialog {
 
                     //label: "Date"
                     value: aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
+                    valueColor: Theme.primaryColor
                     //text: aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
                     width: Theme.fontSizeSmall*8 //font.pixelSize*8
                     //readOnly: true
@@ -436,14 +439,15 @@ Dialog {
             }
 
             Row { // määrä
-                spacing: Theme.paddingSmall
+                spacing: Theme.paddingMedium
                 x: 0.5*(sivu.width - maaraLabel.width - maaranNaytto.width - yksikonValinta.width - 2*spacing) //
                 //padding: Theme.paddingMedium
 
                 Label {
                     id: maaraLabel
                     text: qsTr("volume")
-                    width: font.pixelSize*4
+                    color: Theme.secondaryHighlightColor //Theme.highlightColor
+                    //width: font.pixelSize*4
                     //anchors.verticalCenterOffset: 4
                     height: yksikonValinta.height
                     verticalAlignment: Text.AlignVCenter
@@ -451,8 +455,9 @@ Dialog {
 
                 Label {
                     id: maaranNaytto
-                    width: font.pixelSize*3 //ExtraSmall*6
+                    //width: font.pixelSize*3 //ExtraSmall*6
                     text: maara.toFixed(maaraDesimaaleja)// + yksikkoTunnus
+                    color: Theme.highlightColor
                     //anchors.verticalCenterOffset: 0.3*font.pixelSize
                     height: yksikonValinta.height
                     verticalAlignment: Text.AlignVCenter
@@ -464,6 +469,7 @@ Dialog {
                     //width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin - maaraLabel.width - maaranNaytto.width - 2*Theme.paddingMedium
                     width: Theme.fontSizeSmall*7// font.pixelSize*8
                     //height: Theme.fontSizeSmall
+                    valueColor: Theme.primaryColor
 
                     menu: ContextMenu {
                         //id: drinkMenu
