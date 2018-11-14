@@ -7,15 +7,44 @@ import "../scripts/tietokanta.js" as Tkanta
 Page {
     id: sivu
 
+    signal muuttuu
+    property bool muuttunut: false
+
     function unTappdLoginUrl() {
         return "https://untappd.com/oauth/authenticate/?client_id=" + UnTpd.unTpdId +
                 "&response_type=code&redirect_url=" + UnTpd.callbackURL
+    }
+
+    function vaihdaTunnus(tunnus) {
+        muuttunut = true
+        UnTpd.unTpToken = tunnus
+        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, tunnus)
+
+        return
     }
 
     SilicaWebView {
         id: webView
         anchors.fill: parent
         url: unTappdLoginUrl()
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("sign out")
+                visible: (UnTpd.unTpToken != "") ? true : false
+                onClicked: {
+                    vaihdaTunnus("")
+                    pageStack.pop();
+                }
+            }
+            MenuItem {
+                text: qsTr("cancel")
+                onClicked: {
+                    muuttunut = false
+                    pageStack.pop();
+                }
+            }
+        }
 
         onLoadingChanged: {
             var vertailu = new RegExp(UnTpd.callbackURL.replace(/\//g, '\\/') + "\\?code=(.*)");
@@ -32,9 +61,8 @@ Page {
                 xhttp.onreadystatechange = function() {
                     if (xhttp.readyState == 4 && xhttp.status == 200 ){
                         var reply = JSON.parse(xhttp.responseText);
-                        UnTpd.unTpToken = reply.response.access_token;
                         experimental.deleteAllCookies();
-                        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, UnTpd.unTpToken)
+                        vaihdaTunnus(reply.response.access_token)
                         pageStack.pop();
                     }
                 }
@@ -46,4 +74,7 @@ Page {
 
     }
 
+    Component.onDestruction:
+        if (muuttunut)
+            muuttuu()
 }

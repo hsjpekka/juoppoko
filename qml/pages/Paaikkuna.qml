@@ -247,11 +247,9 @@ Page {
         else if (ind0 < 0)
             ind0 = 0
 
-        //console.log("etsiPaikka_1 " + ind0 + " aika " + hetki)
-
         if (juomat.count > 0) { // jos juomalista ei ole tyhjä
             edAika = lueJuomanAika(ind0)
-            //console.log("etsiPaikka_2 " + ind0 + " edaika " + edAika)
+            //console.log("etsiPaikka_2 i " + ind0 + ", edaika " + edAika + ", haettava " + hetki)
 
             while (hetki < edAika) {
                 ind0 = ind0 - 1
@@ -261,24 +259,25 @@ Page {
                     ind0 = 0
                     edAika = hetki - 1
                 }
+                //console.log("etsiPaikka_2b i " + ind0 + ", edaika " + edAika)
             }
 
             edAika = lueJuomanAika(ind0)
-            //console.log("etsiPaikka_3 " + ind0 + " edaika " + edAika)
+            //console.log("etsiPaikka_3, hetki " + hetki + ", ind " + ind0 + ", edaika " + edAika)
 
             while (hetki >= edAika) {
-                ind0 = ind0 + 1
+                ind0++
                 if (ind0 < juomat.count) {
                     edAika = lueJuomanAika(ind0)
                 } else {
                    edAika = hetki + 1
                 }
+                //console.log("etsiPaikka_3b i " + ind0 + ", edaika " + edAika)
             }
 
         } else
             ind0 = 0
 
-        //console.log("etsiPaikka " + ind0 + " aika " + hetki + " edaika " + edAika)
         return ind0
     }
 
@@ -395,7 +394,7 @@ Page {
     }
 
     function kopioiJuoma(qId) {
-        var i = Apuja.etsiPaikka(lueJuomanAika(qId)) - 1
+        var i = Apuja.monesko(lueJuomanTunnus(qId))
         //txtJuoma.text = lueJuomanNimi(qId)
         txtJuoma.text = Apuja.juomanNimi(i)
         txtMaara.text = lueJuomanMaara(qId)
@@ -406,7 +405,7 @@ Page {
         //olutId = lueOluenId(qId)
         olutId = Apuja.juomanId(i)
         UnTpd.setBeer(olutId)
-        //console.log("kopioiJuoma " + olutId)
+        //console.log("kopioiJuoma i " + i + " qId " + qId + " nimi " + lueJuomanNimi(qId))
 
         return
     }
@@ -451,7 +450,7 @@ Page {
             //}
         })
 
-        dialog.accepted.connect(function() {
+        dialog.rejected.connect(function() {
             tarkistaUnTpd()
         })
 
@@ -1027,10 +1026,18 @@ Page {
     function lueJuomanAika(xid) {
         // palauttaa ajan millisenkunteina
         //var ms = 0
-        var i = Apuja.monesko(juomat.get(xid).tunnus)
+
+        var i = 0
         //if ((juomat.count > xid) && (xid > -0.5)) {
         //    ms = juomat.get(xid).aikaMs
         //}
+
+        if (juomat.count < xid)
+            return new Date().getTime()
+
+        i = Apuja.monesko(juomat.get(xid).tunnus)
+
+        //console.log("juoman " + xid + " aika " + Apuja.juomanAika(i) + " i " + i)
 
         return Apuja.juomanAika(i)
     }
@@ -1053,6 +1060,16 @@ Page {
         }
 
         return ml
+    }
+
+    function lueJuomanNimi(xid){
+        var nimi = ""
+        if ((juomat.count > xid) && (xid > -0.5)) {
+            nimi = juomat.get(xid).juomanimi
+        }
+
+        return nimi
+
     }
 
     /*
@@ -1080,16 +1097,6 @@ Page {
         }
 
         return vahvuus
-    }
-
-    function lueJuomanNimi(xid){
-        var nimi = ""
-        if ((juomat.count > xid) && (xid > -0.5)) {
-            nimi = juomat.get(xid).juomanimi
-        }
-
-        return nimi
-
     }
 
     /*
@@ -1343,7 +1350,7 @@ Page {
         var i = Apuja.monesko(lueJuomanTunnus(id))
         //var i = Apuja.monesko(id)
 
-        Apuja.asetaJuomanArvot(i, ms, mlAlkoholia, juoma, maara, vahvuus,
+        Apuja.asetaJuomanArvot(i, lueJuomanTunnus(id), ms, mlAlkoholia, juoma, maara, vahvuus,
                                kuvaus, juomaId)
 
         juomat.set(id, {"section": paiva,"juomaaika": kello,
@@ -2139,7 +2146,6 @@ Page {
         repeat: false
         onTriggered: {
             hetkinen.running = false
-            interval: 2*1000
         }
     }
 
@@ -2159,10 +2165,12 @@ Page {
                 valittu = juomaLista.indexAt(mouseX,y+mouseY)
                 kopioiJuoma(valittu)
                 mouse.accepted = false
+                //console.log("valittu " + valittu + ", aika " + lueJuomanAika(valittu))
             }
 
             onPressAndHold: {
                 valittu = juomaLista.indexAt(mouseX,y+mouseY)
+                //kopioiJuoma(valittu)
                 juomaLista.currentIndex = valittu
                 mouse.accepted = false
             }
@@ -2175,6 +2183,7 @@ Page {
                         juomaLista.currentItem.remorseAction(qsTr("deleting"), function () {
                             //tyhjennaDbJuodut(lueJuomanId(valittu))
                             Tkanta.poistaTkJuodut(lueJuomanTunnus(valittu))
+                            Apuja.poistaJuoma(lueJuomanTunnus(valittu))
                             juomat.remove(valittu)
                             paivitaMlVeressa(lueJuomanAika(valittu-1)-1); //-1 varmistaa, että usean samaan aikaan juodun juoman kohdalla päivitys toimii
                             paivitaPromillet();
@@ -2208,7 +2217,7 @@ Page {
                     text: tunnus
                     visible: false
                     width: 0
-                    color: Theme.highlightColor
+                    color: Theme.secondaryColor
                 }
                 //Label {
                 //    text: aikaMs
@@ -2226,23 +2235,23 @@ Page {
                 Label {
                     text: juomaaika
                     width: (Theme.fontSizeMedium*3.5).toFixed(0) //ExtraSmall*6
-                    color: Theme.highlightColor
+                    color: Theme.secondaryColor
                 }
                 Label {
                     text: juomanimi
                     width: Theme.fontSizeMedium*7 //ExtraSmall*8
                     truncationMode: TruncationMode.Fade
-                    color: Theme.highlightColor
+                    color: Theme.secondaryColor
                 }
                 Label {
                     text: juomamaara
                     width: (Theme.fontSizeMedium*2.5).toFixed(0) //ExtraSmall*3
-                    color: Theme.highlightColor
+                    color: Theme.secondaryColor
                 }
                 Label {
                     text: juomapros
                     width: (Theme.fontSizeMedium*2.5).toFixed(0) //ExtraSmall*3
-                    color: Theme.highlightColor
+                    color: Theme.secondaryColor
                 }
                 //Label {
                 //    text: kuvaus
@@ -2591,23 +2600,6 @@ Page {
             }
 
             MenuItem {
-                text: qsTr("unTappd")
-                visible: luettuUnTpToken
-                onClicked: {
-                    var dialog = pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"), {
-                                   "haeKaikki": true} )
-                    dialog.accepted.connect(function() {
-                        tarkistaUnTpd()
-                    })
-                    dialog.rejected.connect(function() {
-                        tarkistaUnTpd()
-                    })
-
-                }
-
-            }
-
-            MenuItem {
                 text: qsTr("settings")
                 onClicked:
                     kysyAsetukset()
@@ -2621,6 +2613,34 @@ Page {
                                    "promilleja": laskePromillet(new Date().getTime()),
                                    "vetta": vetta, "paino": massa
                                    })
+            }
+
+        }
+
+        PushUpMenu {
+            visible: luettuUnTpToken ? true : false
+            MenuItem {
+                text: qsTr("unTappd")
+                onClicked: {
+                    var dialog = pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
+                    dialog.sulkeutuu.connect(function() {
+                        tarkistaUnTpd()
+                    })
+                }
+
+            }
+
+            MenuItem {
+                text: qsTr("Pints nearby")
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("unTpPub.qml", {"vainKaverit": false} ))
+                }
+            }
+            MenuItem {
+                text: qsTr("Active friends")
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("unTpPub.qml"), {"vainKaverit": true} )
+                }
             }
 
         }
@@ -2903,7 +2923,7 @@ Page {
             }
 
             Row { // unTappd-valinnat
-                id: unTappdrivi
+                id: lisaysrivi
                 x: luettuUnTpToken? Theme.paddingSmall : 0.5*(sivu.width - kulautus.width)
                 //spacing: (column.width - checkinUnTappd.width - kulautus.width - Theme.paddingMedium)
                 //spacing: (column.width - 2*x - txtBaari.width - kirjataankoUnTpd.width - kirjausAsetukset.width)/2
@@ -2947,7 +2967,7 @@ Page {
                     enabled: olutId > 0 ? true : false
 
                     width: column.width - kulautus.width -
-                           kirjausAsetukset.width - 2*unTappdrivi.x
+                           kirjausAsetukset.width - 2*lisaysrivi.x
 
                     onClicked: kirjaaUnTp = !kirjaaUnTp
                 } // */
@@ -2958,11 +2978,12 @@ Page {
                     //anchors.horizontalCenter: parent.horizontalCenter
                     text: qsTr("cheers!")
                     onClicked: {
-                        uusiJuoma(new Date().getTime(), pvm.getTime(), parseInt(txtMaara.text),
+                        var nyt = new Date().getTime(), juomaAika = pvm.getTime()
+                        uusiJuoma(nyt, juomaAika, parseInt(txtMaara.text),
                                  parseFloat(voltit.text), txtJuoma.text, juomanKuvaus, olutId)
                         juomaLista.positionViewAtEnd()
 
-                        lisaaKuvaajaan(pvm.getTime(), parseInt(txtMaara.text), parseFloat(voltit.text))
+                        lisaaKuvaajaan(juomaAika, parseInt(txtMaara.text), parseFloat(voltit.text))
                         paivyriKay = true
                         kelloKay = true
                         muutaAjanKirjasin()
@@ -3032,22 +3053,22 @@ Page {
                     Label {
                         text: qsTr("time")
                         width: (Theme.fontSizeMedium*3.5).toFixed(0)
-                        color: Theme.highlightColor
+                        color: Theme.secondaryHighlightColor
                     }
                     Label {
                         text: qsTr("drink")
                         width: Theme.fontSizeMedium*7
-                        color: Theme.highlightColor
+                        color: Theme.secondaryHighlightColor
                     }
                     Label {
                         text: "ml"
                         width: (Theme.fontSizeMedium*2.5).toFixed(0)
-                        color: Theme.highlightColor
+                        color: Theme.secondaryHighlightColor
                     }
                     Label {
                         text: qsTr("vol-%")
                         width: (Theme.fontSizeMedium*2.5).toFixed(0)
-                        color: Theme.highlightColor
+                        color: Theme.secondaryHighlightColor
                     }
                 }
 

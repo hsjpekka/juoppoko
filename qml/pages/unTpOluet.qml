@@ -98,10 +98,9 @@ Dialog {
 
     function lisaaListaan(olut, panimo, voltit, hapokkuus, tyyppi, tarra, unTpId, toive) {
 
-        loydetytOluet.append({"oluenMerkki": olut, "panimo": panimo, "olutTyyppi": tyyppi,
+        return loydetytOluet.append({"oluenMerkki": olut, "panimo": panimo, "olutTyyppi": tyyppi,
                              "etiketti": tarra, "unTpId": unTpId, "alkoholia": voltit,
-                             "hapot": hapokkuus, "toive": toive });
-        return
+                             "hapot": hapokkuus, "toive": toive });        
     }
 
     function lisaaToiveisiin() {
@@ -242,14 +241,15 @@ Dialog {
     }
 
     function tyhjennaLista() {
+        /*
         var i=loydetytOluet.count
 
         while (i>0) {
             loydetytOluet.remove(i-1)
             i--
-        }
+        } // */
 
-        return
+        return loydetytOluet.clear()
     }
 
     Timer{
@@ -357,8 +357,8 @@ Dialog {
                 }
             }
             MenuItem {
-                text: qsTr("log in UnTappd")
-                visible: (UnTpd.unTpToken == "")? true : false
+                text: qsTr("sign in UnTappd")
+                visible: (UnTpd.unTpToken == "") ? true : false
                 onClicked: pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
             }
 
@@ -514,7 +514,6 @@ Dialog {
                         hakunro = hakunro + 1
                         haeOluita(haettava.text)
                     }
-
                 }
             }
 

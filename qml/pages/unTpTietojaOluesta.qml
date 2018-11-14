@@ -246,7 +246,7 @@ Page {
                 width: sivu.width - 2*x
                 text: otsikko.title // + " " + (sivu.width/(otsikko.title.length*Theme.fontSizeLarge)).toFixed(2)
                 //visible: ( sivu.width < 0.37*(otsikko.title.length*Theme.fontSizeLarge) ) ? true : false
-                color: Theme.secondaryHighlightColor
+                color: Theme.highlightColor
                 visible: (leveystesti.width > sivu.width) ? true : false
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
@@ -301,7 +301,7 @@ Page {
                         //readOnly: true
                         text: "oluen tyyppi"
                         color: Theme.highlightColor
-                        width: column.width - etiketti.width - etiketti.x - etikettiRivi.spacing
+                        width: sivu.width - etikettiRivi.x - etiketti.width - etikettiRivi.spacing - Theme.paddingSmall
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         //x: txtPanimo.x + Theme.paddingLarge
                     }
@@ -315,7 +315,7 @@ Page {
                     Label {
                         id: txtPanimo
                         //readOnly: true
-                        width: column.width - etiketti.width - etiketti.x - etikettiRivi.spacing
+                        width: sivu.width - etikettiRivi.x - etiketti.width - etikettiRivi.spacing
                         text: "panimo"
                         color: Theme.highlightColor
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -398,8 +398,8 @@ Page {
                 text: qsTr("description")
                 color: Theme.highlightColor
                 readOnly: true
-                //horizontalAlignment: TextEdit.AlignHCenter
-                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: TextEdit.AlignHCenter
+                //anchors.horizontalCenter: sivu.horizontalCenter
             }
 
             Label {
@@ -435,4 +435,5 @@ Page {
             kirjautunut = true
         lueOluenTiedot(olutId)
     }
+
 }

@@ -172,7 +172,7 @@ Page {
                 width: ansio1.width - 2*(reunus + border.width)
                 x: 0.5*(sivu.width - width)
                 border.width: 2
-                border.color: "gray"
+                border.color: Theme.secondaryHighlightColor
                 radius: Theme.paddingMedium
                 color: "transparent"
             }

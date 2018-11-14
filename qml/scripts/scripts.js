@@ -3,8 +3,9 @@
 var juotu = []  //tkid: id, ms: aika, mlVeri: veressa, nimi: juoma, maara: tilavuus,
                 //pros: prosenttia, teksti: kuvaus, juomaId: olutId
 
-function asetaJuomanArvot(j, aika, veressa, juoma, tilavuus, vahvuus, kuvaus, juomaId){
+function asetaJuomanArvot(j, tkid, aika, veressa, juoma, tilavuus, vahvuus, kuvaus, juomaId){
     var mj = "j " + j
+    mj += ", tkid " + asetaJuotuTkId(j, tkid)
     mj += ", aika " + asetaJuotuAika(j, aika)
     mj += ", veressa " + asetaMlVeressa(j, veressa)
     mj += ", juoma " + asetaJuotuJuoma(j, juoma)
@@ -114,6 +115,7 @@ function juomanAika(i){
 }
 
 function juomanId(i){
+    // unTappd bid
     var id = 0
     if ((i >= 0) && (i < juotu.length))
         id = juotu[i].juomaId
@@ -146,6 +148,7 @@ function juomanTilavuus(i){
 }
 
 function juomanTkId(i){
+    // talletetun tiedoston juodut-taulukon juoman tunnus
     if ((i >= 0) && (i < juotu.length))
         return juotu[i].tkid
     else
@@ -177,28 +180,35 @@ function lisaaJuotuihin(id, aika, veressa, tilavuus, pros, juoma, kuvaus, olutId
 }
 
 function lisaaJuotujenLoppuun(id, aika, veressa, tilavuus, pros, juoma, kuvaus, olutId){
-    return juotu.push({tkid: id, ms: aika, mlVeri: veressa, nimi: juoma,
-                          maara: tilavuus, pros: pros, teksti: kuvaus,
-                          juomaId: olutId})
+    return juotu.push({"tkid": id, "ms": aika, "mlVeri": veressa, "nimi": juoma,
+                          "maara": tilavuus, "pros": pros, "teksti": kuvaus,
+                          "juomaId": olutId})
 }
 
 function lisaaValiin(id, aika, veressa, tilavuus, prosenttia, juoma, kuvaus, olutId) {
-    var i = 0, j
-    lisaaJuotujenLoppuun(id, aika, veressa, tilavuus, prosenttia, juoma, kuvaus, olutId)
 
-    while ((aika <= juomanAika(i)) && (i < juotu.length )){
+    var i = 0, j
+    //lisaaJuotujenLoppuun(id, aika, veressa, tilavuus, prosenttia, juoma, kuvaus, olutId)
+
+    while ((aika >= juomanAika(i)) && (i < juotu.length )){
         i++
     }
 
+    /*
     j = juotu.length - 1
     while (j > i ){
-        asetaJuomanArvot(j, juomanAika(j-1), mlVeressa(j-1),
+        asetaJuomanArvot(j, juomanTkId(j-1), juomanAika(j-1), mlVeressa(j-1),
                          juomanNimi(j-1), juomanTilavuus(j-1), juomanVahvuus(j-1),
                          juomanKuvaus(j-1), juomanId(j-1))
         j--
     }
 
-    return juotu.length
+    asetaJuomanArvot(j, id, aika, veressa, juoma, tilavuus, prosenttia, kuvaus, olutId)
+    // */
+
+    return juotu.splice(i, 0 , {"tkid": id, "ms": aika, "mlVeri": veressa, "nimi": juoma,
+                            "maara": tilavuus, "pros": prosenttia, "teksti": kuvaus,
+                            "juomaId": olutId})
 }
 
 function mlVeressa(i){
@@ -218,10 +228,26 @@ function monesko(juomaId){
 
         i--
     }
-    console.log("lista id " + i + ", tkid " + juomaId + ", vikan tkid " + juotu[juotu.length -1].tkid)
+    //console.log("lista id " + i + ", tkid " + juomaId + ", vikan tkid " + juotu[juotu.length -1].tkid)
     return -1
 }
-// */
+
+function poistaJuoma(juomaId) {
+    var i = monesko(juomaId), j
+
+    if (i>=0) {
+        j = i
+        while (j< juotu.length -1){
+            asetaJuomanArvot(j, juomanTkId(i+1), juomanAika(j+1), mlVeressa(j+1),
+                             juomanNimi(j+1), juomanTilavuus(j+1), juomanVahvuus(j+1),
+                             juomanKuvaus(j+1), juomanId(j+1))
+            j++
+        }
+        juotu.pop()
+    }
+
+    return i
+}
 
 function vyohyke(aika) {
     var m0, m1

@@ -147,30 +147,6 @@ function checkInPart2(beerId, tzone, venueId, position, lat, lng, shout, rating,
     return encodeURI(query);
 }
 
-function getActivityFeed(maxId, minId, limit) { //(address1, auth, maxId, minId, limit)
-    var endpoint = "/checkin/recent";
-    //max_id (int, optional) - The checkin ID that you want the results to start with //"&max_id=132"
-    //min_id (int, optional) - Returns only checkins that are newer than this value //"&min_id=132"
-    //limit (int, optional) - The number of results to return, max of 50, default is 25 // "&limit=34"
-
-    var query = unTpOsoite + endpoint + "?" + userAut(); // authentication required
-
-    if (minId > 0) {
-        if ((maxId > 0) && (maxId < minId)) maxId = minId
-        query += "&min_id=" + minId
-    };
-
-    if (maxId > 0) {
-        query += "&max_id=" + maxId
-    };
-
-    if (limit > 0) {
-        query += "&limit=" + limit
-    };
-
-    return encodeURI(query);
-}
-
 function getBadges(targetName, offset, limit) { //(address1, appReg, auth, targetName, offset, limit)
     //USERNAME (string, optional) - The username that you wish to call the request upon.
         //If you do not provide a username - the feed will return results from the authenticated user
@@ -292,6 +268,31 @@ function getBreweryInfo(targetId, compact) { //(address1, appReg, auth, targetId
 
     if (compact != "")
         query += "&compact=" + compact;
+
+    return encodeURI(query);
+}
+
+function getFriendsActivityFeed(maxId, minId, limit) { //(address1, auth, maxId, minId, limit)
+    var endpoint = "/checkin/recent";
+    //max_id (int, optional) - The checkin ID that you want the results to start with //"&max_id=132"
+    //min_id (int, optional) - Returns only checkins that are newer than this value //"&min_id=132"
+    //limit (int, optional) - The number of results to return, max of 50, default is 25 // "&limit=34"
+
+    var query = unTpOsoite + endpoint + "?" + userAut(); // authentication required
+
+    if (minId > 0) {
+        if ((maxId > 0) && (maxId < minId))
+            maxId = minId
+        query += "&min_id=" + minId
+    };
+
+    if (maxId > 0) {
+        query += "&max_id=" + maxId
+    };
+
+    if (limit > 0) {
+        query += "&limit=" + limit
+    };
 
     return encodeURI(query);
 }
@@ -435,8 +436,9 @@ function getUserFeed(targetName, maxId, minId, limit) { //(address1, appReg, aut
     //min_id (int, optional) - Returns only checkins that are newer than this value //"&min_id=132"
     //limit (int, optional) - The number of results to return, max of 50, default is 25 //"&limit=32"
 
-    var query = unTpOsoite + endpoint + "?"; // authentication not required
+    var query = unTpOsoite + endpoint + "?";
 
+    // authentication not required
     if (unTpToken == "")
         query +=  appAut()
     else
@@ -639,12 +641,12 @@ function searchBrewery(qString, offset, limit) { //(address1, appReg, auth, qStr
     return encodeURI(query);
 }
 
-function toast(targetId) { //(address1, auth, targetId)
+function toast(checkInId) { //(address1, auth, targetId)
     //post-string not used
     //CHECKIN_ID (int, required) - The checkin ID of checkin you want to toast //"32"
     //authentication required
 
-    var endpoint = "/checkin/toast/" + targetId;
+    var endpoint = "/checkin/toast/" + checkInId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
     return encodeURI(query);
