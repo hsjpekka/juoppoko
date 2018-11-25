@@ -1690,6 +1690,8 @@ Page {
         var i = Apuja.etsiPaikka(ms1)
         var ms0, ml0, koko0, vahvuus0, id1, ml1, koko1, vahvuus1
 
+        console.log(" i " + i + " aika " + ms1)
+
         if (i > 0){ // ms1 on listan ensimmäisen jälkeen
             ms0 = Apuja.juomanAika(i-1)
             ml0 = Apuja.mlVeressa(i-1)
@@ -1701,6 +1703,8 @@ Page {
             koko0 = 0
             vahvuus0 = 0
         }
+
+        console.log(" " + ms0 + " " + ml0 + " " + koko0 + " " + vahvuus0)
 
         while (i < Apuja.juotu.length) {
             id1 = Apuja.juomanTkId(i)
@@ -1717,8 +1721,9 @@ Page {
                 ml0 = ml1
                 koko0 = koko1
                 vahvuus0 = vahvuus1
-            } else
-                i = Apuja.juotu.length
+                console.log(" " + ms1 + " " + ml1 + " " + koko1 + " " + vahvuus1)
+            } //else
+                //i = Apuja.juotu.length
 
             i++
         }
@@ -1759,6 +1764,8 @@ Page {
 
         if (nytMs > msSelvana.getTime())
             txtSelvana.text = " -"
+
+        //console.log(" " + "paivita promillet " + prml)
 
         return prml
     }
@@ -2024,7 +2031,9 @@ Page {
     function uusiJuoma(xid, hetki, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId)     {
         //var lisayskohta = etsiPaikka(hetki, juomat.count -1) // mihin kohtaan uusi juoma kuuluu juomien historiassa?
 
-        lisaaListoihin(xid, hetki, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId)
+        lisaaListoihin(xid, hetki, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId);
+
+        paivitaMlVeressa(hetki);
 
         paivitaPromillet();
 
@@ -2165,7 +2174,9 @@ Page {
                 valittu = juomaLista.indexAt(mouseX,y+mouseY)
                 kopioiJuoma(valittu)
                 mouse.accepted = false
-                //console.log("valittu " + valittu + ", aika " + lueJuomanAika(valittu))
+
+                console.log("valittu " + valittu + ", aika1 " + lueJuomanAika(valittu) +
+                            ", aika2 " + Apuja.juomanAika(Apuja.monesko(lueJuomanTunnus(valittu))))
             }
 
             onPressAndHold: {
@@ -2173,6 +2184,7 @@ Page {
                 //kopioiJuoma(valittu)
                 juomaLista.currentIndex = valittu
                 mouse.accepted = false
+                console.log("valittu " + valittu + ", aika " + lueJuomanAika(valittu))
             }
 
             // contextmenu erillisenä komponenttina on ongelma remorseActionin kanssa
@@ -2180,6 +2192,8 @@ Page {
                 MenuItem {
                     text: qsTr("delete")
                     onClicked: {
+                        console.log("valittu1 " + valittu + ", aika " + lueJuomanAika(valittu-1))
+
                         juomaLista.currentItem.remorseAction(qsTr("deleting"), function () {
                             //tyhjennaDbJuodut(lueJuomanId(valittu))
                             Tkanta.poistaTkJuodut(lueJuomanTunnus(valittu))
@@ -2189,6 +2203,7 @@ Page {
                             paivitaPromillet();
                             paivitaAjatRajoille();
                             paivitaKuvaaja();
+                            console.log("poisto " + (valittu-1) + ", aika " + lueJuomanAika(valittu-1))
 
                         })
 

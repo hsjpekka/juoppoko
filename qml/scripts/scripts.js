@@ -5,72 +5,97 @@ var juotu = []  //tkid: id, ms: aika, mlVeri: veressa, nimi: juoma, maara: tilav
 
 function asetaJuomanArvot(j, tkid, aika, veressa, juoma, tilavuus, vahvuus, kuvaus, juomaId){
     var mj = "j " + j
-    mj += ", tkid " + asetaJuotuTkId(j, tkid)
-    mj += ", aika " + asetaJuotuAika(j, aika)
-    mj += ", veressa " + asetaMlVeressa(j, veressa)
-    mj += ", juoma " + asetaJuotuJuoma(j, juoma)
-    mj += ", tilavuus " + asetaJuotuTilavuus(j, tilavuus)
-    mj += ", vahvuus " + asetaJuotuVahvuus(j, vahvuus)
-    mj += ", kuvaus " + asetaJuotuKuvaus(j, kuvaus)
-    mj += ", bid " + asetaJuotuId(j, juomaId)
+    var i = 0
+    i += asetaJuotuTkId(j, tkid)
+    mj += ", tkid " + i
+    i += asetaJuotuAika(j, aika)
+    mj += ", aika " + i
+    i += asetaMlVeressa(j, veressa)
+    mj += ", veressa " + i
+    i += asetaJuotuJuoma(j, juoma)
+    mj += ", juoma " + i
+    i += asetaJuotuTilavuus(j, tilavuus)
+    mj += ", tilavuus " + i
+    i += asetaJuotuVahvuus(j, vahvuus)
+    mj += ", vahvuus " + i
+    i += asetaJuotuKuvaus(j, kuvaus)
+    mj += ", kuvaus " + i
+    i += asetaJuotuId(j, juomaId)
+    mj += ", bid " + i
 
     //console.log(mj)
 
-    return
+    return i
 }
 
 function asetaJuotuAika(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].ms = arvo
+    if ((i >= 0) && (i < juotu.length)){
+        juotu[i].ms = arvo
+        return 1
+    }
     else
         return -1
 }
 
 function asetaJuotuId(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].juomaId = arvo
+    if ((i >= 0) && (i < juotu.length)) {
+        juotu[i].juomaId = arvo
+        return 1
+    }
     else
         return -1
 }
 
 function asetaJuotuJuoma(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].nimi = arvo
+    if ((i >= 0) && (i < juotu.length)){
+        juotu[i].nimi = arvo
+        return 1
+    }
     else
         return -1
 }
 
 function asetaJuotuKuvaus(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].teksti = arvo
+    if ((i >= 0) && (i < juotu.length)) {
+        juotu[i].teksti = arvo
+        return 1
+    }
     else
         return -1
 }
 
 function asetaJuotuTilavuus(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].maara = arvo
+    if ((i >= 0) && (i < juotu.length)){
+        juotu[i].maara = arvo
+        return 1
+    }
     else
         return -1
 }
 
 function asetaJuotuTkId(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].tkid = arvo
+    if ((i >= 0) && (i < juotu.length)){
+        juotu[i].tkid = arvo
+        return 1
+    }
     else
         return -1
 }
 
 function asetaJuotuVahvuus(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].pros = arvo
+    if ((i >= 0) && (i < juotu.length)) {
+        juotu[i].pros = arvo
+        return 1
+    }
     else
         return -1
 }
 
 function asetaMlVeressa(i, arvo){
-    if ((i >= 0) && (i < juotu.length))
-        return juotu[i].mlVeri = arvo
+    if ((i >= 0) && (i < juotu.length)) {
+        juotu[i].mlVeri = arvo
+        return 1
+    }
     else
         return -1
 }

@@ -39,6 +39,7 @@ DISTFILES += \
     qml/pages/unTpBaarit.qml \
     qml/scripts/tietokanta.js
 
+# defines windowsissa "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"", linuxissa XXX
 DEFINES += \
      "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"" \
      "UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\"" \
