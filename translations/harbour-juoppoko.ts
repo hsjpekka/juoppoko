@@ -839,8 +839,8 @@
         <translation>lähistöllä juotuja</translation>
     </message>
     <message>
-        <source>?? no check-ins nearby! ??</source>
-        <translation>?? ei kirjauksia lähistöllä! ??</translation>
+        <source>no check-ins nearby! ??</source>
+        <translation>ei toimintaa lähistöllä! ??</translation>
     </message>
 </context>
 <context>

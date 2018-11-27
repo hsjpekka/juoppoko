@@ -49,7 +49,7 @@ Page {
     property int aikaVyohyke: 0 // aikavyöhykkeen ja GMT:n ero minuutteina
     property int kuvaajanEkaVko: 0 // montako viikkoa viikosta 1971.01.01
     property int lisaviikkoja: 52
-    property bool kirjaaUnTp: false
+    property bool kirjaaUnTp: true
 
     //hakusana "kuvaaja"
     property string tunnusKuvaaja: "kuvaaja"
@@ -129,6 +129,7 @@ Page {
     property real vetta: 0.75
     //hakusana "maksa"
     property real kunto: 1.0
+    property bool juomariLuettu: false
 
     //   TIETOKANNAT
     //
@@ -183,12 +184,11 @@ Page {
 
         keho = Tkanta.lueTkJuomari();
 
-        if (keho[0] < 1 ){
-            kysyAsetukset()
-        } else {
+        if (keho[0] > 1 ){
             massa = keho[0];
             vetta = keho[1];
             kunto = keho[2];
+            juomariLuettu = true;
         }
 
         //lueSuosikit();
@@ -1034,10 +1034,12 @@ Page {
 
         if (juomat.count < xid)
             return new Date().getTime()
+        else if (xid < 0)
+            return 0
 
         i = Apuja.monesko(juomat.get(xid).tunnus)
 
-        //console.log("juoman " + xid + " aika " + Apuja.juomanAika(i) + " i " + i)
+        console.log("juoman " + xid + " aika " + Apuja.juomanAika(i) + " i " + i)
 
         return Apuja.juomanAika(i)
     }
@@ -1084,6 +1086,7 @@ Page {
 
     function lueJuomanTunnus(xid) {
         var tunnus = 0
+        console.log(" valittu " + xid)
         if ((juomat.count > xid) && (xid > -0.5)) {
             tunnus = juomat.get(xid).tunnus
         }
@@ -3097,6 +3100,8 @@ Page {
 
     Component.onCompleted: {
         alkutoimet()
+        //if (!juomariLuettu)
+          //  kysyAsetukset()
     }
 
 }

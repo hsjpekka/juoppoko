@@ -58,5 +58,8 @@ ApplicationWindow
         FourSqr.appSecret = Qt.application.arguments[args-2]
         FourSqr.fsqrVersion = Qt.application.arguments[args-1]
 
+        //if (!paaikkuna.juomariLuettu)
+            //paaikkuna.kysyAsetukset()
+
     }
 }
