@@ -8,7 +8,7 @@ Page {
     id: sivu
 
     signal muuttuu
-    property bool muuttunut: false
+    property bool muuttunut: false    
 
     function unTappdLoginUrl() {
         return "https://untappd.com/oauth/authenticate/?client_id=" + UnTpd.unTpdId +
@@ -27,6 +27,10 @@ Page {
         id: webView
         anchors.fill: parent
         url: unTappdLoginUrl()
+
+        property real suurennos: (Screen.width < 550) ? 1.5 : ((Screen.width < 825) ? 2 : 3)
+
+        experimental.customLayoutWidth: Screen.width / suurennos // tekee unTappdin kirjautumisruudun sopivan kokoiseksi
 
         PullDownMenu {
             MenuItem {

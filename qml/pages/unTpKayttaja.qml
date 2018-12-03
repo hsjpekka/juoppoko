@@ -311,7 +311,7 @@ Page {
                 Image {
                     id: listanEtiketti
                     source: etiketti
-                    height: oluenTiedot.height
+                    height: oluenNimi.height + oluenPanimo.height
                     width: height
                     //x: Theme.paddingLarge
                     //y: 2
@@ -320,6 +320,21 @@ Page {
                     Column {
                         id: alkioSarake
 
+                        Label{
+                            id: oluenNimi
+                            text: oluenMerkki
+                            color: Theme.highlightColor
+                            x: Theme.paddingMedium
+                        }
+
+                        Label{
+                            id: oluenPanimo
+                            text: lausahdus
+                            color: Theme.secondaryHighlightColor
+                            x: Theme.paddingMedium
+                        }
+
+                        /*
                         TextField {
                             id: oluenTiedot
                             text: oluenMerkki
@@ -339,7 +354,7 @@ Page {
                             //anchors.left: listanEtiketti.right
                             //anchors.right: peukku.left
                             //y: 2
-                        }
+                        } // */
 
                         Row {
                             spacing: Theme.paddingMedium
