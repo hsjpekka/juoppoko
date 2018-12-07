@@ -9,10 +9,12 @@ Page {
 
     property bool vainKaverit: false
     property int uusinCheckin: 0 // max_int, uusimman haettavan tunnus. Ei rajoita, jos 0.
-    property int hakujaSivulle: 5
+    property int hakujaSivulle: 0 // jos = 0, unTappdin oletusmäärä = 25, max 50
     property int valittu: 0
     property bool hakuvirhe: false
     property date pvm
+    property var kirjaustenTiedot: []
+    property bool ensimmainenHaku: true
 
     function haunAloitus() {
         hakuvirhe = false
@@ -43,6 +45,12 @@ Page {
     }
 
     function tyhjennaLista() {
+
+        while (kirjaustenTiedot.length > 0){
+            kirjaustenTiedot.pop()
+        }
+
+        console.log("kirjauksia " + kirjaustenTiedot.length)
         return kirjausLista.clear()
     }
 
@@ -175,7 +183,6 @@ Page {
                 unTpdViestit.text = qsTr("no activity")
         }
 
-
         while (i<n) {
             kirjaus = kirjatut[i].checkin_id
             aikams = Date.parse(kirjatut[i].created_at)
@@ -214,9 +221,19 @@ Page {
             lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut, panimo,
                          baari, maljoja, huutoja)
 
+            //if (!ensimmainenHaku) {
+                kirjaustenTiedot.push(kirjatut[i])
+            //}
+
             i++
         }
 
+        if (ensimmainenHaku) {
+            //kirjaustenTiedot = kirjatut
+            ensimmainenHaku = false
+        }
+
+        console.log("kirjaustenTiedot " + kirjaustenTiedot.length + " " + kirjaustenTiedot[kirjaustenTiedot.length-3].beer.beer_name)
         return i
     }
 
@@ -585,5 +602,6 @@ Page {
 
     Component.onCompleted: {
         haeKirjauksia()
+        console.log("tietoja >" + kirjaustenTiedot.length + "<")
     }
 }

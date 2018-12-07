@@ -1039,7 +1039,7 @@ Page {
 
         i = Apuja.monesko(juomat.get(xid).tunnus)
 
-        console.log("juoman " + xid + " aika " + Apuja.juomanAika(i) + " i " + i)
+        //console.log("juoman " + xid + " aika " + Apuja.juomanAika(i) + " i " + i)
 
         return Apuja.juomanAika(i)
     }

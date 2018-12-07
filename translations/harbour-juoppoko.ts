@@ -776,7 +776,7 @@
     <name>unTpPub</name>
     <message>
         <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
+        <translation type="unfinished">lähetetään kyselyä</translation>
     </message>
     <message>
         <source>request not initialized</source>
@@ -795,52 +795,52 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user data</source>
-        <translation>käyttäjän tiedot</translation>
-    </message>
-    <message>
-        <source>beer</source>
-        <translation>olut</translation>
-    </message>
-    <message>
-        <source>check friends</source>
-        <translation>kurkkaa kavereitasi</translation>
-    </message>
-    <message>
-        <source>Seems like you haven&apos;t logged in UnTappd. That may limit the number of queries per day.</source>
-        <translation>Et näytä kirjautuneen UnTappdiin. Se saattaa rajata kyselyjen päivittäistä määrää.</translation>
-    </message>
-    <message>
-        <source>starting search</source>
-        <translation>hakua aloitetaan</translation>
+        <source>no check-ins nearby! ??</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>no activity</source>
-        <translation>ei toimintaa</translation>
-    </message>
-    <message>
-        <source>check pubs nearby</source>
-        <translation>tapahtumia lähipubeissa</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>request finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>user data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>beer</source>
+        <translation type="unfinished">olut</translation>
+    </message>
+    <message>
         <source>toast</source>
-        <translation>kohota malja</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>check pubs nearby</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>check friends</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>pints by friends</source>
-        <translation>kaverien juomia</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>pints nearby</source>
-        <translation>lähistöllä juotuja</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>no check-ins nearby! ??</source>
-        <translation>ei toimintaa lähistöllä! ??</translation>
+        <source>Seems like you haven&apos;t logged in UnTappd. That may limit the number of queries per day.</source>
+        <translation type="unfinished">Et näytä kirjautuneen UnTappdiin. Se saattaa rajata kyselyjen päivittäistä määrää.</translation>
+    </message>
+    <message>
+        <source>starting search</source>
+        <translation type="unfinished">hakua aloitetaan</translation>
     </message>
 </context>
 <context>
