@@ -18,11 +18,17 @@ Dialog {
     property bool haettu: false
     property int ikoninKoko: 88 // 32, 44, 64 ja 88 saatavilla
 
+    property bool naytaSijainti: true
+    property alias ppiiri: pituuspiiri.text
+    property alias lpiiri: leveyspiiri.text
+    property bool sijaintiTuore: false
+    property string aikaaSitten: ""
+
     property bool face: false
     property bool foursq: false
     property bool tweet: false
 
-    property bool asetuksenNakyvat: false
+    property bool asetuksetNakyvat: false
     property bool julkaisutNakyvat: false
 
     function haeBaareja(haku) {
@@ -102,30 +108,57 @@ Dialog {
         txtBaari.label = (loydetytBaarit.get(nro).osoite == "") ? loydetytBaarit.get(nro).tyyppi : loydetytBaarit.get(nro).osoite
         kuvaBaari.source = loydetytBaarit.get(nro).kuvake
         baarinTunnus = loydetytBaarit.get(nro).baariId
+        pituuspiiri.text = loydetytBaarit.get(nro).baarinPituusPiiri
+        leveyspiiri.text = loydetytBaarit.get(nro).baarinLeveysPiiri
+
         return
     }
 
     // /*
     function koordinaatit() {
-        var muu = paikkatieto.position.timestamp
+        var pvm = new Date(paikkatieto.position.timestamp)
+        var aikaero = 1000*60*60*24*10, minEro = 10*60*1000
 
         if (!paikkatieto.position.longitudeValid || !paikkatieto.position.latitudeValid) {            
-            asema.text = qsTr("defaults to lat: %1, long: %2").arg(FourSqr.lastLat).arg(FourSqr.lastLong)
-            asema.label = qsTr("timestamp") + ": " + paikkatieto.position.timestamp
+            //asema.text = qsTr("defaults to lat: %1, long: %2").arg(FourSqr.lastLat).arg(FourSqr.lastLong)
+            //asema.label = qsTr("timestamp") + ": " + paikkatieto.position.timestamp
+            pituuspiiri.text = FourSqr.lastLong
+            leveyspiiri.text = FourSqr.lastLat            
         } else {
-            asema.text = qsTr("lat: %1, long: %2, alt: %3").arg(paikkatieto.position.coordinate.latitude).arg(paikkatieto.position.coordinate.longitude).arg(paikkatieto.position.coordinate.altitude)
-            asema.label = qsTr("timestamp") + " " + Qt.formatDateTime(muu)
+            //asema.text = qsTr("lat: %1, long: %2, alt: %3").arg(paikkatieto.position.coordinate.latitude).arg(paikkatieto.position.coordinate.longitude).arg(paikkatieto.position.coordinate.altitude)
+            //asema.label = qsTr("timestamp") + " " + Qt.formatDateTime(paivays)
+            pituuspiiri.text = paikkatieto.position.coordinate.longitude
+            leveyspiiri.text = paikkatieto.position.coordinate.latitude
+            aikaero = new Date().getTime() - pvm.getTime()
         }
 
-        //console.log("" + muu + " " + Qt.formatTime(muu))
+        console.log(" pvm " + pvm + " - " + pvm.getTime() )
+
+        //sijainninTila.text = new Date().getTime() + " " + paikkatieto.active + " - " + paikkatieto.valid + " - " + paikkatieto.position.timestamp + " - " + pvm.getTime()
+
+        if (aikaero < minEro) {
+            sijaintiTuore = true
+        } else
+            sijaintiTuore = false
+
+        if (paikkatieto.position.latitudeValid){
+            if (aikaero < 60*60*1000){
+                aikaaSitten = "(" + qsTr("location determined %1 min ago").arg(Math.round(aikaero/(60*1000))) + ")"
+            } else {
+                aikaaSitten = "(" + qsTr("location determined %1 hours ago").arg(Math.round(aikaero/(60*60*1000))) + ")"
+            }
+        }
 
         return
     }
     // */
 
-    function lisaaListaan(id, nimi, osoite, tyyppi, kuvake) {
+    function lisaaListaan(id, nimi, osoite, tyyppi, kuvake, levpii, pitpii) {
         return loydetytBaarit.append({"baariId": id, "nimi": nimi, "osoite": osoite,
-                                                "tyyppi": tyyppi, "kuvake": kuvake });
+                                         "tyyppi": tyyppi, "kuvake": kuvake,
+                                         "baarinPituusPiiri": pitpii,
+                                         "baarinLeveysPiiri": levpii
+                                     });
 
     }
 
@@ -134,12 +167,8 @@ Dialog {
         var i = 0, n = kentat.length
         var onko = false
 
-        //console.log("haettu " + kentta + ": " + kentat + " n " + n + kentat[0])
-
-        //return true
-
         while ( i<n && !onko ){
-            if (kentat[i] == kentta)
+            if (kentat[i] === kentta) // oli ==
                 onko = true
             i++
         }
@@ -150,7 +179,7 @@ Dialog {
     function paivitaHaetut(vastaus) { // vastaus = JSON(fourSqr-vastaus)
         var haetut = vastaus.response.venues
         var i=0, n=haetut.length, j, m
-        var tunnus, nimi, osoite, etaisyys, tyyppi
+        var tunnus, nimi, osoite, etaisyys, tyyppi, pitpii, levpii
         var kuvake = ""
 
         while (i<n) {
@@ -188,15 +217,23 @@ Dialog {
                     osoite += ", "
                 osoite += haetut[i].location.distance + " m"
             }
+            if (onkoTietoa(haetut[i].location,"lat")) {
+                levpii = haetut[i].location.lat
+            } else
+                levpii = leveyspiiri.text
+            if (onkoTietoa(haetut[i].location,"lng")) {
+                pitpii = haetut[i].location.lng
+            } else
+                pitpii = pituuspiiri.text
 
-            lisaaListaan(haetut[i].id, nimi, osoite, tyyppi, encodeURI(kuvake))
+            lisaaListaan(haetut[i].id, nimi, osoite, tyyppi, encodeURI(kuvake), levpii, pitpii)
             i++
         }
 
         if (n === 0) {
             txtBaari.text = qsTr("None found.")
             txtBaari.label = qsTr("Better luck next time.")
-            asetuksenNakyvat = true
+            asetuksetNakyvat = true
         }
 
         return
@@ -236,7 +273,6 @@ Dialog {
                     repeat = false
                 else
                     haunAloitus("")
-
             }
         }
     }
@@ -247,6 +283,7 @@ Dialog {
         updateInterval: 5*60*1000 // 5 min
         onPositionChanged: {
             koordinaatit()
+            console.log("paikkatieto vaihtui")
         }
     }
 
@@ -307,10 +344,20 @@ Dialog {
                     //z: -1
                 }
 
-                Label {
+                Text {
                     text: osoite
                     visible: false
                     //width: sivu.width - 0.5*x - Theme.paddingLarge
+                }
+
+                Text {
+                    text: baarinPituusPiiri
+                    visible: false
+                }
+
+                Text {
+                    text: baarinLeveysPiiri
+                    visible: false
                 }
 
             } // row
@@ -406,6 +453,20 @@ Dialog {
             }
             // */
 
+            IconTextSwitch {
+                id: asemanTalletus
+                icon.source: "image://theme/icon-m-location"
+                checked: true
+                highlighted: !sijaintiTuore
+                text: checked ? qsTr("shows location") : qsTr("hides location")
+                onCheckedChanged: {
+                    if (checked == false) {
+                        asetuksetNakyvat = false
+                    }
+                    naytaSijainti = checked
+                }
+            }
+
             Item {
                 id: piilotusRivi
                 x: Theme.paddingMedium
@@ -414,9 +475,9 @@ Dialog {
 
                 IconButton {
                     id: piilotus
-                    icon.source: asetuksenNakyvat? "image://theme/icon-m-down" : "image://theme/icon-m-right"
+                    icon.source: asetuksetNakyvat? "image://theme/icon-m-down" : "image://theme/icon-m-right"
                     onClicked: {
-                        asetuksenNakyvat = !asetuksenNakyvat
+                        asetuksetNakyvat = !asetuksetNakyvat
                     }
                 }
 
@@ -424,20 +485,23 @@ Dialog {
                     y: piilotus.y + 0.5*(piilotus.height - height)
                     x: piilotus.x + piilotus.width + Theme.paddingMedium
                     text: qsTr("search settings")
+                    color: asemanTalletus.checked ? Theme.highlightColor : Theme.highlightDimmerColor
                 }
 
                 MouseArea {
                     anchors.fill: piilotusRivi
                     onClicked: {
-                        asetuksenNakyvat = !asetuksenNakyvat
+                        asetuksetNakyvat = !asetuksetNakyvat
                     }
                 }
 
-            } // hakuasetukset
+            }
 
-            Row {
+            Row { // hakuasetukset
+                id: asetuksetRivi
                 x: Theme.paddingLarge
                 spacing: Theme.paddingMedium
+                visible: asetuksetNakyvat
 
                 Rectangle {
                     width: 1
@@ -446,25 +510,63 @@ Dialog {
                 }
 
                 Column {
-                    id: hakuasetukset
-                    TextField {
-                        id: asema
-                        text: ""
-                        label: qsTr("timestamp") + ": " + paikkatieto.position.timestamp
-                        //wrapMode: Text.WordWrap
-                        color: Theme.highlightColor
-                        readOnly: true
-                        width: sivu.width
-                        visible: asetuksenNakyvat
+                    id: hakuasetukset                    
+
+                    Label {
+                        id: sijainninTila
+                        text: paikkatieto.position.latitudeValid ? aikaaSitten : "(" + qsTr("location not determined") + ")"
+                        visible: !sijaintiTuore
+                        color: naytaSijainti? Theme.highlightColor : Theme.highlightDimmerColor
+                        x: Theme.paddingLarge*3
+                    }
+
+                    Row { //asema
+                        id: asemaRivi
                         //x: Theme.paddingLarge
-                        onClicked: {
-                            koordinaatit()
+
+                        TextField {
+                            id: pituuspiiri
+                            text: "???"
+                            label: qsTr("lng")
+                            //wrapMode: Text.WordWrap
+                            readOnly: !asemanTalletus.checked
+                            width: (sivu.width - 2*asetuksetRivi.x - asemaRivi.spacing)/2
+                            //width: (sivu.width - asetuksetRivi.width - 2*asetuksetRivi.x - 2*asemaRivi.spacing - lueAsema.width)/2
+                            color: asemanTalletus.checked ? Theme.primaryColor : Theme.highlightDimmerColor
+                            //visible: asetuksetNakyvat
+                            //x: Theme.paddingLarge
+                            inputMethodHints: Qt.ImhFormattedNumbersOnly
+                            validator: DoubleValidator {bottom: -180.0; top: 180.0}
+                            onTextChanged: {
+                                sijainninTila.visible = false
+                            }
                         }
+
+                        TextField {
+                            id: leveyspiiri
+                            text: "???"
+                            label: qsTr("lat")
+                            //wrapMode: Text.WordWrap
+                            color: asemanTalletus.checked ? Theme.primaryColor : Theme.highlightDimmerColor
+                            //readOnly: !asemanTalletus.checked
+                            width: pituuspiiri.width
+                            //visible: asetuksetNakyvat
+                            //x: Theme.paddingLarge
+                        }
+
+                        //IconButton {
+                            //id: lueAsema
+                            //icon.source: "image://theme/icon-m-refresh"
+                            //onClicked: koordinaatit()
+                            //highlighted: asemanTalletus.checked
+                        //}
+
                     }
 
                     ComboBox {
                         id: etaisyys
-                        visible: asetuksenNakyvat
+                        width: sivu.width - hakuasetukset.x
+                        //visible: asetuksetNakyvat
                         label: qsTr("radius")
 
                         //width: Theme.fontSizeSmall*7// font.pixelSize*8
@@ -504,10 +606,10 @@ Dialog {
 
                     TextSwitch {
                         id: tyyppiRajaus
-                        visible: asetuksenNakyvat
+                        //visible: asetuksetNakyvat
                         checked: true
-                        text: checked? qsTr("limit to Foursquare categories %1 and %2").arg("Food").arg("Nightlife Spot") :
-                                       qsTr("show all places")
+                        text: checked? qsTr("limits to Foursquare categories %1 and %2").arg("Food").arg("Nightlife Spot") :
+                                       qsTr("searches in all categories")
                     } // */
                 }
             }
@@ -523,7 +625,7 @@ Dialog {
                 TextField {
                     id: txtBaari
                     width: sivu.width - kuvaBaari.width - valittuRivi.x - valittuRivi.spacing
-                    color: Theme.highlightColor
+                    color: asemanTalletus.checked ? Theme.highlightColor : Theme.highlightDimmerColor
                     readOnly: true
                     //x: Theme.paddingLarge
                 }
@@ -557,6 +659,7 @@ Dialog {
                     id: hae
                     icon.source: "image://theme/icon-m-search"
                     width: Theme.fontSizeMedium*3
+                    highlighted: asemanTalletus.checked
                     onClicked: {
                         haunAloitus(haettava.text)
                     }
@@ -614,6 +717,7 @@ Dialog {
         UnTpd.postFacebook = face //facebook.checked
         UnTpd.postTwitter = tweet //twitter.checked
         UnTpd.postFoursquare = foursq //foursquare.checked
+        console.log("valittu baari " + baarinTunnus + " , " + baari)
     }
 
     Component.onCompleted: {

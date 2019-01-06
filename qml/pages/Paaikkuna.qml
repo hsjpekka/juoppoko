@@ -33,6 +33,7 @@ import QtPositioning 5.2
 import "../scripts/unTap.js" as UnTpd
 import "../scripts/scripts.js" as Apuja
 import "../scripts/tietokanta.js" as Tkanta
+import "../scripts/foursqr.js" as FourSqr
 
 Page {
     id: sivu
@@ -105,9 +106,9 @@ Page {
     property bool luettuYksikko: false
     property string tunnusUnTappdToken: "untappdtoken"
     property bool luettuUnTpToken: false
-    property string tunnusTalletaSijainti: "talletaSijainti"
-    property int arvoTalletaSijainti: 0 // 0 - älä, 1 - vain jos baariId tiedossa, 2 - myös koordinaatit
-    property bool luettuTalletaSijainti: false
+    //property string tunnusTalletaSijainti: "talletaSijainti"
+    property int arvoTalletaSijainti: 0 // 0 - älä, 1 - pelkät koordinaatit riittää, 2 - vain, jos baari valittu
+    //property bool luettuTalletaSijainti: false
     property string tunnusJulkaiseFacebook: "julkaiseFacebook"
     property int arvoJulkaiseFacebook: 0 // 0 - älä, 1 - julkaise
     property bool luettuJulkaiseFacebook: false
@@ -1086,7 +1087,7 @@ Page {
 
     function lueJuomanTunnus(xid) {
         var tunnus = 0
-        console.log(" valittu " + xid)
+        //console.log(" valittu " + xid)
         if ((juomat.count > xid) && (xid > -0.5)) {
             tunnus = juomat.get(xid).tunnus
         }
@@ -1428,7 +1429,7 @@ Page {
 
             arvostelu = dialog.tahtia
 
-            //console.log("muutaUusi: olutId = " + olutId)
+            console.log("" + juomanKuvaus + ", " + arvostelu)
 
             return
         })
@@ -1693,8 +1694,6 @@ Page {
         var i = Apuja.etsiPaikka(ms1)
         var ms0, ml0, koko0, vahvuus0, id1, ml1, koko1, vahvuus1
 
-        console.log(" i " + i + " aika " + ms1)
-
         if (i > 0){ // ms1 on listan ensimmäisen jälkeen
             ms0 = Apuja.juomanAika(i-1)
             ml0 = Apuja.mlVeressa(i-1)
@@ -1706,8 +1705,6 @@ Page {
             koko0 = 0
             vahvuus0 = 0
         }
-
-        console.log(" " + ms0 + " " + ml0 + " " + koko0 + " " + vahvuus0)
 
         while (i < Apuja.juotu.length) {
             id1 = Apuja.juomanTkId(i)
@@ -1724,7 +1721,6 @@ Page {
                 ml0 = ml1
                 koko0 = koko1
                 vahvuus0 = vahvuus1
-                console.log(" " + ms1 + " " + ml1 + " " + koko1 + " " + vahvuus1)
             } //else
                 //i = Apuja.juotu.length
 
@@ -1832,11 +1828,13 @@ Page {
     // */
 
     function unTpdCheckIn() {
-        var barId, pituus, naytaSijainti, leveys, huuto, tahtia
+        var barId = "", pituus, naytaSijainti, leveys, huuto, tahtia
         var osoite, kysely, face="", twit="", fsqr="", vyohyketunnus, aika
         var xhttp = new XMLHttpRequest()
         var m0, m1
 
+        console.log("tiedot: " + olutId + ", " + baariId + ", " + juomanKuvaus + ", "
+                    + arvostelu)
         if (!luettuUnTpToken)
             return
 
@@ -1851,15 +1849,13 @@ Page {
 
         hetkinen.running = true
 
-        barId = 0
+        barId = ""
         naytaSijainti = false
         if (arvoTalletaSijainti > 0.5) {
+            naytaSijainti = true
+            pituus = FourSqr.lastLong
+            leveys = FourSqr.lastLat
             barId = baariId
-            if (arvoTalletaSijainti > 1.5) {
-                naytaSijainti = true
-                pituus = sijainti.coordinate.longitude
-                leveys = sijainti.coordinate.latitude
-            }
         }
 
         huuto = juomanKuvaus
@@ -1877,10 +1873,11 @@ Page {
             twit = "on"
 
         // checkIn(beerId, tzone, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare)
-        osoite = UnTpd.checkInPart1()
-        kysely = UnTpd.checkInPart2(olutId, vyohyketunnus, barId, naytaSijainti, leveys, pituus, huuto, tahtia, face, twit, fsqr)
+        osoite = UnTpd.checkInAddress()
+        kysely = UnTpd.checkInData(olutId, vyohyketunnus, barId, naytaSijainti, leveys,
+                                    pituus, huuto, tahtia, face, twit, fsqr)
 
-        //console.log("checkIN " + kysely)
+        console.log("checkIN " + kysely)
 
         xhttp.onreadystatechange = function () {
             //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
@@ -1919,6 +1916,7 @@ Page {
     function unTpdKirjausTehty(vastaus) {
         var mj
         var i=0
+        console.log(JSON.stringify(vastaus))
         if (vastaus.meta.code == 200){
             unTpdViestit.text = vastaus.response.result
 
@@ -2164,7 +2162,7 @@ Page {
     PositionSource {
         id: paikkatieto
         active: true
-        updateInterval: 5*60*1000 // 5 min
+        updateInterval: 15*60*1000 // 15 min
     }
 
     // tunnus, aikaMs, mlVeressa, juomaaika, juomanimi, juomamaara, juomapros, kuvaus
@@ -2908,9 +2906,10 @@ Page {
                     readOnly: true
                     color: Theme.primaryColor
                     text: qsTr("beer")
-                    label: arvostelu > 0 ? "      " + (arvostelu/2+0.5).toFixed(1) + "/5" : " "
+                    label: arvostelu > 0 ? "" + (arvostelu/2+0.5).toFixed(1) + "/5" : " "
                     onClicked: {
                         muutaUusi()
+                        console.log("-- " + juomanKuvaus)
                     }
                 }
 
@@ -2961,6 +2960,16 @@ Page {
                         dialog.accepted.connect(function() {
                             baariNimi = dialog.baari
                             baariId = dialog.baarinTunnus
+                            if (baariId != "")
+                                arvoTalletaSijainti = 2
+                            if (dialog.naytaSijainti){
+                                FourSqr.lastLat = dialog.lpiiri
+                                FourSqr.lastLong = dialog.ppiiri
+                                if (arvoTalletaSijainti == 0)
+                                    arvoTalletaSijainti = 1
+                            } else
+                                arvoTalletaSijainti = 0
+
                         })
                     }
                 } // button
@@ -3006,8 +3015,8 @@ Page {
                         kelloKay = true
                         muutaAjanKirjasin()
                         paivitaAika()
-                        juomanKuvaus = ""
                         unTpdCheckIn()
+                        juomanKuvaus = ""
                     }
                     y: txtBaari.y + 0.5*(txtBaari.height - height)
 

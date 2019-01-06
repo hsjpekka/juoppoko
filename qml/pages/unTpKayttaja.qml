@@ -13,6 +13,7 @@ Page {
     property bool avaaKirjautumissivu: true
     property bool haeKayttajatiedot: true
     property bool tilastotNakyvat: false
+    property date pvm
 
     function tyhjennaKentat() {
         otsikko.title = qsTr("UnTappd account")
@@ -51,10 +52,11 @@ Page {
     function kirjaudu() {
         var sivu=pageStack.push(Qt.resolvedUrl("unTpKirjautuminen.qml"))
         sivu.muuttuu.connect( function() {
-            if (UnTpd.unTpToken == ""){
-                tyhjennaKentat()
-            } else {
-                lueKayttajanTiedot("")
+            tyhjennaKentat()
+            if (UnTpd.unTpToken != ""){
+                kayttaja = ""
+                lueKayttajanTiedot(kayttaja)
+                lueKayttajanKirjaukset(kayttaja, 0)
             }
         })
         return
@@ -62,12 +64,16 @@ Page {
 
     function kirjoitaKirjaukset(jsonVastaus) {
         var vastaus = jsonVastaus.response.checkins
-        var id, bid, etiketti, merkki, lausahdus, maljoja, huutoja, baari
-        var i=0, N = vastaus.count
+        //var kirjaus = jsonVastaus.response.checkins.items
+        var id, aika = "", bid, etiketti, merkki, lausahdus, maljoja, omaMalja, huutoja, baari,
+                panimo
+        var i=0, N = vastaus.count, aikams, paivays = new Date()
         var kentta
         while (i < N) {
             lausahdus = ""
             baari = ""
+            //paikka = ""
+            panimo = ""
 
             id = vastaus.items[i].checkin_id
             bid = vastaus.items[i].beer.bid
@@ -76,24 +82,31 @@ Page {
 
             lausahdus = vastaus.items[i].checkin_comment
 
-            if (lausahdus == "" ) {
-                for (kentta in vastaus.items[i].venue) {
-                    if (kentta == "venue_name") {
-                        //console.log(merkki + " - " + vastaus.items[i].venue.venue_name)
-                        baari = vastaus.items[i].venue.venue_name
-                    } else {
+            aikams = Date.parse(vastaus.items[i].created_at)
+            paivays.setTime(aikams)
+            pvm = paivays
+            aika = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+
+            //if (lausahdus == "" ) {
+            for (kentta in vastaus.items[i].venue) {
+                if (kentta == "venue_name") {
+                    //console.log(merkki + " - " + vastaus.items[i].venue.venue_name)
+                    baari = vastaus.items[i].venue.venue_name
+                } else {
                         //console.log(merkki + " + " + kentta)
-                    }
                 }
-                if (baari != "")
-                    lausahdus = baari
-                else
-                    lausahdus = vastaus.items[i].brewery.brewery_name
             }
+                //if (baari != "")
+                    //lausahdus = baari
+                //else
+            panimo = vastaus.items[i].brewery.brewery_name
+            //}
 
             maljoja = vastaus.items[i].toasts.count
+            omaMalja = vastaus.items[i].toasts.auth_toast
             huutoja = vastaus.items[i].comments.count
-            lisaaListaan(id, bid, etiketti, merkki, lausahdus, maljoja, huutoja)
+            lisaaListaan(id, aika, bid, baari, etiketti, merkki, panimo, lausahdus, maljoja,
+                         omaMalja, huutoja)
             i++
         }
     }
@@ -149,33 +162,41 @@ Page {
         //Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, UnTpd.unTpToken)
     }
 
-    function lisaaListaan(id, bid, etiketti, merkki, lausahdus, maljoja, huutoja) {
+    function lisaaListaan(id, aika, bid, baari, etiketti, merkki, panimo, lausahdus, maljoja,
+                          kohotinko, huutoja) {
         //var maljoja = qsTr("%1 toasts").arg(mal), huutoja = qsTr("%1 comments").arg(huu)
         //console.log("" + id + ", " + etiketti + ", " + merkki + ", " + lausahdus + ", " + maljoja + ", " + huutoja)
 
-        return kirjaukset.append({"checkinId": id, "bid": bid, "etiketti": etiketti, "oluenMerkki": merkki,
-                          "lausahdus": lausahdus, "maljoja": maljoja, "huutoja": huutoja })
+        return kirjaukset.append({"section": aika, "checkinId": id, "bid": bid, "paikka": baari,
+                                     "etiketti": etiketti, "oluenMerkki": merkki,
+                                     "panimo": panimo, "lausahdus": lausahdus,
+                                     "maljoja": maljoja, "nostinko": kohotinko,
+                                     "huutoja": huutoja })
     }
 
     function lueKayttajanTiedot(tunnus) { // jos tunnus = "" hakee käyttäjän tiedot
         var xhttp = new XMLHttpRequest();
         var kysely = UnTpd.getUserInfo(tunnus,"true");
         var async = true, sync = false;
+        var vastaus
 
         hetkinen.running = true
 
         xhttp.onreadystatechange = function() {
             console.log("lueKayttajanTiedot - " + xhttp.readyState + " - " + xhttp.status)
             if (xhttp.readyState == 4){
-                var vastaus = JSON.parse(xhttp.responseText);
 
                 if (xhttp.status == 200) {
+                    vastaus = JSON.parse(xhttp.responseText);
                     //console.log(xhttp.responseText)
                     kirjoitaTiedot(vastaus)
-                } else if (xhttp.status == 500) {
-                    nimi.text = vastaus.meta.error_detail
                 } else {
-                    nimi.text = qsTr("user info: ") + xhttp.status + ", " + xhttp.statusText
+                    console.log(xhttp.responseText)
+                    if (xhttp.status == 500) {
+                        nimi.text = vastaus.meta.error_detail
+                    } else {
+                        nimi.text = qsTr("user info: ") + xhttp.status + ", " + xhttp.statusText
+                    }
                 }
 
                 hetkinen.running = false
@@ -202,10 +223,8 @@ Page {
 
                 if (xhttp.status == 200) {
                     kirjoitaKirjaukset(vastaus)
-                } else if (xhttp.status == 500) {
-                    //nimi.text = vastaus.meta.error_detail
                 } else {
-                    //nimi.text = qsTr("user info: ") + xhttp.status + ", " + xhttp.statusText
+                    console.log(JSON.stringify(vastaus))
                 }
 
                 hetkinen.running = false
@@ -268,7 +287,8 @@ Page {
 
         ListItem {
             id: listanOsa
-            contentHeight: alkioSarake.height + Theme.paddingSmall
+            //contentHeight: alkioSarake.height + Theme.paddingMedium
+            contentHeight: kirjaus.height + Theme.paddingMedium
             width: sivu.width
             menu: ContextMenu {
                 //MenuItem {
@@ -292,6 +312,28 @@ Page {
                 }
             }
 
+            UnTpKirjauksenKooste{
+                id: kirjaus
+                x: Theme.paddingSmall
+                width: sivu.width - 2*x
+                tunnus: checkinId
+                olutId: bid
+                naytaTekija: false
+                //kuva: osoite
+                //kayttis: kayttajatunnus
+                //juomari: tekija
+                pubi: paikka //
+                tarra: etiketti
+                kalja: oluenMerkki
+                valmistaja: panimo //
+                sanottu: lausahdus
+                nostoja: maljoja
+                omaNosto: nostinko
+                juttuja: huutoja
+
+            }
+
+            /*
             Row {
                 spacing: Theme.paddingSmall
                 x: Theme.paddingLarge
@@ -334,27 +376,7 @@ Page {
                             x: Theme.paddingMedium
                         }
 
-                        /*
-                        TextField {
-                            id: oluenTiedot
-                            text: oluenMerkki
-                            readOnly: true
-                            color: Theme.highlightColor
-                            label: lausahdus
-                            width: sivu.width - x
-                            onClicked: {
-                                listanOsa.menuOpen
-                                mouse.accepted = false
-                            }
-                            onPressAndHold: {
-                                listanOsa.menuOpen
-                                mouse.accepted = false
-                            }
-
-                            //anchors.left: listanEtiketti.right
-                            //anchors.right: peukku.left
-                            //y: 2
-                        } // */
+                        // textfield oluentiedot poistettu tästä
 
                         Row {
                             spacing: Theme.paddingMedium
@@ -417,6 +439,29 @@ Page {
                     }
 
             }
+            // */
+
+            /*
+            TextField {
+                id: oluenTiedot
+                text: oluenMerkki
+                readOnly: true
+                color: Theme.highlightColor
+                label: lausahdus
+                width: sivu.width - x
+                onClicked: {
+                    listanOsa.menuOpen
+                    mouse.accepted = false
+                }
+                onPressAndHold: {
+                    listanOsa.menuOpen
+                    mouse.accepted = false
+                }
+
+                //anchors.left: listanEtiketti.right
+                //anchors.right: peukku.left
+                //y: 2
+            } // */
 
         }
     }
@@ -681,6 +726,15 @@ Page {
                 }
 
                 delegate: kirjaustyyppi
+
+                // /*
+                section {
+                    property: "section"
+
+                    delegate: SectionHeader {
+                        text: section
+                    }
+                } // */
 
                 onMovementEnded: {
                     if (atYEnd) {

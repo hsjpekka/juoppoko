@@ -835,12 +835,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+<<<<<<< Updated upstream
         <source>Seems like you haven&apos;t logged in UnTappd. That may limit the number of queries per day.</source>
         <translation type="unfinished">Et näytä kirjautuneen UnTappdiin. Se saattaa rajata kyselyjen päivittäistä määrää.</translation>
     </message>
     <message>
         <source>starting search</source>
         <translation type="unfinished">hakua aloitetaan</translation>
+=======
+        <source>no check-ins nearby! ??</source>
+        <translation type="unfinished"></translation>
+>>>>>>> Stashed changes
     </message>
 </context>
 <context>

@@ -35,13 +35,15 @@ Page {
         return tulos
     }
 
-    function lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut, panimo,
-                          baari, maljoja, huutoja){
+    function lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut,
+                          panimo, baari, maljoja, kohotinko, huuto, jutteluita){
+
         return kirjausLista.append({"checkinId": kirjaus, "bid": bid, "section": aika,
                                        "osoite": kuva, "kayttajatunnus": kayttajatunnus,
                                        "tekija": nimi, "paikka": baari,
                                        "etiketti": etiketti, "olut": olut, "panimo": panimo,
-                                       "maljoja": maljoja, "huutoja": huutoja })
+                                       "maljoja": maljoja, "kohotinko": kohotinko,
+                                       "huuto": huuto, "jutteluita": jutteluita })
     }
 
     function tyhjennaLista() {
@@ -107,6 +109,7 @@ Page {
                     paivitaLista(vastaus)
                 } else {
                     console.log("kaverienKirjauksia: " + xhttp.status + ", " + xhttp.statusText)
+                    console.log(xhttp.responseText)
                     hakuvirhe = true
                 }
 
@@ -173,7 +176,7 @@ Page {
         var i=0, n = vastaus.response.checkins.count
         var paivays = new Date(), kentta
         var kirjaus, bid, aikams, aika, kuva, nimi, etiketti, olut, panimo, baari,
-                maljoja, huutoja, kayttajatunnus
+                maljoja, omaMalja, jutteluita, kayttajatunnus, huuto
 
         if ( n === 0 && uusinCheckin === 0 ) {
             hakuvirhe = true
@@ -201,8 +204,11 @@ Page {
             etiketti = kirjatut[i].beer.beer_label
             olut = kirjatut[i].beer.beer_name
             panimo = kirjatut[i].brewery.brewery_name
-            maljoja = kirjatut[i].toasts.count
-            huutoja = kirjatut[i].comments.count
+            maljoja = kirjatut[i].toasts.count // mikä ero on välillä total_count ja count?
+            omaMalja = kirjatut[i].toasts.auth_toast // onko
+            //console.log("toasts.count " + maljoja + ", total_count " + kirjatut[i].toasts.count + ", auth_toast " + omaMalja)
+            jutteluita = kirjatut[i].comments.count
+            huuto = kirjatut[i].checkin_comment
 
             baari = ""
             for (kentta in kirjatut[i].venue) {
@@ -216,10 +222,10 @@ Page {
 
             /*console.log("" + i + "= " +  + kirjaus + ", " + aika + ", " + kuva + ", " + nimi
                         + "- " + bid + "- " + etiketti + "- " + olut + "; " + panimo + "; "
-                        + maljoja + "; " + huutoja + ", " + baari)// */
+                        + maljoja + "; " + jutteluita + ", " + baari)// */
             //console.log("" + i + "= " + JSON.stringify(kirjatut[i]))
             lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut, panimo,
-                         baari, maljoja, huutoja)
+                         baari, maljoja, omaMalja, huuto, jutteluita)
 
             //if (!ensimmainenHaku) {
                 kirjaustenTiedot.push(kirjatut[i])
@@ -233,11 +239,11 @@ Page {
             ensimmainenHaku = false
         }
 
-        console.log("kirjaustenTiedot " + kirjaustenTiedot.length + " " + kirjaustenTiedot[kirjaustenTiedot.length-3].beer.beer_name)
+        //console.log("kirjaustenTiedot " + kirjaustenTiedot.length + " " + kirjaustenTiedot[kirjaustenTiedot.length-3].beer.beer_name)
         return i
     }
 
-    function unTpdMaljattu(jsonVastaus) {
+    function unTpdKohota(jsonVastaus) {
         var onnistunut = jsonVastaus.response.result
         var maljoja, kentta
 
@@ -247,6 +253,20 @@ Page {
             kirjausLista.set(valittu, {"maljoja": jsonVastaus.response.toasts.count})
 
         hetkinen.running = false
+
+        return
+    }
+
+    function unTpJuttele(){
+        //console.log("===\n===\n " + JSON.stringify(kirjaustenTiedot[valittu]))
+        //console.log(" - - valittu = " + valittu)
+        var viestisivu
+        viestisivu = pageStack.push(Qt.resolvedUrl("unTpJuomispuheet.qml"),
+                       { "kirjaus": kirjaustenTiedot[valittu] })
+        viestisivu.sulkeutuu.connect( function() {
+            if (viestisivu.viesteja != kirjausLista.get(valittu).jutteluita )
+                kirjausLista.set(valittu,{"jutteluita":viestisivu.viesteja })
+            })
 
         return
     }
@@ -274,7 +294,7 @@ Page {
 
                 vastaus = JSON.parse(xhttp.responseText);
 
-                unTpdMaljattu(vastaus)
+                unTpdKohota(vastaus)
 
             } else {
                 console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
@@ -318,7 +338,13 @@ Page {
             propagateComposedEvents: true
             onClicked: {
                 valittu = kirjaukset.indexAt(mouseX,y+mouseY)
-                console.log("ListItem " + valittu + ", hiiri " + mouseX + " " + (y + mouseY))
+                console.log("__ " + valittu + ", hiiri " + mouseX.toFixed(1)
+                            + " " + mouseY.toFixed(1) + " " +
+                            (tietue.y).toFixed(1) )
+                mouse.accepted = false
+            }
+            onPressAndHold: {
+                valittu = kirjaukset.indexAt(mouseX,y+mouseY)
                 mouse.accepted = false
             }
 
@@ -327,24 +353,32 @@ Page {
                     text: qsTr("user data")
                     onClicked: {
                         pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"),{
-                                        "kayttaja": kayttaja.text } )
+                                        "kayttaja": kirjaus.kayttis } )
                     }
                 }
                 MenuItem {
                     text: qsTr("beer")
                     onClicked: {
                         pageStack.push(Qt.resolvedUrl("unTpTietojaOluesta.qml"),{
-                                        "olutId": oluenId.text } )
+                                        "olutId": kirjaus.olutId } )
                     }
                 }
                 MenuItem {
                     text: qsTr("toast")
                     onClicked: {
-                        unTpdToast(kirjausId.text)
+                        unTpdToast(kirjaus.tunnus)
                     }
                 }
+                MenuItem {
+                    text: qsTr("comment")
+                    onClicked: {                        
+                        unTpJuttele()
+                    }
+                }
+
             }
 
+            /*
             Rectangle {
                 color: "transparent"
                 border.color: Theme.secondaryColor
@@ -354,8 +388,29 @@ Page {
                 x: Theme.paddingMedium/2
                 height: kirjaus.height
                 //y: 0
+            } // */
+
+            UnTpKirjauksenKooste{
+                id: kirjaus
+                x: Theme.paddingSmall
+                width: tietue.width - 2*x
+                tunnus: checkinId
+                olutId: bid
+                kuva: osoite
+                kayttis: kayttajatunnus
+                juomari: tekija
+                pubi: paikka
+                tarra: etiketti
+                kalja: olut
+                valmistaja: panimo
+                sanottu: huuto
+                nostoja: maljoja                
+                juttuja: jutteluita
+                omaNosto: kohotinko
+
             }
 
+            /*
             Column {
                 id: kirjaus
                 x: Theme.paddingLarge
@@ -387,7 +442,7 @@ Page {
                         id: kuka
                         width: kirjaus.width - x - Theme.paddingSmall
 
-                        Label {
+                        Text {
                             id: kayttaja
                             text: kayttajatunnus
                             visible: false
@@ -410,7 +465,8 @@ Page {
                 }
 
                 Row {// olut, kommentit
-                    x: Theme.paddingLarge
+                    id: kirjattuOlut
+                    //x: Theme.paddingLarge
                     spacing: Theme.paddingMedium
                     //x: Theme.paddingLarge
 
@@ -423,7 +479,7 @@ Page {
 
                     Column {
                         id: mita
-                        width: sivu.width - juomanEtiketti.width - kirjaus.x
+                        width: sivu.width - kirjattuOlut.x - x
 
                         Label {
                             text: olut
@@ -439,6 +495,15 @@ Page {
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         }
 
+                        Label {
+                            text: huuto
+                            color: Theme.highlightColor
+                            font.bold: true
+                            font.italic: true
+                            width: mita.width - Theme.paddingSmall
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        }
+
                         Row {
                             spacing: Theme.paddingMedium
 
@@ -450,8 +515,7 @@ Page {
                                 //enabled: false
                                 onClicked: {
                                     var ykoord = tietue.y + mouseY
-                                    valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
-                                    console.log("" + valittu + ", hiiri " + mouseX.toFixed(1) + " " + mouseY.toFixed(1) + " " + (tietue.y).toFixed(1) )
+                                    //valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
                                     unTpdToast(kirjausId.text)
                                 }
                             }
@@ -471,12 +535,16 @@ Page {
                             IconButton {
                                 id: kommentti
                                 icon.source: "image://theme/icon-s-chat"
-                                //highlighted: (huutoja > 0) ? true : false
+                                highlighted: (jutteluita > 0) ? true : false
                                 height: kommentteja.height
-                                enabled: false
+                                //enabled: false
                                 onClicked: {
                                     highlighted = !highlighted
-                                    //comment(kirjausId.text)
+                                    valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
+                                    console.log("oo " + valittu + ", hiiri " + mouseX.toFixed(1)
+                                                + " " + mouseY.toFixed(1) + " " +
+                                                (tietue.y).toFixed(1) )
+                                    unTpJuttele()
                                 }
 
                                 //anchors.top: (peukku.height > peukkuja.height) ? peukku.bottom : peukkuja.bottom
@@ -485,8 +553,8 @@ Page {
 
                             Label {
                                 id: kommentteja
-                                text: huutoja
-                                color: Theme.highlightDimmerColor //(huutoja > 0) ? Theme.highlightColor : Theme.secondaryHighlightColor
+                                text: jutteluita
+                                color: (jutteluita > 0) ? Theme.highlightColor : Theme.secondaryHighlightColor
                                 //anchors.top: (peukku.height > peukkuja.height) ? peukku.bottom : peukkuja.bottom
                                 //anchors.left: peukkuja.left
                             }
@@ -500,6 +568,7 @@ Page {
                 }
 
             }
+            // */
         }
     }
 
@@ -509,6 +578,12 @@ Page {
         contentHeight: nakyma.height
 
         PullDownMenu {
+            MenuItem {
+                text: "↻ " + qsTr("refresh")
+                onClicked:
+                    haunAloitus()
+            }
+
             MenuItem {
                 text: vainKaverit? qsTr("check pubs nearby") : qsTr("check friends")
                 onClicked: {

@@ -55,6 +55,7 @@ Dialog {
     property int tilavuusMitta//: 1 // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
     property int olutId: 0
     property int tahtia: 0
+    property bool alkutoimet: true
 
     function asetaYksikotMl() {
         maara = maara*yksikko
@@ -225,7 +226,7 @@ Dialog {
                                 vahvuus = dialog.vahvuus
                                 olutId = dialog.olutId
                                 valitunEtiketti.source = UnTpd.oluenEtiketti
-                                tahtiaRivi.visible = (olutId > 0) ? true : false
+                                //tahtiaRivi.visible = ( > 0) ? true : false
                                 //console.log("avaaUnTappd: olutId " + olutId)
                             })
                         }
@@ -243,8 +244,10 @@ Dialog {
                     readOnly: false
                     width: sivu.width - tyhjennaHaku.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
                     onTextChanged: {
-                        olutId = 0
-                        tahtiaRivi.visible = false
+                        if (!alkutoimet)
+                            olutId = 0
+                        //tahtiaRivi.visible = false
+                        console.log("nimi muuttunut")
                     }
                 }
 
@@ -256,7 +259,7 @@ Dialog {
                         //juoma.text = ""
                         nimi0 = ""
                         olutId = 0
-                        tahtiaRivi.visible = false
+                        //tahtiaRivi.visible = false
                         valitunEtiketti.source = "tuoppi.png"
                     }
                 }
@@ -706,11 +709,15 @@ Dialog {
 
         //console.log("olutId + tahtia: " + olutId + " " + tahtia + " " + nimi)
 
-        if (olutId > 0)
-            tahtiaRivi.visible = true
+        //if (olutId > 0)
+        //    tahtiaRivi.visible = true
 
         valitunEtiketti.source = UnTpd.oluenEtiketti
         nimi0 = nimi
+
+        alkutoimet = false
+
+        console.log("oluen id " + olutId)
 
     }
 
@@ -719,6 +726,7 @@ Dialog {
             nimi = juoma.text
             juomanKuvaus = kuvaus.text
             if (nimi0 != nimi){ // nimi0 = joko juodut-tietokantaan talletettu tai untappedista haettu
+                console.log("nimi muuttunut")
                 olutId = 0
                 UnTpd.setBeer(olutId)
             }

@@ -47,7 +47,7 @@ DEFINES += \
      "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
      "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
      "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\"" \
-     "JUOPPOKO_VERSION=\"\\\"2.2\\\"\""
+     "JUOPPOKO_VERSION=\"\\\"2.3\\\"\""
 
 QT += positioning
 

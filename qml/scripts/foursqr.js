@@ -4,8 +4,8 @@ var apiUrl = "https://api.foursquare.com/v2/"
 var appId = ""
 var appSecret = ""
 var fsqrVersion = ""
-var lastLat = 62.2
-var lastLong = 24.9
+var lastLat = 61.61
+var lastLong = 22.58
 
 function auth() {
     return "client_id=" + appId + "&client_secret=" + appSecret + "&v=" + fsqrVersion

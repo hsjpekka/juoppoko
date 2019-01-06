@@ -60,12 +60,20 @@ function acceptFriend(targetId) {// (address1, auth, targetId) {
     return encodeURI(query);
 }
 
-function addComment(targetId) { //(address1, auth, targetId, comment)
+function addCommentAddress(checkinId) { //(address1, auth, targetId, comment)
     //post-string "&comment=" + comment
     // CHECKIN_ID (int, required) - The checkin id of the check-in you want to add the comment.//"32"
     //comment (string, required) - The text of the comment you want to add. Max of 140 characters.//"&comment=Tou!"
-    var endpoint = "/checkin/addcomment/"+ targetId;
+    var endpoint = "/checkin/addcomment/"+ checkinId;
     var query = unTpOsoite + endpoint + "?" + userAut();
+
+    return encodeURI(query);
+}
+
+function addCommentString(comment){
+    //post-string "&comment=" + comment
+    //comment (string, required) - The text of the comment you want to add. Max of 140 characters.//"&comment=Tou!"
+    var query = "&comment=" + comment
 
     return encodeURI(query);
 }
@@ -79,7 +87,7 @@ function addToWishList(targetId) { //(address1, auth, targetId)
     return encodeURI(query);
 }
 
-function checkInPart1() {
+function checkInAddress() {
     //post
     //bid (int, required) - The numeric beer ID you want to check into. //"&bid=32"
 
@@ -104,7 +112,7 @@ function checkInPart1() {
     return encodeURI(address);
 }
 
-function checkInPart2(beerId, tzone, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare) { //(address1, auth, beerId, venueId, lat, lng, shout, rating, fbook, twitter, fsquare)
+function checkInData(beerId, tzone, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare) { //(address1, auth, beerId, venueId, lat, lng, shout, rating, fbook, twitter, fsquare)
     //post
     //bid (int, required) - The numeric beer ID you want to check into. //"&bid=32"
 
@@ -123,13 +131,17 @@ function checkInPart2(beerId, tzone, venueId, position, lat, lng, shout, rating,
     //authentication required
 
     var pvm = new Date();
-    var gmtOffset = "&gmt_offset=" + (-pvm.getTimezoneOffset()/60).toFixed(1)//toFixed(1);
+    var gmtOffset = "&gmt_offset=" + (-pvm.getTimezoneOffset()/60).toFixed(1);
     var timezone = "&timezone=" + tzone;
     var query = ""
 
     query += "bid=" + beerId + gmtOffset + timezone;
 
-    if (position) {
+    if (venueId != ""){
+        query += "&geolat=" + lat;
+        query += "&geolng=" + lng;
+        query += "&foursquare_id=" + venueId;
+    } else if (position) {
         query += "&geolat=" + lat;
         query += "&geolng=" + lng;
     }
@@ -550,10 +562,10 @@ function rejectFriend(targetId) { //(address1, auth, targetId)
     return encodeURI(query);
 }
 
-function removeComment(targetId) { //(address1, auth, targetId)
+function removeComment(commentId) { //(address1, auth, targetId)
     //post-string not used
     // COMMENT_ID (int, required) - The checkin id of the check-in you want to add the comment.//"32"
-    var endpoint = "/checkin/deletecomment/"+ targetId;
+    var endpoint = "/checkin/deletecomment/"+ commentId;
     var query = unTpOsoite + endpoint + "?" + userAut();
 
     return encodeURI(query);
@@ -567,10 +579,10 @@ function removeFriend(targetId) { //(address1, auth, targetId)
     return encodeURI(query);
 }
 
-function removeFromWishList(targetId) { //(address1, auth, targetId)
+function removeFromWishList(beerId) { //(address1, auth, targetId)
     //bid (int, required) - The numeric BID of the beer you want to remove from your list. //"&bid=32"
     var endPoint = "/user/wishlist/delete";
-    var wishRemoveBeer = "&bid=" + targetId;
+    var wishRemoveBeer = "&bid=" + beerId;
     var query = unTpOsoite + endPoint + "?" + userAut() + wishRemoveBeer;
 
     return encodeURI(query);
