@@ -19,6 +19,9 @@ Item {
     property int nostoja: 0
     property bool omaNosto: false
     property int juttuja: 0
+    property bool osallistunut: false
+
+    property var keskustelu: [] //checkins.items[i].comments[0-(N-1)]
 
     Rectangle {
         id: kehys
@@ -144,18 +147,25 @@ Item {
                         icon.source: "image://theme/icon-m-like"
                         highlighted: omaNosto
                         height: peukkuja.height*1.5
+                        propagateComposedEvents: true
                         //enabled: false
                         onClicked: {
-                            //var ykoord = tietue.y + mouseY
-                            //valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
+                            valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
                             unTpdToast(kirjausId.text)
+                            //console.log("hiiri " + valittu + " - " + mouseY + " tietue " + tietue.y)
+                            mouse.accepted = true
+                        }
+                        onPressAndHold: {
+                            valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
+                            tietue.openMenu()
+                            mouse.accepted = true
                         }
                     }
 
                     Label {
                         id: peukkuja
                         text: nostoja
-                        color: (nostoja > 0) ? Theme.secondaryHighlightColor : Theme.highlightColor
+                        color: Theme.secondaryHighlightColor
                     }
 
                     Rectangle {
@@ -167,16 +177,23 @@ Item {
                     IconButton {
                         id: kommentti
                         icon.source: "image://theme/icon-m-chat"
-                        //highlighted: (juttuja > 0) ? true : false
+                        highlighted: osallistunut
                         height: kommentteja.height*1.5
                         //enabled: false
+                        propagateComposedEvents: true
                         onClicked: {
                             //highlighted = !highlighted
-                            //valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
+                            valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
                             //console.log("oo " + valittu + ", hiiri " + mouseX.toFixed(1)
                             //            + " " + mouseY.toFixed(1) + " " +
                             //            (tietue.y).toFixed(1) )
-                            unTpJuttele()
+                            unTpdJuttele()
+                            mouse.accepted = true
+                        }
+                        onPressAndHold: {
+                            mouse.accepted = true
+                            valittu = kirjaukset.indexAt(mouseX, tietue.y + mouseY)
+                            tietue.openMenu()
                         }
 
                         //anchors.top: (peukku.height > peukkuja.height) ? peukku.bottom : peukkuja.bottom
@@ -186,7 +203,7 @@ Item {
                     Label {
                         id: kommentteja
                         text: juttuja
-                        color: (juttuja > 0) ? Theme.highlightColor : Theme.secondaryHighlightColor
+                        color: Theme.secondaryHighlightColor
                         //anchors.top: (peukku.height > peukkuja.height) ? peukku.bottom : peukkuja.bottom
                         //anchors.left: peukkuja.left
                     }

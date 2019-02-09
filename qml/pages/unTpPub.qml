@@ -13,7 +13,7 @@ Page {
     property int valittu: 0
     property bool hakuvirhe: false
     property date pvm
-    property var kirjaustenTiedot: []
+    //property var kirjaustenTiedot: []
     property bool ensimmainenHaku: true
 
     function haunAloitus() {
@@ -36,23 +36,25 @@ Page {
     }
 
     function lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut,
-                          panimo, baari, maljoja, kohotinko, huuto, jutteluita){
+                          panimo, baari, maljoja, kohotinko, huuto, juttuja, juttuLista,
+                          jutellut){
 
         return kirjausLista.append({"checkinId": kirjaus, "bid": bid, "section": aika,
                                        "osoite": kuva, "kayttajatunnus": kayttajatunnus,
                                        "tekija": nimi, "paikka": baari,
                                        "etiketti": etiketti, "olut": olut, "panimo": panimo,
                                        "maljoja": maljoja, "kohotinko": kohotinko,
-                                       "huuto": huuto, "jutteluita": jutteluita })
+                                       "huuto": huuto, "jutteluita": juttuja,
+                                       "jutut": juttuLista, "mukana": jutellut })
     }
 
     function tyhjennaLista() {
 
-        while (kirjaustenTiedot.length > 0){
-            kirjaustenTiedot.pop()
-        }
+        //while (kirjaustenTiedot.length > 0){
+        //    kirjaustenTiedot.pop()
+        //}
 
-        console.log("kirjauksia " + kirjaustenTiedot.length)
+        //console.log("kirjauksia " + kirjaustenTiedot.length)
         return kirjausLista.clear()
     }
 
@@ -68,15 +70,6 @@ Page {
             pp = paikkatieto.position.coordinate.longitude
             lp = paikkatieto.position.coordinate.latitude
         } else {
-            /*
-            if (!vainKaverit) {
-                unTpdViestit.text = qsTr("Location not known. Can't search for nearby activity.")
-                hakuvirhe = true
-                hetkinen.running = false
-
-                return 0
-            }
-            // */
             lp = 60.28
             pp = 24.85
 
@@ -108,8 +101,8 @@ Page {
                     hakuvirhe = false
                     paivitaLista(vastaus)
                 } else {
-                    console.log("kaverienKirjauksia: " + xhttp.status + ", " + xhttp.statusText)
-                    console.log(xhttp.responseText)
+                    //console.log("kaverienKirjauksia: " + xhttp.status + ", " + xhttp.statusText)
+                    console.log(xhttp.status + " " + xhttp.responseText)
                     hakuvirhe = true
                 }
 
@@ -124,59 +117,23 @@ Page {
         return xhttp.status
     }
 
-    /*function kaverienKirjauksia() {
-        var xhttp = new XMLHttpRequest();
-        var kysely = "", vastaus
-
-        hetkinen.running = true
-        unTpdViestit.text = qsTr("posting query")
-
-        kysely = UnTpd.getFriendsActivityFeed(uusinCheckin, 0, hakujaSivulle) // uusin, vanhin, per sivu
-
-        xhttp.onreadystatechange = function () {
-            //console.log("kaverienKirjauksia - " + xhttp.readyState + " - " + xhttp.status + " , " + hakunro)
-            if (xhttp.readyState == 0)
-                unTpdViestit.text = qsTr("request not initialized") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 1)
-                unTpdViestit.text = qsTr("server connection established") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 2)
-                unTpdViestit.text = qsTr("request received") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 3)
-                unTpdViestit.text = qsTr("processing request") + ", " + xhttp.statusText
-            else { //if (xhttp.readyState == 4){
-                //if(uusinCheckin > 0) console.log(xhttp.responseText)
-
-                unTpdViestit.text = xhttp.statusText
-
-                if (xhttp.status == 200) {
-                    vastaus = JSON.parse(xhttp.responseText);
-                    //console.log(xhttp.responseText)
-                    hakuvirhe = false
-                    paivitaLista(vastaus)
-                } else {
-                    console.log("kaverienKirjauksia: " + xhttp.status + ", " + xhttp.statusText)
-                    hakuvirhe = true
-                }
-
-                hetkinen.running = false
-            }
-
+    function olenkoJutellut(jutut) {
+        var juttuja = jutut.count, i = 0
+        while(i < juttuja){
+            if (jutut.items[i].comment_editor == true)
+                return true
+            i++
         }
 
-        xhttp.open("GET", kysely, true)
-        xhttp.send();
-
-        //console.log(" kysely: " + kysely)
-
-        return
-    } // */
+        return false
+    }
 
     function paivitaLista(vastaus) {
         var kirjatut = vastaus.response.checkins.items
         var i=0, n = vastaus.response.checkins.count
         var paivays = new Date(), kentta
         var kirjaus, bid, aikams, aika, kuva, nimi, etiketti, olut, panimo, baari,
-                maljoja, omaMalja, jutteluita, kayttajatunnus, huuto
+                maljoja, omaMalja, puheita, puheLista, kayttajatunnus, huuto, osallistunut
 
         if ( n === 0 && uusinCheckin === 0 ) {
             hakuvirhe = true
@@ -207,8 +164,10 @@ Page {
             maljoja = kirjatut[i].toasts.count // mikä ero on välillä total_count ja count?
             omaMalja = kirjatut[i].toasts.auth_toast // onko
             //console.log("toasts.count " + maljoja + ", total_count " + kirjatut[i].toasts.count + ", auth_toast " + omaMalja)
-            jutteluita = kirjatut[i].comments.count
+            puheita = kirjatut[i].comments.count
+            puheLista = kirjatut[i].comments
             huuto = kirjatut[i].checkin_comment
+            osallistunut = olenkoJutellut(kirjatut[i].comments)
 
             baari = ""
             for (kentta in kirjatut[i].venue) {
@@ -225,10 +184,10 @@ Page {
                         + maljoja + "; " + jutteluita + ", " + baari)// */
             //console.log("" + i + "= " + JSON.stringify(kirjatut[i]))
             lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut, panimo,
-                         baari, maljoja, omaMalja, huuto, jutteluita)
+                         baari, maljoja, omaMalja, huuto, puheita, puheLista, osallistunut)
 
             //if (!ensimmainenHaku) {
-                kirjaustenTiedot.push(kirjatut[i])
+                //kirjaustenTiedot.push(kirjatut[i])
             //}
 
             i++
@@ -245,28 +204,61 @@ Page {
 
     function unTpdKohota(jsonVastaus) {
         var onnistunut = jsonVastaus.response.result
-        var maljoja, kentta
+        var maljoja
 
-        //console.log("" + JSON.stringify(jsonVastaus))
+        //console.log("> toast >\n" + JSON.stringify(jsonVastaus) + "\n< toast <")
 
-        if (onnistunut)
-            kirjausLista.set(valittu, {"maljoja": jsonVastaus.response.toasts.count})
+        if (onnistunut == "success"){
+            kirjausLista.set(valittu, {"maljoja": jsonVastaus.response.toasts.count,
+                                 "kohotinko": jsonVastaus.response.toasts.auth_toast
+                             })
+        }
 
         hetkinen.running = false
 
         return
     }
 
-    function unTpJuttele(){
+    function unTpdJuttele(){
         //console.log("===\n===\n " + JSON.stringify(kirjaustenTiedot[valittu]))
         //console.log(" - - valittu = " + valittu)
-        var viestisivu
-        viestisivu = pageStack.push(Qt.resolvedUrl("unTpJuomispuheet.qml"),
-                       { "kirjaus": kirjaustenTiedot[valittu] })
+        var viestisivu, solu = kirjausLista.get(valittu), nimi = ""
+        if (solu.tekija != "") {
+            nimi = solu.tekija
+        } else {
+            nimi = solu.kayttajatunnus
+        }
+
+        viestisivu = pageStack.push(Qt.resolvedUrl("unTpJuomispuheet.qml"), {
+                                        "keskustelu": solu.jutut,
+                                        //"viesteja": solu.juttuja,
+                                        "user_avatar": solu.osoite,
+                                        "user_name": nimi,
+                                        "venue_name": solu.paikka,
+                                        "beer_label": solu.etiketti,
+                                        "beer_name": solu.olut,
+                                        "brewery_name": solu.panimo,
+                                        "checkin_comment": solu.huuto,
+                                        "ckdId": solu.checkinId
+                                    })
+        //viestisivu.sulkeutuu.connect( function() {
+        //    if (viestisivu.viesteja != kirjausLista.get(valittu).jutteluita )
+        //        kirjausLista.set(valittu,{"jutteluita":viestisivu.viesteja })
+        //    })
         viestisivu.sulkeutuu.connect( function() {
-            if (viestisivu.viesteja != kirjausLista.get(valittu).jutteluita )
-                kirjausLista.set(valittu,{"jutteluita":viestisivu.viesteja })
-            })
+            //console.log("sulkeutuu " + valittu + ", << " + viestisivu.viesteja + " >> "
+            //            + viestisivu.keskustelu)
+            kirjausLista.set(valittu,{//"maljoja": viestisivu.nostoja,
+                                 //"kohotinko": viestisivu.omaNosto,
+                                 "jutteluita": viestisivu.viesteja,
+                                 "jutut": viestisivu.keskustelu})
+            if (olenkoJutellut(viestisivu.keskustelu)) {
+                kirjausLista.set(valittu,{"mukana": true})
+            } else {
+                kirjausLista.set(valittu,{"mukana": false})
+            }
+
+        })
 
         return
     }
@@ -297,7 +289,7 @@ Page {
                 unTpdKohota(vastaus)
 
             } else {
-                console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
+                console.log(xhttp.readyState + ", " + xhttp.statusText)
                 unTpdViestit.text = xhttp.readyState + ", " + xhttp.statusText
                 viestinNaytto.start()
             }
@@ -337,14 +329,13 @@ Page {
             contentHeight: kirjaus.height + Theme.paddingMedium
             propagateComposedEvents: true
             onClicked: {
-                valittu = kirjaukset.indexAt(mouseX,y+mouseY)
-                console.log("__ " + valittu + ", hiiri " + mouseX.toFixed(1)
-                            + " " + mouseY.toFixed(1) + " " +
-                            (tietue.y).toFixed(1) )
-                mouse.accepted = false
+                //valittu = kirjaukset.indexAt(mouseX,mouseY)
+                //mouse.accepted = false
+                //console.log("oo hiiri " + mouseY + " - " + y)
             }
             onPressAndHold: {
                 valittu = kirjaukset.indexAt(mouseX,y+mouseY)
+                //kirjaukset.currentIndex = kirjaukset.indexAt(mouseX,y+mouseY)
                 mouse.accepted = false
             }
 
@@ -357,14 +348,14 @@ Page {
                     }
                 }
                 MenuItem {
-                    text: qsTr("beer")
+                    text: qsTr("beer info")
                     onClicked: {
                         pageStack.push(Qt.resolvedUrl("unTpTietojaOluesta.qml"),{
                                         "olutId": kirjaus.olutId } )
                     }
                 }
                 MenuItem {
-                    text: qsTr("toast")
+                    text: kirjaus.omaNosto? qsTr("untoast") : qsTr("toast")
                     onClicked: {
                         unTpdToast(kirjaus.tunnus)
                     }
@@ -372,23 +363,11 @@ Page {
                 MenuItem {
                     text: qsTr("comment")
                     onClicked: {                        
-                        unTpJuttele()
+                        unTpdJuttele()
                     }
                 }
 
             }
-
-            /*
-            Rectangle {
-                color: "transparent"
-                border.color: Theme.secondaryColor
-                border.width: 1
-                radius: Theme.paddingMedium
-                width: tietue.width - 2*x
-                x: Theme.paddingMedium/2
-                height: kirjaus.height
-                //y: 0
-            } // */
 
             UnTpKirjauksenKooste{
                 id: kirjaus
@@ -405,9 +384,10 @@ Page {
                 valmistaja: panimo
                 sanottu: huuto
                 nostoja: maljoja                
-                juttuja: jutteluita
                 omaNosto: kohotinko
-
+                juttuja: jutteluita
+                keskustelu: jutut
+                osallistunut: mukana
             }
 
             /*
@@ -544,7 +524,7 @@ Page {
                                     console.log("oo " + valittu + ", hiiri " + mouseX.toFixed(1)
                                                 + " " + mouseY.toFixed(1) + " " +
                                                 (tietue.y).toFixed(1) )
-                                    unTpJuttele()
+                                    unTpdJuttele()
                                 }
 
                                 //anchors.top: (peukku.height > peukkuja.height) ? peukku.bottom : peukkuja.bottom
@@ -677,6 +657,6 @@ Page {
 
     Component.onCompleted: {
         haeKirjauksia()
-        console.log("tietoja >" + kirjaustenTiedot.length + "<")
+        //console.log("tietoja >" + kirjaustenTiedot.length + "<")
     }
 }

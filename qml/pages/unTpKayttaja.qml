@@ -14,6 +14,7 @@ Page {
     property bool haeKayttajatiedot: true
     property bool tilastotNakyvat: false
     property date pvm
+    property int valittu
 
     function tyhjennaKentat() {
         otsikko.title = qsTr("UnTappd account")
@@ -46,7 +47,7 @@ Page {
     }
 
     function tyhjennaKirjaukset() {
-        return kirjaukset.clear()
+        return kirjausLista.clear()
     }
 
     function kirjaudu() {
@@ -66,7 +67,7 @@ Page {
         var vastaus = jsonVastaus.response.checkins
         //var kirjaus = jsonVastaus.response.checkins.items
         var id, aika = "", bid, etiketti, merkki, lausahdus, maljoja, omaMalja, huutoja, baari,
-                panimo
+                panimo, osallistunut
         var i=0, N = vastaus.count, aikams, paivays = new Date()
         var kentta
         while (i < N) {
@@ -105,8 +106,9 @@ Page {
             maljoja = vastaus.items[i].toasts.count
             omaMalja = vastaus.items[i].toasts.auth_toast
             huutoja = vastaus.items[i].comments.count
+            osallistunut = olenkoJutellut(vastaus.items[i].comments)
             lisaaListaan(id, aika, bid, baari, etiketti, merkki, panimo, lausahdus, maljoja,
-                         omaMalja, huutoja)
+                         omaMalja, huutoja, vastaus.items[i].comments, osallistunut)
             i++
         }
     }
@@ -163,15 +165,17 @@ Page {
     }
 
     function lisaaListaan(id, aika, bid, baari, etiketti, merkki, panimo, lausahdus, maljoja,
-                          kohotinko, huutoja) {
+                          kohotinko, huutoja, keskustelu, jutellut) {
         //var maljoja = qsTr("%1 toasts").arg(mal), huutoja = qsTr("%1 comments").arg(huu)
         //console.log("" + id + ", " + etiketti + ", " + merkki + ", " + lausahdus + ", " + maljoja + ", " + huutoja)
 
-        return kirjaukset.append({"section": aika, "checkinId": id, "bid": bid, "paikka": baari,
+        return kirjausLista.append({"section": aika, "checkinId": id, "bid": bid, "paikka": baari,
                                      "etiketti": etiketti, "oluenMerkki": merkki,
                                      "panimo": panimo, "lausahdus": lausahdus,
                                      "maljoja": maljoja, "nostinko": kohotinko,
-                                     "huutoja": huutoja })
+                                     "huutoja": huutoja, "jutut": keskustelu,
+                                     "mukana": jutellut
+                                 })
     }
 
     function lueKayttajanTiedot(tunnus) { // jos tunnus = "" hakee käyttäjän tiedot
@@ -217,7 +221,7 @@ Page {
         //hetkinen.running = true
 
         xhttp.onreadystatechange = function() {
-            console.log("lueKayttajanKirjaukset - " + xhttp.readyState + " - " + xhttp.status)
+            //console.log("lueKayttajanKirjaukset - " + xhttp.readyState + " - " + xhttp.status)
             if (xhttp.readyState == 4){
                 var vastaus = JSON.parse(xhttp.responseText);
 
@@ -228,12 +232,106 @@ Page {
                 }
 
                 hetkinen.running = false
+
             }
         }
         xhttp.open("GET",kysely,async);
         xhttp.send();
 
         //console.log("unTpKirjautuminen - lueKayttajanTiedot - xhttp.responseText")
+
+        return
+    }
+
+    function olenkoJutellut(jutut) {
+        var juttuja = jutut.count, i = 0
+        while(i < juttuja){
+            if (jutut.items[i].comment_editor == true)
+                return true
+            i++
+        }
+
+        return false
+    }
+
+    function unTpdKohota(jsonVastaus) {
+        var onnistunut = jsonVastaus.response.result
+        var maljoja, kentta
+
+        //console.log("> toast >\n" + JSON.stringify(jsonVastaus) + "\n< toast <")
+
+        if (onnistunut) {
+            kirjausLista.set(valittu, {"maljoja": jsonVastaus.response.toasts.count,
+                               "nostinko": jsonVastaus.response.toasts.auth_toast
+                           })
+        }
+
+        hetkinen.running = false
+
+        return
+    }
+
+    function unTpdJuttele(){
+        //console.log("===\n===\n " + JSON.stringify(kirjaustenTiedot[valittu]))
+        //console.log(" - - valittu = " + valittu)
+        var viestisivu, solu = kirjausLista.get(valittu)
+
+        viestisivu = pageStack.push(Qt.resolvedUrl("unTpJuomispuheet.qml"), {
+                                        "keskustelu": solu.jutut,
+                                        //"viesteja": solu.huutoja,
+                                        "user_avatar": kuva1.source, //solu.osoite
+                                        "user_name": nimi.text,
+                                        "venue_name": solu.paikka,
+                                        "beer_label": solu.etiketti,
+                                        "beer_name": solu.olut,
+                                        "brewery_name": solu.panimo,
+                                        "checkin_comment": solu.lausahdus,
+                                        "ckdId": solu.checkinId
+                                    })
+        viestisivu.sulkeutuu.connect( function() {
+            //console.log("sulkeutuu " + valittu + ", << " + viestisivu.viesteja + " >> "
+            //            + viestisivu.keskustelu.count)
+            kirjausLista.set(valittu,{"huutoja": viestisivu.viesteja,
+                                 "jutut": viestisivu.keskustelu})
+            if (olenkoJutellut(viestisivu.keskustelu)) {
+                kirjausLista.set(valittu,{"mukana": true})
+            } else {
+                kirjausLista.set(valittu,{"mukana": false})
+            }
+        })
+
+        return
+    }
+
+    function unTpdToast(ckId) {
+        var xhttp = new XMLHttpRequest()
+        var osoite = "", vastaus
+
+        hetkinen.running = true
+
+        osoite = UnTpd.toast(ckId)
+
+        xhttp.onreadystatechange = function () {
+            //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
+            if (xhttp.readyState == 4){
+
+                if (xhttp.status == 200) {
+                    vastaus = JSON.parse(xhttp.responseText);
+
+                    unTpdKohota(vastaus)
+
+                } else {
+                    console.log(xhttp.readyState + ", " + xhttp.statusText)
+                }
+
+            }
+
+        }
+
+        //unTpdViestit.text = qsTr("posting query")
+        xhttp.open("POST", osoite, false)
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+        xhttp.send("");
 
         return
     }
@@ -286,28 +384,39 @@ Page {
         id: kirjaustyyppi
 
         ListItem {
-            id: listanOsa
+            id: tietue
             //contentHeight: alkioSarake.height + Theme.paddingMedium
             contentHeight: kirjaus.height + Theme.paddingMedium
             width: sivu.width
+            onClicked: {
+                console.log("valittu " + valittu)
+                valittu = kirjaukset.indexAt(mouseX,y+mouseY)
+                console.log("valittu taas " + valittu)
+                mouse.accepted = false
+            }
+            onPressAndHold: {
+                valittu = kirjaukset.indexAt(mouseX,y+mouseY)
+                mouse.accepted = false
+            }
+
             menu: ContextMenu {
-                //MenuItem {
-                  //  text: qsTr("toast")
-                    //onClicked: {
-                        //toast(kirjausId.text)
-                    //}
-                //}
-                //MenuItem {
-                  //  text: qsTr("comment")
-                    //onClicked: {
-                        //comment(kirjausId.text)
-                    //}
-                //}
                 MenuItem {
                     text: qsTr("beer info")
                     onClicked: {
                         pageStack.push(Qt.resolvedUrl("unTpTietojaOluesta.qml"),{
-                                        "olutId": oluenId.text } )
+                                        "olutId": kirjaus.olutId } )
+                    }
+                }
+                MenuItem {
+                    text: kirjaus.omaNosto? qsTr("untoast") : qsTr("toast")
+                    onClicked: {
+                        unTpdToast(kirjaus.tunnus)
+                    }
+                }
+                MenuItem {
+                    text: qsTr("comment")
+                    onClicked: {
+                        unTpdJuttele() //kirjaus.tunnus
                     }
                 }
             }
@@ -315,7 +424,7 @@ Page {
             UnTpKirjauksenKooste{
                 id: kirjaus
                 x: Theme.paddingSmall
-                width: sivu.width - 2*x
+                width: tietue.width - 2*x
                 tunnus: checkinId
                 olutId: bid
                 naytaTekija: false
@@ -330,138 +439,10 @@ Page {
                 nostoja: maljoja
                 omaNosto: nostinko
                 juttuja: huutoja
+                keskustelu: jutut
+                osallistunut: mukana
 
             }
-
-            /*
-            Row {
-                spacing: Theme.paddingSmall
-                x: Theme.paddingLarge
-
-                Text {
-                    id: kirjausId
-                    visible: false
-                    text: checkinId
-                }
-
-                Text {
-                    id: oluenId
-                    text: bid
-                    visible: false
-                }
-
-                Image {
-                    id: listanEtiketti
-                    source: etiketti
-                    height: oluenNimi.height + oluenPanimo.height
-                    width: height
-                    //x: Theme.paddingLarge
-                    //y: 2
-                }
-
-                    Column {
-                        id: alkioSarake
-
-                        Label{
-                            id: oluenNimi
-                            text: oluenMerkki
-                            color: Theme.highlightColor
-                            x: Theme.paddingMedium
-                        }
-
-                        Label{
-                            id: oluenPanimo
-                            text: lausahdus
-                            color: Theme.secondaryHighlightColor
-                            x: Theme.paddingMedium
-                        }
-
-                        // textfield oluentiedot poistettu tästä
-
-                        Row {
-                            spacing: Theme.paddingMedium
-                            IconButton {
-                                id: peukku
-                                icon.source: "image://theme/icon-s-like"
-                                highlighted: (maljoja > 0) ? true : false
-                                height: peukkuja.height
-                                enabled: false
-                                onClicked: {
-                                    //toast(kirjausId.text)
-                                }
-
-                                //anchors.right: peukkuja.left
-                                //y: 2
-                            }
-
-                            Label {
-                                id: peukkuja
-                                text: maljoja
-                                color: Theme.highlightDimmerColor
-                                //color: (maljoja > 0) ? Theme.secondaryHighlightColor : Theme.highlightColor
-                                //x: listanOsa.width - ( (width > kommentteja.width) ? width : kommentteja.width ) - Theme.paddingLarge
-                                //y: 2
-                            }
-
-                            Rectangle {
-                                height: 1
-                                width: Theme.paddingLarge*2
-                                color: "transparent"
-                            }
-
-                            IconButton {
-                                id: kommentti
-                                icon.source: "image://theme/icon-s-chat"
-                                highlighted: (huutoja > 0) ? true : false
-                                height: kommentteja.height
-                                enabled: false
-                                onClicked: {
-                                    highlighted = !highlighted
-                                    //comment(kirjausId.text)
-                                }
-
-                                //anchors.top: (peukku.height > peukkuja.height) ? peukku.bottom : peukkuja.bottom
-                                //anchors.left: peukku.left
-                            }
-
-                            Label {
-                                id: kommentteja
-                                text: huutoja
-                                color: Theme.highlightDimmerColor
-                                //color: (huutoja > 0) ? Theme.highlightColor : Theme.secondaryHighlightColor
-                                //anchors.top: (peukku.height > peukkuja.height) ? peukku.bottom : peukkuja.bottom
-                                //anchors.left: peukkuja.left
-                            }
-
-
-                        }
-
-                    }
-
-            }
-            // */
-
-            /*
-            TextField {
-                id: oluenTiedot
-                text: oluenMerkki
-                readOnly: true
-                color: Theme.highlightColor
-                label: lausahdus
-                width: sivu.width - x
-                onClicked: {
-                    listanOsa.menuOpen
-                    mouse.accepted = false
-                }
-                onPressAndHold: {
-                    listanOsa.menuOpen
-                    mouse.accepted = false
-                }
-
-                //anchors.left: listanEtiketti.right
-                //anchors.right: peukku.left
-                //y: 2
-            } // */
 
         }
     }
@@ -518,26 +499,14 @@ Page {
                 height: (kuva2.height > kuva1.height + Theme.paddingLarge) ? kuva2.height : kuva1.height + Theme.paddingLarge
                 //x: 0.5*(sivu.width - width)
 
-                Image {
+                Image { //taustakuva
                     id: kuva2
                     width: sivu.width
+                    fillMode: Image.PreserveAspectFit
                     //anchors.bottomMargin: Theme.paddingMedium
                     //height: width
                     source: ""
                 }
-
-                /*
-                TextField {
-                    id: nimi
-                    //width: parent.width/3
-                    //label: qsTr("username")
-                    //text: kayttaja
-                    placeholderText: qsTr("unidentified")
-                    placeholderColor: Theme.secondaryHighlightColor
-                    color: Theme.highlightColor
-                    readOnly: true
-                    qsTr("unidentified")
-                } // */
 
                 Label {
                     id: nimi
@@ -547,38 +516,40 @@ Page {
                     y: logo.height - height - Theme.paddingMedium
                 }
 
-                Image {
+                Image { //naama
                     id: kuva1
                     width: Theme.fontSizeMedium*3//sivu.width/3
                     anchors.bottom: nimi.bottom
                     x: sivu.width - width - Theme.paddingLarge
                     height: width
                     source: ""
-                    visible: false
+                    //visible: false
                 }
-                OpacityMask{
-                    anchors.fill: kuva1
-                    source: kuva1
-                    maskSource: kuva1
-                }
+                //OpacityMask{
+                //    anchors.fill: kuva1
+                //    source: kuva1
+                //    maskSource: kuva1
+                //}
 
             }
 
             Row { // alaotsikot
-                height: tilastot.height// + Theme.paddingLarge
+                id: alaotsikkorivi
+                height: tilastotNakyvat ? tilastot.height : juodut.height// + Theme.paddingLarge
                 //anchors.topMargin: Theme.paddingMedium
                 x: (sivu.width - tilastot.width - juodut.width)/3
                 spacing: x
-                width: sivu.width - 2*x
+                //width: sivu.width - 2*x
 
                 Label {
                     id: tilastot
                     text: qsTr("statistics")
-                    color: tilastotNakyvat ? Theme.highlightColor : Theme.secondaryHighlightColor
+                    color: tilastotNakyvat ? Theme.highlightColor : Theme.secondaryColor
                     font.pixelSize: tilastotNakyvat ? Theme.fontSizeLarge : Theme.fontSizeMedium
                     leftPadding: Theme.paddingMedium
+                    rightPadding: Theme.paddingMedium
                     topPadding: Theme.paddingMedium
-                    bottomPadding: Theme.paddingSmall
+                    //bottomPadding: Theme.paddingSmall
 
                     MouseArea {
                         anchors.fill: parent
@@ -591,11 +562,12 @@ Page {
                 Label {
                     id: juodut
                     text: qsTr("check-ins")
-                    color: tilastotNakyvat ? Theme.secondaryHighlightColor : Theme.highlightColor
+                    color: tilastotNakyvat ? Theme.secondaryColor : Theme.highlightColor
                     font.pixelSize: tilastotNakyvat ? Theme.fontSizeMedium : Theme.fontSizeLarge
                     leftPadding: Theme.paddingMedium
+                    rightPadding: Theme.paddingMedium
                     topPadding: Theme.paddingMedium
-                    bottomPadding: Theme.paddingSmall
+                    //bottomPadding: Theme.paddingSmall
 
                     MouseArea {
                         anchors.fill: parent
@@ -606,7 +578,41 @@ Page {
                 }
             }
 
-            TextField {
+            Row {
+                id: lehdenReuna
+                spacing: 0
+
+                Rectangle {
+                    height: 1
+                    width: alaotsikkorivi.spacing
+                    color: Theme.secondaryHighlightColor
+                }
+                Rectangle {
+                    height: 1
+                    width: tilastot.width
+                    color: tilastotNakyvat? "transparent" : Theme.secondaryHighlightColor
+                }
+                Rectangle {
+                    height: 1
+                    width: alaotsikkorivi.spacing
+                    color: Theme.secondaryHighlightColor
+                }
+
+                Rectangle {
+                    height: 1
+                    width: juodut.width
+                    color: tilastotNakyvat? Theme.secondaryHighlightColor : "transparent"
+                }
+
+                Rectangle {
+                    height: 1
+                    width: alaotsikkorivi.spacing
+                    color: Theme.secondaryHighlightColor
+                }
+
+            }
+
+            TextArea {
                 id: kuvaus
                 width: sivu.width
                 placeholderText: qsTr("No biograph.")
@@ -647,7 +653,8 @@ Page {
                     readOnly: true
                     onClicked: {
                         if (text != "")
-                            pageStack.push(Qt.resolvedUrl("unTpAnsiomerkit.qml"))
+                            pageStack.push(Qt.resolvedUrl("unTpAnsiomerkit.qml"), {
+                                                              "kayttajaTunnus": kayttaja})
                     }
                 }
 
@@ -666,7 +673,8 @@ Page {
                     readOnly: true
                     onClicked: {
                         if (text != "") {
-                            var uusi = pageStack.push(Qt.resolvedUrl("unTpKaverit.qml"), {"tunnus": kayttaja})
+                            var uusi = pageStack.push(Qt.resolvedUrl("unTpKaverit.qml"), {
+                                                          "tunnus": kayttaja})
                             uusi.sulkeutuu.connect(function() {
                                 if (uusi.tunnus != kayttaja) {
                                     kayttaja = uusi.tunnus
@@ -714,15 +722,16 @@ Page {
 
             }
 
+            // kirjaukset-lehti
             SilicaListView {
-                id: kirjauslista
-                height: sivu.height - y
+                id: kirjaukset
+                height: (y < 0.5*sivu.height) ? sivu.height - y : 0.5*sivu.height
                 width: sivu.width
                 visible: !tilastotNakyvat
                 clip: true
 
                 model: ListModel {
-                    id: kirjaukset
+                    id: kirjausLista
                 }
 
                 delegate: kirjaustyyppi
@@ -738,7 +747,7 @@ Page {
 
                 onMovementEnded: {
                     if (atYEnd) {
-                        var vikaKirjaus = kirjaukset.get(kirjaukset.count-1).checkinId
+                        var vikaKirjaus = kirjausLista.get(kirjausLista.count-1).checkinId
                         lueKayttajanKirjaukset(kayttaja, vikaKirjaus - 1)
                     }
                 }

@@ -407,9 +407,11 @@ Page {
     } // flickable
 
     Component.onCompleted: {
+        console.log("kayttaja: " + kayttajaTunnus)
         if (haeKaikki)
             haeMerkit()
         else
             naytaUudet()
+
     }
 }

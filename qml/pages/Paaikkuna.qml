@@ -1429,7 +1429,7 @@ Page {
 
             arvostelu = dialog.tahtia
 
-            console.log("" + juomanKuvaus + ", " + arvostelu)
+            //console.log("" + juomanKuvaus + ", " + arvostelu)
 
             return
         })
@@ -1833,8 +1833,8 @@ Page {
         var xhttp = new XMLHttpRequest()
         var m0, m1
 
-        console.log("tiedot: " + olutId + ", " + baariId + ", " + juomanKuvaus + ", "
-                    + arvostelu)
+        //console.log("tiedot: " + olutId + ", " + baariId + ", " + juomanKuvaus + ", "
+        //            + arvostelu)
         if (!luettuUnTpToken)
             return
 
@@ -1877,7 +1877,7 @@ Page {
         kysely = UnTpd.checkInData(olutId, vyohyketunnus, barId, naytaSijainti, leveys,
                                     pituus, huuto, tahtia, face, twit, fsqr)
 
-        console.log("checkIN " + kysely)
+        //console.log("checkIN " + kysely)
 
         xhttp.onreadystatechange = function () {
             //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
@@ -1916,7 +1916,7 @@ Page {
     function unTpdKirjausTehty(vastaus) {
         var mj
         var i=0
-        console.log(JSON.stringify(vastaus))
+        //console.log(JSON.stringify(vastaus))
         if (vastaus.meta.code == 200){
             unTpdViestit.text = vastaus.response.result
 
@@ -2176,8 +2176,8 @@ Page {
                 kopioiJuoma(valittu)
                 mouse.accepted = false
 
-                console.log("valittu " + valittu + ", aika1 " + lueJuomanAika(valittu) +
-                            ", aika2 " + Apuja.juomanAika(Apuja.monesko(lueJuomanTunnus(valittu))))
+                //console.log("valittu " + valittu + ", aika1 " + lueJuomanAika(valittu) +
+                //            ", aika2 " + Apuja.juomanAika(Apuja.monesko(lueJuomanTunnus(valittu))))
             }
 
             onPressAndHold: {
@@ -2185,7 +2185,7 @@ Page {
                 //kopioiJuoma(valittu)
                 juomaLista.currentIndex = valittu
                 mouse.accepted = false
-                console.log("valittu " + valittu + ", aika " + lueJuomanAika(valittu))
+                //console.log("valittu " + valittu + ", aika " + lueJuomanAika(valittu))
             }
 
             // contextmenu erillisenä komponenttina on ongelma remorseActionin kanssa
@@ -2193,7 +2193,7 @@ Page {
                 MenuItem {
                     text: qsTr("delete")
                     onClicked: {
-                        console.log("valittu1 " + valittu + ", aika " + lueJuomanAika(valittu-1))
+                        //console.log("valittu1 " + valittu + ", aika " + lueJuomanAika(valittu-1))
 
                         juomaLista.currentItem.remorseAction(qsTr("deleting"), function () {
                             //tyhjennaDbJuodut(lueJuomanId(valittu))
@@ -2204,7 +2204,7 @@ Page {
                             paivitaPromillet();
                             paivitaAjatRajoille();
                             paivitaKuvaaja();
-                            console.log("poisto " + (valittu-1) + ", aika " + lueJuomanAika(valittu-1))
+                            //console.log("poisto " + (valittu-1) + ", aika " + lueJuomanAika(valittu-1))
 
                         })
 
@@ -2909,7 +2909,7 @@ Page {
                     label: arvostelu > 0 ? "" + (arvostelu/2+0.5).toFixed(1) + "/5" : " "
                     onClicked: {
                         muutaUusi()
-                        console.log("-- " + juomanKuvaus)
+                        //console.log("-- " + juomanKuvaus)
                     }
                 }
 
@@ -2986,9 +2986,9 @@ Page {
 
                 TextField {
                     id: txtBaari
-                    text: kirjaaUnTp? qsTr("check in") : qsTr("don't check in")
+                    text: kirjaaUnTp? qsTr("checks in") : qsTr("doesn't check in")
                     label: (baariId == "")? qsTr("no location") : baariNimi
-                    color: enabled? Theme.primaryColor : Theme.highlightDimmerColor
+                    color: !enabled? Theme.highlightDimmerColor : (kirjaaUnTp? Theme.primaryColor : Theme.secondaryColor)
                     readOnly: true
                     visible: luettuUnTpToken
                     enabled: olutId > 0 ? true : false

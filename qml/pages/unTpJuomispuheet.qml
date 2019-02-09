@@ -7,18 +7,28 @@ Page {
     id: sivu
     signal sulkeutuu
 
-    property var kirjaus //json-olio
+    //property var kirjaus //json-olio
+    property var keskustelu //json-olio
     property bool hakuvirhe: false
     property int viesteja: 0
+    property int ckdId: 0
+    property alias user_avatar: naama.source
+    property alias user_name: kuka.text
+    property alias venue_name: paikka.text
+    property alias beer_label: juomanEtiketti.source
+    property alias beer_name: olut.text
+    property alias brewery_name: panimo.text
+    property alias checkin_comment: huuto.text
+    //property int valittu
 
     function kirjoitaSanotut(juttu){
         var kuva = juttu.user.user_avatar, kayttajaTunnus = juttu.user.user_name
         var sanottu = juttu.comment, puhuja = juttu.user.first_name + " " + juttu.user.last_name
-        var commentId = juttu.comment_id, oikeudet = ""
+        var commentId = juttu.comment_id, oikeudet = false
 
-        console.log("oikeudet owner " + juttu.comment_owner + " editor " + juttu.comment_editor)
+        //console.log("oikeudet owner " + juttu.comment_owner + " editor " + juttu.comment_editor)
         if (juttu.comment_owner || juttu.comment_editor)
-            oikeudet = "on"
+            oikeudet = true
 
         sanotut.append({"commentId": commentId, "oikeudet": oikeudet,
                            "kayttajaTunnus": kayttajaTunnus, "puhuja": puhuja,
@@ -32,29 +42,31 @@ Page {
     function kirjoitaTiedot() {
         var nimi = "", i = 0
 
-        naama.source = kirjaus.user.user_avatar        
-        if(kirjaus.user.first_name != "" || kirjaus.user.last_name != ""){
-            nimi = kirjaus.user.first_name + " " + kirjaus.user.last_name
-        } else
-            nimi = kirjaus.user.user_name
-        kuka.text = nimi
+        //naama.source = kirjaus.user.user_avatar
+        //if(kirjaus.user.first_name != "" || kirjaus.user.last_name != ""){
+        //    nimi = kirjaus.user.first_name + " " + kirjaus.user.last_name
+        //} else
+        //    nimi = kirjaus.user.user_name
+        //kuka.text = nimi
 
-        if (onkoTietoa(kirjaus.venue, "venue_name"))
-            paikka.text = kirjaus.venue.venue_name
+        //if (onkoTietoa(kirjaus.venue, "venue_name"))
+        //    paikka.text = kirjaus.venue.venue_name
 
-        juomanEtiketti.source = kirjaus.beer.beer_label
-        olut.text =  kirjaus.beer.beer_name
-        panimo.text = kirjaus.brewery.brewery_name
+        //juomanEtiketti.source = kirjaus.beer.beer_label
+        //olut.text =  kirjaus.beer.beer_name
+        //panimo.text = kirjaus.brewery.brewery_name
 
-        huuto.text = kirjaus.checkin_comment
+        //huuto.text = kirjaus.checkin_comment
 
-        while (i < kirjaus.comments.count) {
-            console.log("sanottu: " + JSON.stringify(kirjaus.comments.items[i]))
-            kirjoitaSanotut(kirjaus.comments.items[i])
+        //while (i < kirjaus.comments.count) {
+        while (i < keskustelu.count) {
+            //console.log("sanottu: " + JSON.stringify(kirjaus.comments.items[i]))
+            //kirjoitaSanotut(kirjaus.comments.items[i])
+            kirjoitaSanotut(keskustelu.items[i])
             i++
         }
 
-        console.log("tehty")
+        //console.log("tehty")
         return
     }
 
@@ -62,7 +74,7 @@ Page {
         var xhttp = new XMLHttpRequest();
         var osoite, kysely
 
-        osoite = UnTpd.addCommentAddress(kirjaus.checkin_id)
+        osoite = UnTpd.addCommentAddress(ckdId)
         kysely = UnTpd.addCommentString(juttuni.text)
 
         xhttp.onreadystatechange = function () {
@@ -82,14 +94,18 @@ Page {
                 var vastaus = JSON.parse(xhttp.responseText);
                 var vika = vastaus.response.comments.count - 1
 
-                console.log(" " +  vastaus.response.result + ", <==> " + vika)
+                //console.log(" " +  vastaus.response.result + ", <==> " + vika)
+
+                keskustelu = vastaus.response.comments
 
                 kirjoitaSanotut(vastaus.response.comments.items[vika])
+
+                juttuni.text = ""
 
 
             } else {
                 hakuvirhe = true
-                console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
+                console.log(xhttp.readyState + ", " + xhttp.statusText)
                 unTpdViestit.text = xhttp.readyState + ", " + xhttp.statusText
             }
 
@@ -141,11 +157,17 @@ Page {
 
                 var vastaus = JSON.parse(xhttp.responseText);
 
-                console.log(" " +  vastaus.response.result)
+                //console.log(" " +  vastaus.response.result)
+
+                if (vastaus.response.result == "success") {
+                    keskustelu = vastaus.response.comments
+                    sanotut.remove(valittu)
+                    viesteja--
+                }
 
             } else {
                 hakuvirhe = true
-                console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
+                console.log(xhttp.readyState + ", " + xhttp.statusText)
                 unTpdViestit.text = xhttp.readyState + ", " + xhttp.statusText
             }
 
@@ -156,8 +178,6 @@ Page {
         xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
         xhttp.send(kysely);
 
-        viesteja--
-
         return
     }
 
@@ -166,22 +186,22 @@ Page {
         ListItem{
             id: kupla
             x: Theme.paddingMedium
-            height: kuplanTekstit.height + Theme.paddingMedium
+            contentHeight: kuplanTekstit.height + Theme.paddingMedium
 
             onPressAndHold: {
-                console.log("- :" + sanotutLista.currentIndex + ", " + sanotutLista.indexAt(mouseX,y+mouseY))
+                //console.log("- :" + sanotutLista.currentIndex + ", " + sanotutLista.indexAt(mouseX,y+mouseY))
                 sanotutLista.currentIndex = sanotutLista.indexAt(mouseX,y+mouseY)
             }
 
             menu: ContextMenu {
                 MenuItem {
                     text: qsTr("delete")
+                    enabled: muokkausOikeudet.text == "true" ? true : false
                     onClicked: {
-                        //console.log("valittu1 " + valittu + ", aika " + lueJuomanAika(valittu-1))
+                        //console.log("valittu1 " + valittu + ", aika " + lueJuomanAika(valittu-1))                        
                         sanotutLista.currentItem.remorseAction(qsTr("deleting"), function () {
                             var valittu = sanotutLista.currentIndex
                             poistaSanottu(valittu)
-                            sanotut.remove(sanotutLista.currentIndex)
                         })
 
                     }
@@ -251,7 +271,7 @@ Page {
 
         VerticalScrollDecorator{}
 
-        PullDownMenu {
+        PushUpMenu {
             MenuItem {
                 text: qsTr("post")
                 enabled: (juttuni.text != "") ? true : false
@@ -379,7 +399,7 @@ Page {
 
             SilicaListView{
                 id: sanotutLista
-                height: sivu.height - y - juttuni.height
+                height: sivu.height - y - juttuni.height - column.spacing
                 width: parent.width
                 clip: true
 
@@ -404,9 +424,10 @@ Page {
     }
 
     Component.onCompleted: {
-        console.log("-> " + JSON.stringify(kirjaus))
+        //console.log("-> \n \n " + JSON.stringify(keskustelu))
+        viesteja = 0
         kirjoitaTiedot()
-        console.log("valmis")
+        //console.log("\n\n valmis")
     }
 
     Component.onDestruction: {

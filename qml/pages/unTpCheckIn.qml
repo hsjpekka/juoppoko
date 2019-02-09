@@ -47,9 +47,12 @@ Dialog {
         else
             lp = FourSqr.lastLat
 
-        luokat = "4d4b7105d754a06374d81259,4d4b7105d754a06376d81259"
         // 4d4b7105d754a06374d81259 - food
         // 4d4b7105d754a06376d81259 - nightlife spot
+        if (tyyppiRajaus.checked)
+            luokat = "4d4b7105d754a06374d81259,4d4b7105d754a06376d81259"
+        else
+            luokat = ""
 
         hetkinen.running = true
         fourSqrViestit.text = qsTr("posting query")
@@ -382,82 +385,11 @@ Dialog {
                 title: qsTr("check-in details")
             }
 
-            /*
-            Item {
-                id: julkaisujenPiilotusRivi
-                x: Theme.paddingMedium
-                width: sivu.width - 2*x
-                height: (julkaisujenPiilotus.height > Theme.fontSizeMedium)? julkaisujenPiilotus.height : Theme.fontSizeMedium
-
-                IconButton {
-                    id: julkaisujenPiilotus
-                    icon.source: julkaisutNakyvat? "image://theme/icon-m-down" : "image://theme/icon-m-right"
-                    onClicked: {
-                        julkaisutNakyvat = !julkaisutNakyvat
-                    }
-                }
-
-                Label {
-                    y: julkaisujenPiilotus.y + 0.5*(julkaisujenPiilotus.height - height)
-                    x: julkaisujenPiilotus.x + julkaisujenPiilotus.width + Theme.paddingMedium
-                    text: (facebook.checked || twitter.checked || foursquare.checked) ? qsTr("postings") : qsTr("no postings")
-                }
-
-                MouseArea {
-                    anchors.fill: julkaisujenPiilotusRivi
-                    onClicked: {
-                        julkaisutNakyvat = !julkaisutNakyvat
-                    }
-                }
-
-            } //
-
-            Item {
-                width: sivu.width
-                height: facebook.height + twitter.height + foursquare.height
-                visible: julkaisutNakyvat
-
-                Rectangle {
-                    x: Theme.paddingLarge
-                    width: 1
-                    height: facebook.height + twitter.height + foursquare.height
-                    visible: julkaisutNakyvat
-                }
-
-                TextSwitch {
-                    id: facebook
-                    checked: false
-                    text: checked ? qsTr("post to facebook") : qsTr("not to facebook")
-                    visible: julkaisutNakyvat
-                    x: Theme.paddingLarge
-                }
-
-                TextSwitch {
-                    id: twitter
-                    checked: false
-                    text: checked ? qsTr("post to twitter") : qsTr("no tweeting")
-                    visible: julkaisutNakyvat
-                    x: Theme.paddingLarge
-                    y: facebook.height
-                }
-
-                TextSwitch {
-                    id: foursquare
-                    checked: false
-                    text: checked ? qsTr("post to foursquare") : qsTr("not to foursquare")
-                    visible: julkaisutNakyvat
-                    x: Theme.paddingLarge
-                    y: twitter.y + twitter.height
-                }
-
-            }
-            // */
-
             IconTextSwitch {
                 id: asemanTalletus
                 icon.source: "image://theme/icon-m-location"
                 checked: true
-                highlighted: !sijaintiTuore
+                //highlighted: !sijaintiTuore
                 text: checked ? qsTr("shows location") : qsTr("hides location")
                 onCheckedChanged: {
                     if (checked == false) {
@@ -485,7 +417,7 @@ Dialog {
                     y: piilotus.y + 0.5*(piilotus.height - height)
                     x: piilotus.x + piilotus.width + Theme.paddingMedium
                     text: qsTr("search settings")
-                    color: asemanTalletus.checked ? Theme.highlightColor : Theme.highlightDimmerColor
+                    color: asemanTalletus.checked ? Theme.secondaryColor : Theme.highlightDimmerColor
                 }
 
                 MouseArea {
@@ -524,22 +456,27 @@ Dialog {
                         id: asemaRivi
                         //x: Theme.paddingLarge
 
+                        IconButton{
+                            id: syotaKoordinaatit
+                            icon.source: "image://theme/icon-m-edit"
+                            highlighted: false
+                            onClicked: {
+                                highlighted = !highlighted
+                                sijainninTila.visible = !highlighted
+                            }
+                        }
+
                         TextField {
                             id: pituuspiiri
                             text: "???"
                             label: qsTr("lng")
                             //wrapMode: Text.WordWrap
-                            readOnly: !asemanTalletus.checked
-                            width: (sivu.width - 2*asetuksetRivi.x - asemaRivi.spacing)/2
-                            //width: (sivu.width - asetuksetRivi.width - 2*asetuksetRivi.x - 2*asemaRivi.spacing - lueAsema.width)/2
-                            color: asemanTalletus.checked ? Theme.primaryColor : Theme.highlightDimmerColor
-                            //visible: asetuksetNakyvat
+                            color: readOnly ? Theme.highlightColor : Theme.primaryColor
+                            readOnly: !syotaKoordinaatit.highlighted
+                            width: (sivu.width - 2*asetuksetRivi.x - 2*asemaRivi.spacing - syotaKoordinaatit.width )/2
                             //x: Theme.paddingLarge
                             inputMethodHints: Qt.ImhFormattedNumbersOnly
                             validator: DoubleValidator {bottom: -180.0; top: 180.0}
-                            onTextChanged: {
-                                sijainninTila.visible = false
-                            }
                         }
 
                         TextField {
@@ -547,9 +484,11 @@ Dialog {
                             text: "???"
                             label: qsTr("lat")
                             //wrapMode: Text.WordWrap
-                            color: asemanTalletus.checked ? Theme.primaryColor : Theme.highlightDimmerColor
-                            //readOnly: !asemanTalletus.checked
+                            color: readOnly ? Theme.highlightColor : Theme.primaryColor
+                            readOnly: !syotaKoordinaatit.highlighted
                             width: pituuspiiri.width
+                            inputMethodHints: Qt.ImhFormattedNumbersOnly
+                            validator: DoubleValidator {bottom: -180.0; top: 180.0}
                             //visible: asetuksetNakyvat
                             //x: Theme.paddingLarge
                         }
@@ -723,6 +662,7 @@ Dialog {
     Component.onCompleted: {
         paikkatieto.start()
         koordinaatit()
+        sijaintiTuore = false
     }
 
 }

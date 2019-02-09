@@ -399,19 +399,19 @@
     <name>unTpAnsiomerkit</name>
     <message>
         <source>request not initialized</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>server connection established</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>request received</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>processing request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Badges</source>
@@ -465,19 +465,19 @@
     </message>
     <message>
         <source>request not initialized</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>server connection established</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>request received</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>processing request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Satellite</source>
@@ -516,10 +516,6 @@
         <translation>hakuasetukset</translation>
     </message>
     <message>
-        <source>show all places</source>
-        <translation>näytä kaikki</translation>
-    </message>
-    <message>
         <source>None found.</source>
         <translation>Ei löytöjä.</translation>
     </message>
@@ -528,28 +524,99 @@
         <translation>Parempi onni ensi kerralla.</translation>
     </message>
     <message>
-        <source>defaults to lat: %1, long: %2</source>
-        <translation>oletukset: lev. %1, pit. %2</translation>
-    </message>
-    <message>
-        <source>lat: %1, long: %2, alt: %3</source>
-        <translation>lev. %1, pit. %2, korkeus %3</translation>
-    </message>
-    <message>
-        <source>limit to Foursquare categories %1 and %2</source>
-        <translation>rajaa haku Foursquaren luokkiin %1 ja %2</translation>
-    </message>
-    <message>
-        <source>timestamp</source>
-        <translation>määrityshetki</translation>
-    </message>
-    <message>
         <source>radius</source>
         <translation>etäisyys</translation>
     </message>
     <message>
         <source>not limited</source>
         <translation>ei rajattu</translation>
+    </message>
+    <message>
+        <source>location determined %1 min ago</source>
+        <translation>sijainti määritetty %1 min sitten</translation>
+    </message>
+    <message>
+        <source>location determined %1 hours ago</source>
+        <translation>sijainti määritetty %1 tuntia sitten</translation>
+    </message>
+    <message>
+        <source>shows location</source>
+        <translation>näyttää sijainnin</translation>
+    </message>
+    <message>
+        <source>hides location</source>
+        <translation>piilottaa sijainnin</translation>
+    </message>
+    <message>
+        <source>location not determined</source>
+        <translation>sijaintia ei määritetty</translation>
+    </message>
+    <message>
+        <source>lng</source>
+        <translation>pituuspiiri</translation>
+    </message>
+    <message>
+        <source>lat</source>
+        <translation>leveyspiiri</translation>
+    </message>
+    <message>
+        <source>limits to Foursquare categories %1 and %2</source>
+        <translation>rajaa Foursquare-luokkiin %1 ja %2</translation>
+    </message>
+    <message>
+        <source>searches in all categories</source>
+        <translation>älä rajaa hakua</translation>
+    </message>
+</context>
+<context>
+    <name>unTpJuomispuheet</name>
+    <message>
+        <source>request not initialized</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>request finished</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>posting query</source>
+        <translation>lähetetään kyselyä</translation>
+    </message>
+    <message>
+        <source>delete</source>
+        <translation>poista</translation>
+    </message>
+    <message>
+        <source>deleting</source>
+        <translation>poistaa</translation>
+    </message>
+    <message>
+        <source>post</source>
+        <translation>julkaise</translation>
+    </message>
+    <message>
+        <source>Comments</source>
+        <translation>Sanottuja</translation>
+    </message>
+    <message>
+        <source>starting search</source>
+        <translation>hakua aloitetaan</translation>
+    </message>
+    <message>
+        <source>my comment</source>
+        <translation>sanottavani</translation>
     </message>
 </context>
 <context>
@@ -560,19 +627,19 @@
     </message>
     <message>
         <source>request not initialized</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>server connection established</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>request received</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>processing request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>my friends</source>
@@ -686,6 +753,18 @@
         <translation>tietoja oluesta</translation>
     </message>
     <message>
+        <source>untoast</source>
+        <translation>ei maljaa sittenkään</translation>
+    </message>
+    <message>
+        <source>toast</source>
+        <translation>malja sille!</translation>
+    </message>
+    <message>
+        <source>comment</source>
+        <translation>huikkaa</translation>
+    </message>
+    <message>
         <source></source>
         <translation></translation>
     </message>
@@ -705,7 +784,7 @@
     <name>unTpOluet</name>
     <message>
         <source>request not initialized</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>server connection established</source>
@@ -796,11 +875,11 @@
     </message>
     <message>
         <source>no check-ins nearby! ??</source>
-        <translation type="unfinished"></translation>
+        <translation>ei kirjauksia lähistöllä!??</translation>
     </message>
     <message>
         <source>no activity</source>
-        <translation type="unfinished"></translation>
+        <translation>ei toimintaa</translation>
     </message>
     <message>
         <source>request finished</source>
@@ -808,44 +887,51 @@
     </message>
     <message>
         <source>user data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>beer</source>
-        <translation type="unfinished">olut</translation>
+        <translation>käyttäjän tiedot</translation>
     </message>
     <message>
         <source>toast</source>
-        <translation type="unfinished"></translation>
+        <translation>malja sille!</translation>
     </message>
     <message>
         <source>check pubs nearby</source>
-        <translation type="unfinished"></translation>
+        <translation>toimintaa lähibaareissa</translation>
     </message>
     <message>
         <source>check friends</source>
-        <translation type="unfinished"></translation>
+        <translation>kaljarinki</translation>
     </message>
     <message>
         <source>pints by friends</source>
-        <translation type="unfinished"></translation>
+        <translation>kavereiden kaljat</translation>
     </message>
     <message>
         <source>pints nearby</source>
-        <translation type="unfinished"></translation>
+        <translation>lähistöllä juodut</translation>
     </message>
     <message>
-<<<<<<< Updated upstream
         <source>Seems like you haven&apos;t logged in UnTappd. That may limit the number of queries per day.</source>
-        <translation type="unfinished">Et näytä kirjautuneen UnTappdiin. Se saattaa rajata kyselyjen päivittäistä määrää.</translation>
+        <translation>Et näytä kirjautuneen UnTappdiin. Se saattaa rajata kyselyjen päivittäistä määrää.</translation>
     </message>
     <message>
         <source>starting search</source>
-        <translation type="unfinished">hakua aloitetaan</translation>
-=======
-        <source>no check-ins nearby! ??</source>
-        <translation type="unfinished"></translation>
->>>>>>> Stashed changes
+        <translation>hakua aloitetaan</translation>
+    </message>
+    <message>
+        <source>beer info</source>
+        <translation>tietoja oluesta</translation>
+    </message>
+    <message>
+        <source>untoast</source>
+        <translation>ei maljaa sittenkään</translation>
+    </message>
+    <message>
+        <source>comment</source>
+        <translation>huikkaa</translation>
+    </message>
+    <message>
+        <source>refresh</source>
+        <translation>päivitä</translation>
     </message>
 </context>
 <context>
@@ -856,19 +942,19 @@
     </message>
     <message>
         <source>request not initialized</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>server connection established</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>request received</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>processing request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>add to wish-list</source>
