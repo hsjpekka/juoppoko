@@ -4,7 +4,7 @@ import Sailfish.Silica 1.0
 Page {
     id: sivu
     property string paihdelinkki: "http://www.paihdelinkki.fi/fi/tietopankki/tietoiskut/alkoholi/liikakayton-tunnistaminen \n"
-    property string versio: ""
+    property string versioNro: ""
 
     SilicaFlickable {
         anchors.fill: sivu
@@ -17,7 +17,7 @@ Page {
             id: sarake
 
             PageHeader {
-                title: "Juoppoko " + versio
+                title: "Juoppoko " + versioNro
             }
 
             TextArea {

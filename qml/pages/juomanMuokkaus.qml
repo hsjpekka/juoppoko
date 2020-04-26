@@ -28,34 +28,35 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import org.freedesktop.contextkit 1.0
 import "../scripts/unTap.js" as UnTpd
 
 Dialog {
     id: sivu    
 
     property date aika
-    property string nimi
-    property string nimi0
+    property bool alkutoimet: true
+    property int i1: 0
     property string juomanKuvaus
     property real maara
-    property real maaraMuutos : 1
     property int maaraDesimaaleja: 0
-    property real vahvuus
+    property real maaraMuutos : 1
     property real mlLisays
-    property real prosLisays
-    property int tauko0 : 0.8*1000 // ms
-    property int tauko: tauko0
-    property int i1: 0
-    property real yksikko: 1.0
+    property string nimi
+    property string nimi0
+    property int olutId: 0
+    property real ozImp: 28.413
     property real ozUs: 29.574
     property real pintUs: 16*ozUs
-    property real ozImp: 28.413
     property real pintImp: 20*ozImp
-    property string yksikkoTunnus: " ml"
-    property int tilavuusMitta//: 1 // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
-    property int olutId: 0
+    property real prosLisays
     property int tahtia: 0
-    property bool alkutoimet: true
+    property int tauko0 : 0.8*1000 // ms
+    property int tauko: tauko0
+    property int tilavuusMitta//: 1 // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
+    property real vahvuus
+    property real yksikko: 1.0
+    property string yksikkoTunnus: " ml"
 
     function asetaYksikotMl() {
         maara = maara*yksikko
@@ -104,6 +105,22 @@ Dialog {
         maaraMuutos = 0.1
         maaraDesimaaleja = 1
         tilavuusMitta = 5
+        return
+    }
+
+    function avaaUnTappdHaku() {
+        var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
+            "olut": juoma.text, "vahvuus": vahvuus} )
+        dialog.accepted.connect( function() {
+            juoma.text = dialog.olut
+            nimi0 = dialog.olut
+            vahvuus = dialog.vahvuus
+            olutId = dialog.olutId
+            valitunEtiketti.source = UnTpd.oluenEtiketti
+            //tahtiaRivi.visible = ( > 0) ? true : false
+            //console.log("avaaUnTappd: olutId " + olutId)
+        })
+
         return
     }
 
@@ -161,6 +178,11 @@ Dialog {
         return
     }
 
+    ContextProperty {
+        id: networkOnline
+        key: 'Internet.NetworkState'
+    }
+
     Timer {
         id: mlAjastin
         interval: tauko
@@ -215,10 +237,8 @@ Dialog {
                     id: avaaUnTappd
                     text: qsTr("search UnTappd")
                     onClicked: {
-                        //if (UnTpd.unTpToken == "") {
-                        //    pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
-                        //} else {
-                            var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
+                        if (networkOnline.value === 'connected') {
+                            /*var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
                                 "olut": juoma.text, "vahvuus": vahvuus} )
                             dialog.accepted.connect( function() {
                                 juoma.text = dialog.olut
@@ -228,8 +248,13 @@ Dialog {
                                 valitunEtiketti.source = UnTpd.oluenEtiketti
                                 //tahtiaRivi.visible = ( > 0) ? true : false
                                 //console.log("avaaUnTappd: olutId " + olutId)
-                            })
+                            })//*/
+                            avaaUnTappdHaku()
+                        } else {
+                            var dialog = pageStack.push(Qt.resolvedUrl("eiVerkkoa.qml") )
+                            dialog.accepted.connect( avaaUnTappdHaku )
                         }
+                    }
 
                     }
                 //}

@@ -1,12 +1,9 @@
 .pragma library
 
-var queryLimit = 25
-
-var unTpOsoite = "https://api.untappd.com/v4" // url
-var unTpToken = "" // käyttäjän valtuutus
-var unTpdId = "" // ohjelman clientId
-var unTpdSecret = "" // ohjelman salasana
 var callbackURL = ""
+var newBadges
+var newBadgesSet = false
+var notificationsRespond // JSON-objekti
 var oluetSuosionMukaan = true
 var oluenNimi = ""
 var oluenEtiketti = ""
@@ -18,10 +15,13 @@ var oluenId = 0
 var postFoursquare = false
 var postFacebook = false
 var postTwitter = false
-var shout = ""
 var programName = ""
-var newBadges
-var newBadgesSet = false
+var queryLimit = 25
+var shout = ""
+var unTpdId = "" // ohjelman clientId
+var unTpOsoite = "https://api.untappd.com/v4" // url
+var unTpdSecret = "" // ohjelman salasana
+var unTpToken = "" // käyttäjän valtuutus
 
 function setBeer(beerId){
     if (beerId != oluenId) {

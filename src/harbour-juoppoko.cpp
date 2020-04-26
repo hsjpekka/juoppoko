@@ -37,7 +37,7 @@
 int main(int argc, char *argv[])
 {
     char *strings[argc+7]; // + s1-s7
-    char *s1 = JUOPPOKO_VERSION;
+    char *s1 = "2.3"; //JUOPPOKO_VERSION;
     char *s2 = UTPD_ID;
     char *s3 = UTPD_SECRET;
     char *s4 = CB_URL;

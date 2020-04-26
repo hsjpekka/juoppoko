@@ -28,16 +28,18 @@ DISTFILES += \
     qml/pages/tietoja.qml \
     qml/pages/Paaikkuna.qml \
     qml/pages/Kansi.qml \
+    qml/pages/tilastot.qml \
+    qml/pages/demolaskuri.qml \
+    qml/pages/unTpBaarit.qml \
+    qml/pages/Juomari.qml \
+    qml/pages/BarChart.qml \
+    qml/scripts/scripts.js \
+    qml/scripts/tietokanta.js
     harbour-juoppoko.desktop \
     rpm/harbour-juoppoko.yaml \
     rpm/harbour-juoppoko.changes.in \
     rpm/harbour-juoppoko.spec \
     qml/harbour-juoppoko.qml \
-    qml/pages/tilastot.qml \
-    qml/pages/demolaskuri.qml \
-    qml/scripts/scripts.js \
-    qml/pages/unTpBaarit.qml \
-    qml/scripts/tietokanta.js
 
 # defines windowsissa "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"", linuxissa XXX
 DEFINES += \
@@ -46,8 +48,8 @@ DEFINES += \
      "CB_URL=\"\\\"$${_CB_URL}\\\"\"" \
      "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
      "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
-     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\"" \
-     "JUOPPOKO_VERSION=\"\\\"2.3\\\"\""
+     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\""
+#     "JUOPPOKO_VERSION=\"\\\"2.3\\\"\""
 
 QT += positioning
 

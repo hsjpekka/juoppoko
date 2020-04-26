@@ -30,6 +30,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
 import QtPositioning 5.2
+import org.freedesktop.contextkit 1.0
+
 import "../scripts/unTap.js" as UnTpd
 import "../scripts/scripts.js" as Apuja
 import "../scripts/tietokanta.js" as Tkanta
@@ -1783,6 +1785,19 @@ Page {
         return luettuUnTpToken
     }
 
+    function tarkistaVerkko() {
+        var tulos = false
+        if (networkOnline.value === 'connected') {
+            tulos = true
+        } else {
+            var dialog = pageStack.push(Qt.resolvedUrl("eiVerkkoa.qml") )
+            dialog.accepted.connect( function() {
+                tulos = true
+                })
+        }
+        return tulos
+    }
+
     function tilastojenTarkastelu(){
         var uusiTaulukko, uusiRyyppyVrk
         //console.log("kohta1 ")
@@ -1935,6 +1950,58 @@ Page {
 
         return
     }
+
+    function unTpdOnkoUutisia() {
+        var xhttp = new XMLHttpRequest()
+        var osoite, kysely
+
+        if (!luettuUnTpToken)
+            return
+
+        if (!tarkistaVerkko())
+            return
+
+        // checkIn(beerId, tzone, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare)
+        osoite = UnTpd.checkInAddress()
+        kysely = UnTpd.checkInData(olutId, vyohyketunnus, barId, naytaSijainti, leveys,
+                                    pituus, huuto, tahtia, face, twit, fsqr)
+
+        //console.log("checkIN " + kysely)
+
+        xhttp.onreadystatechange = function () {
+            //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
+            if (xhttp.readyState == 0)
+                unTpdViestit.text = qsTr("request not initialized") + ", " + xhttp.statusText
+            else if (xhttp.readyState == 1)
+                unTpdViestit.text = qsTr("server connection established") + ", " + xhttp.statusText
+            else if (xhttp.readyState == 2)
+                unTpdViestit.text = qsTr("request received") + ", " + xhttp.statusText
+            else if (xhttp.readyState == 3)
+                unTpdViestit.text = qsTr("processing request") + ", " + xhttp.statusText
+            else if (xhttp.readyState == 4){
+                //console.log(xhttp.responseText)
+                unTpdViestit.text = qsTr("request finished") + ", " + xhttp.statusText
+
+                UnTpd.notificationsRespond = JSON.parse(xhttp.responseText);
+
+                unTpdKirjausTehty(vastaus)
+
+            } else {
+                console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
+                unTpdViestit.text = xhttp.readyState + ", " + xhttp.statusText
+                viestinNaytto.start()
+            }
+
+        }
+
+        unTpdViestit.text = qsTr("posting query")
+        xhttp.open("POST", osoite, false)
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+        xhttp.send(kysely);
+
+        return
+    }
+
 
     function uusiAsetukset() {
 
@@ -2193,14 +2260,15 @@ Page {
                 MenuItem {
                     text: qsTr("delete")
                     onClicked: {
+                        var poistettava = valittu
                         //console.log("valittu1 " + valittu + ", aika " + lueJuomanAika(valittu-1))
 
                         juomaLista.currentItem.remorseAction(qsTr("deleting"), function () {
                             //tyhjennaDbJuodut(lueJuomanId(valittu))
-                            Tkanta.poistaTkJuodut(lueJuomanTunnus(valittu))
-                            Apuja.poistaJuoma(lueJuomanTunnus(valittu))
-                            juomat.remove(valittu)
-                            paivitaMlVeressa(lueJuomanAika(valittu-1)-1); //-1 varmistaa, että usean samaan aikaan juodun juoman kohdalla päivitys toimii
+                            Tkanta.poistaTkJuodut(lueJuomanTunnus(poistettava))
+                            Apuja.poistaJuoma(lueJuomanTunnus(poistettava))
+                            juomat.remove(poistettava)
+                            paivitaMlVeressa(lueJuomanAika(poistettava-1)-1); //-1 varmistaa, että usean samaan aikaan juodun juoman kohdalla päivitys toimii
                             paivitaPromillet();
                             paivitaAjatRajoille();
                             paivitaKuvaaja();
@@ -2612,7 +2680,7 @@ Page {
                 text: qsTr("info")
                 onClicked:
                     pageStack.push(Qt.resolvedUrl("tietoja.qml"), {
-                                       "versio": app.versio})
+                                       "versioNro": app.versioNro})
             }
 
             MenuItem {
@@ -2634,14 +2702,17 @@ Page {
         }
 
         PushUpMenu {
-            visible: luettuUnTpToken ? true : false
+            visible: luettuUnTpToken
             MenuItem {
                 text: qsTr("unTappd")
                 onClicked: {
-                    var dialog = pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
-                    dialog.sulkeutuu.connect(function() {
-                        tarkistaUnTpd()
-                    })
+                    if (tarkistaVerkko()) {
+                        var dialog = pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
+                        dialog.sulkeutuu.connect(function() {
+                            tarkistaUnTpd()
+                        })
+                    }
+
                 }
 
             }
@@ -2649,13 +2720,17 @@ Page {
             MenuItem {
                 text: qsTr("Pints nearby")
                 onClicked: {
-                    pageStack.push(Qt.resolvedUrl("unTpPub.qml", {"vainKaverit": false} ))
+                    if (tarkistaVerkko()) {
+                        pageStack.push(Qt.resolvedUrl("unTpPub.qml", {"vainKaverit": false} ))
+                    }
                 }
             }
             MenuItem {
                 text: qsTr("Active friends")
                 onClicked: {
-                    pageStack.push(Qt.resolvedUrl("unTpPub.qml"), {"vainKaverit": true} )
+                    if (tarkistaVerkko()) {
+                        pageStack.push(Qt.resolvedUrl("unTpPub.qml"), {"vainKaverit": true} )
+                    }
                 }
             }
 
@@ -2986,7 +3061,7 @@ Page {
 
                 TextField {
                     id: txtBaari
-                    text: kirjaaUnTp? qsTr("checks in") : qsTr("doesn't check in")
+                    text: kirjaaUnTp? qsTr("check in") : qsTr("don't check in")
                     label: (baariId == "")? qsTr("no location") : baariNimi
                     color: !enabled? Theme.highlightDimmerColor : (kirjaaUnTp? Theme.primaryColor : Theme.secondaryColor)
                     readOnly: true
