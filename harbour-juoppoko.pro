@@ -34,12 +34,12 @@ DISTFILES += \
     qml/pages/Juomari.qml \
     qml/pages/BarChart.qml \
     qml/scripts/scripts.js \
-    qml/scripts/tietokanta.js
+    qml/scripts/tietokanta.js \
     harbour-juoppoko.desktop \
     rpm/harbour-juoppoko.yaml \
     rpm/harbour-juoppoko.changes.in \
     rpm/harbour-juoppoko.spec \
-    qml/harbour-juoppoko.qml \
+    qml/harbour-juoppoko.qml
 
 # defines windowsissa "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"", linuxissa XXX
 DEFINES += \

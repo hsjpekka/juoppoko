@@ -2,6 +2,33 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>Juomari</name>
+    <message>
+        <source>delete</source>
+        <translation type="unfinished">poista</translation>
+    </message>
+    <message>
+        <source>deleting</source>
+        <translation type="unfinished">poistaa</translation>
+    </message>
+    <message>
+        <source>modify</source>
+        <translation type="unfinished">muokkaa</translation>
+    </message>
+    <message>
+        <source>time</source>
+        <translation type="unfinished">aika</translation>
+    </message>
+    <message>
+        <source>drink</source>
+        <translation type="unfinished">juoma</translation>
+    </message>
+    <message>
+        <source>vol-%</source>
+        <translation type="unfinished">til-%</translation>
+    </message>
+</context>
+<context>
     <name>Kansi</name>
     <message>
         <source> ‰ at </source>
@@ -37,18 +64,6 @@
     <message>
         <source>posting query</source>
         <translation>lähetetään kyselyä</translation>
-    </message>
-    <message>
-        <source>delete</source>
-        <translation>poista</translation>
-    </message>
-    <message>
-        <source>deleting</source>
-        <translation>poistaa</translation>
-    </message>
-    <message>
-        <source>modify</source>
-        <translation>muokkaa</translation>
     </message>
     <message>
         <source>info</source>
@@ -105,14 +120,6 @@
     <message>
         <source>cheers!</source>
         <translation>skåål!</translation>
-    </message>
-    <message>
-        <source>time</source>
-        <translation>aika</translation>
-    </message>
-    <message>
-        <source>drink</source>
-        <translation>juoma</translation>
     </message>
     <message>
         <source>Pints nearby</source>
@@ -295,6 +302,21 @@
     <message>
         <source>current state at </source>
         <translation>humalatila klo </translation>
+    </message>
+</context>
+<context>
+    <name>eiVerkkoa</name>
+    <message>
+        <source>No network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You don&apos;t seem to have network connection. Internet.NetworkState %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to try to search UnTappd anyway?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

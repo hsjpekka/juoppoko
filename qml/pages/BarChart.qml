@@ -6,45 +6,49 @@ import Sailfish.Silica 1.0
 SilicaListView {
     id: barChartView
 
-    property color labelColor: Theme.secondaryHighlightColor
-    property real labelFontSize: Theme.fontSizeExtraSmall
-    property real labelWidth: Theme.fontSizeMedium*2
-    property color sectionColor: Theme.highlightColor
-    property real sectionFontSize: Theme.fontSizeExtraSmall
-    property var sectionOrientation: orientation === ListView.Horizontal ? ListView.Vertical : ListView.Horizontal
-    property real barWidth: Theme.paddingMedium
-    property real selectedBarHeight: 0
-    property string selectedBarLabel: ""
-    property alias chartData: listData
-    property real horizontalBarX0: Theme.horizontalPageMargin + 2*Theme.fontSizeMedium
+    property real   barWidth: Theme.fontSizeMedium
+    property alias  chartData: listData
+    property color  labelColor: Theme.secondaryHighlightColor
+    property real   labelFontSize: Theme.fontSizeExtraSmall
+    property real   labelWidth: Theme.fontSizeMedium*1.5
+    property real   scale: 1 // bar height = barValue*scale
+    property color  sectionColor: Theme.highlightColor
+    property real   sectionFontSize: Theme.fontSizeExtraSmall
+    property var    sectionOrientation: orientation === ListView.Horizontal ? ListView.Vertical : ListView.Horizontal
+    //property real   selectedBarHeight: 0
+    //property string selectedBarLabel: ""
+
+    signal barSelected(int barNr, real barValue, string barLabel)
 
     height: orientation === ListView.Horizontal ? 3*Theme.fontSizeMedium : 4*Theme.fontSizeMedium
     width: parent.width
 
     delegate: ListItem {
+        id: barItem
         contentHeight: barChartView.orientation === ListView.Horizontal ?
-                    barChartView.height :
-                    (itemLabel.height > barWidth? itemLabel.height: barWidth)
+                    barChartView.height : (itemLabel.height > barWidth? itemLabel.height: barWidth)
         width: barChartView.orientation === ListView.Horizontal ?
-                   (itemLabel.width > barWidth? itemLabel.width : barWidth) :
-                   parent.width
+                   (labelWidth > barWidth? labelWidth : barWidth) : parent.width
         propagateComposedEvents: true
+
+        property real   bValue: barValue
+        property string bLabel: barLabel
+
         onClicked: {
             var i = barChartView.indexAt(mouseX+x,mouseY+y)
-            selectedBarHeight = chartBar.height
-            selectedBarLabel = itemLabel.text
+            barSelected(i, bValue, bLabel)
             mouse.accepted = false
-            console.log("valittu " + i + ", korkeus " + selectedBarHeight
-                        + ", pylväs " + selectedBarLabel + ", rot " + barChartView.orientation +
+            console.log("valittu " + i + ", korkeus " + bValue
+                        + ", pylväs " + bLabel + ", rot " + barChartView.orientation +
                         ", label " + itemLabel.height + ", " + itemLabel.y + ", lista " + height)
         }
 
         Rectangle {
             id: chartBar
-            height: barChartView.orientation === ListView.Horizontal ? barHeight : barWidth
-            width: barChartView.orientation === ListView.Horizontal ? barWidth : barHeight
+            height: barChartView.orientation === ListView.Horizontal ? barItem.bValue*scale : barWidth
+            width: barChartView.orientation === ListView.Horizontal ? barWidth : barItem.bValue*scale
             color: barColor
-            opacity: 0.5
+            opacity: 1.0
             y: barChartView.orientation === ListView.Horizontal ?
                    itemLabel.y - height - Theme.paddingSmall : 0.5*(parent.contentHeight - height)
             x: barChartView.orientation === ListView.Horizontal ?
@@ -58,14 +62,14 @@ SilicaListView {
 
         Label {
             id: itemLabel
-            text: barLabel
+            text: barItem.bLabel
             font.pixelSize: labelFontSize
             horizontalAlignment: barChartView.orientation === ListView.Horizontal?
                                      Text.AlignHCenter : Text.AlignRight
             x: barChartView.orientation === ListView.Horizontal ?
-                   0.5*(parent.width - width) : Theme.horizontalPageMargin
+                   0.5*(parent.width - width) : 0
             y: barChartView.orientation === ListView.Horizontal ?
-                   barChartView.height - height - Theme.paddingSmall : 0.5*(parent.contentHeight - height)
+                   barChartView.height - height : 0.5*(parent.contentHeight - height)
 
             width: barChartView.orientation === ListView.Horizontal? parent.width : labelWidth
             color: labelColor
@@ -74,7 +78,7 @@ SilicaListView {
     }//listitem
 
     section {
-        property: "sctn"
+        property: "sect"
 
         delegate: Item {
             width: barChartView.orientation === ListView.Horizontal?
@@ -104,6 +108,7 @@ SilicaListView {
     }
 
     model: ListModel {
+        // {"barValue", "barColor", "barLabel", "sect"}
         id: listData
     }
 

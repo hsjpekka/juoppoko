@@ -28,13 +28,13 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import "../scripts/scripts.js" as Apuja
+//import "../scripts/scripts.js" as Apuja
 
 CoverBackground {
     id: kansi
 
     function naytaPromillet() {
-        var pro = paaikkuna.laskePromillet(new Date().getTime())
+        var pro = paaikkuna.juomari.promillejaHetkella(new Date().getTime()) //qqlaskePromillet(new Date().getTime())
         var str = ""
 
         str = pro.toFixed(2)  + " ‰"
@@ -44,10 +44,10 @@ CoverBackground {
 
     function paivita() {
         promilleja.text = naytaPromillet()
-        if (paaikkuna.msKunnossa.getTime() < new Date().getTime()){
+        if (paaikkuna.juomari.rajalla.getTime() < new Date().getTime()){
             kunnossa.text = ""
         } else {
-            kunnossa.text = paaikkuna.promilleRaja1 + qsTr(" ‰ at ") + paaikkuna.msKunnossa.toLocaleTimeString(Qt.locale(),"HH:mm")
+            kunnossa.text = paaikkuna.promilleRaja1 + qsTr(" ‰ at ") + paaikkuna.juomari.rajalla.toLocaleTimeString(Qt.locale(),"HH:mm")
         }
 
         return
@@ -85,23 +85,22 @@ CoverBackground {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: Theme.fontSizeLarge
         horizontalAlignment: TextInput.AlignHCenter
-        text: "" + paaikkuna.nykyinenJuoma()
-        label: paaikkuna.nykyinenMaara() + " ml"
+        text: paaikkuna.nykyinenJuoma
+        label: paaikkuna.nykyinenMaara + " ml"
         width: parent.width*0.8
         readOnly: true
     }
 
     Timer {
         id: updateTimer
-        interval: 6*1000 // min*s*ms
-        running: true
+        interval: 5*60*1000 // min*s*ms
+        running: visible
         repeat: true
         onTriggered: {
             paivita()
-
+            console.log("kansi näkyy " + kansi.visible)
         }
     }
-
 
     CoverActionList {
         id: coverAction
@@ -116,6 +115,11 @@ CoverBackground {
         }
     }
 
+    onVisibleChanged: {
+        if (visible) {
+            paivita()
+        }
+    }
+
     Component.onCompleted: paivita()
 }
-

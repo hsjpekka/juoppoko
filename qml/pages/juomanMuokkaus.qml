@@ -159,7 +159,7 @@ Dialog {
             maara = 0
 
         //maaranNaytto.value = maara.toFixed(1) + yksikkoTunnus
-        maaranNaytto.text = maara.toFixed(1) // + yksikkoTunnus
+        maaranNaytto.text = maara.toFixed(maaraDesimaaleja) // + yksikkoTunnus
 
         return
     }
@@ -272,8 +272,9 @@ Dialog {
                         if (!alkutoimet)
                             olutId = 0
                         //tahtiaRivi.visible = false
-                        console.log("nimi muuttunut")
+                        //console.log("nimi muuttunut")
                     }
+                    EnterKey.onClicked: tahtiaRivi.focus = true
                 }
 
                 IconButton {
@@ -629,7 +630,7 @@ Dialog {
                 value: vahvuus.toFixed(1) + " vol-%"
             }
 
-            Item { // tilavuuden muutos
+            Item { // prosenttien muutos
                 width: sivu.width
                 height: txtProsMuutos1.height
 
