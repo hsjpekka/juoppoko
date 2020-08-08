@@ -45,7 +45,12 @@ Dialog {
         vuosi1 = vuosi10
         vuosi2 = vuosi20
 
-        //nesteCombo( vetta )
+        if (vetta > 0.649 && vetta < 0.651) {
+            cbNeste.currentIndex = 1
+        } else if (vetta > 0.749 && vetta < 0.751) {
+            cbNeste.currentIndex = 0
+        } else
+            cbNeste.currentIndex = 2
 
         return
     }
@@ -194,18 +199,6 @@ Dialog {
                     id: cbNeste
                     width: leveysVasen*sivu.width
                     label: qsTr("body water content")
-
-                    currentIndex: {
-                        switch (parseInt(vetta*100)){
-                        case 65:
-                            currentIndex = 1
-                            break
-                        case 75:
-                            currentIndex = 0
-                            break
-                        currentIndex = 2
-                        }
-                    }
 
                     onCurrentIndexChanged: {
                         switch (currentIndex) {

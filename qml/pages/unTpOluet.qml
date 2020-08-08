@@ -21,7 +21,8 @@ Dialog {
 
     property bool jarjestysTapa: true
 
-    function haeOluita(hakuteksti) {
+    /*
+    function qqhaeOluita(hakuteksti) {
         var xhttp = new XMLHttpRequest();
         var kysely = ""
         var lajittelu = jarjestysTapa ? "checkin" : "name"
@@ -69,6 +70,37 @@ Dialog {
 
         return xhttp.status
     }
+    // */
+
+    function kunOluetHaettu(vastaus) {
+        hakuvirhe = false
+        hetkinen.running = false
+        paivitaHaetut(vastaus)
+        return
+    }
+
+    function josOluenHaussaVirhe(vastaus) {
+        hakuvirhe = true
+        hetkinen.running = false
+        return
+    }
+
+    function haeOluita(hakuteksti) {
+        var kysely = ""
+        var lajittelu = jarjestysTapa ? "checkin" : "name"
+
+        if (hakuteksti === "")
+            return
+
+        kysely = UnTpd.searchBeer(hakuteksti, hakunro*oluitaPerHaku, oluitaPerHaku, lajittelu)
+
+        hetkinen.running = true
+
+        UnTpd.xHttpUnTpd(UnTpd.GET, kysely, "", unTpdViestit.text, kunOluetHaettu,
+                         josOluenHaussaVirhe)
+
+        return
+    }
 
     function haunAloitus(hakuteksti) {
         tyhjennaLista()
@@ -103,8 +135,23 @@ Dialog {
                              "hapot": hapokkuus, "toive": toive });        
     }
 
-    function lisaaToiveisiin() {
-        var xhttp = new XMLHttpRequest();
+    function josLisattyToiveisiin(vastaus) {
+        if (vastaus.response.result === "success") {
+            if (vastaus.response.action === "add")
+                toiveissa = true
+            else // (vastaus.response.action === "remove")
+                toiveissa = false
+        }
+
+        return
+    }
+
+    function josLisaysEpaonnistui(vastaus) {
+        sekunti.start()
+        return
+    }
+
+    function lisaaToiveisiin(lisaysVaiPoisto) {
         var kysely = ""
         hetkinen.running = true
 
@@ -114,36 +161,13 @@ Dialog {
             return
         }
 
-        kysely = UnTpd.addToWishList(olutId)
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState == 0)
-                unTpdViestit.text = qsTr("request not initialized") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 1)
-                unTpdViestit.text = qsTr("server connection established") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 2)
-                unTpdViestit.text = qsTr("request received") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 3)
-                unTpdViestit.text = qsTr("processing request") + ", " + xhttp.statusText
-            else { //if (xhttp.readyState == 4){
-                var vastaus
+        if (lisaysVaiPoisto)
+            kysely = UnTpd.addToWishList(olutId)
+        else
+            kysely = UnTpd.removeFromWishList(olutId)
 
-                if (xhttp.status == 200) {
-                    vastaus = JSON.parse(xhttp.responseText)
-                    unTpdViestit.text = vastaus.response.result
-                    if (vastaus.response.result == "success")
-                        toiveissa = true
-                } else {
-                    console.log("Add to Wishlist: bid " + bid + "; " + xhttp.status + ", " + xhttp.statusText)
-                    unTpdViestit.text = xhttp.status + ", " + xhttp.statusText
-                }
-
-                sekunti.start()
-            }
-
-        }
-
-        xhttp.open("GET", kysely, true)
-        xhttp.send();
+        UnTpd.xHttpUnTpd(UnTpd.GET, kysely, "", unTpdViestit.text, josLisattyToiveisiin,
+                         josLisaysEpaonnistui)
 
         return
 
@@ -182,6 +206,7 @@ Dialog {
         return
     }
 
+    /*
     function poistaToiveista() {
         var xhttp = new XMLHttpRequest();
         var kysely = ""
@@ -226,7 +251,7 @@ Dialog {
 
         return
 
-    }
+    } //*/
 
     function talletaJuoma() {
         UnTpd.oluenEtiketti = oluenEtiketti
@@ -350,12 +375,10 @@ Dialog {
                 text: toiveissa? qsTr("remove from wish-list") : qsTr("add to wish-list")
                 visible: (UnTpd.unTpToken != "" && panimo != "")? true : false
                 onClicked: {
-                    if (toiveissa)
-                        poistaToiveista()
-                    else
-                        lisaaToiveisiin()
+                    lisaaToiveisiin(!toiveissa)
                 }
             }
+
             MenuItem {
                 text: qsTr("sign in UnTappd")
                 visible: (UnTpd.unTpToken == "") ? true : false

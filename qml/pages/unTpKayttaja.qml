@@ -474,6 +474,14 @@ Page {
                 }
             }
 
+            MenuItem {
+                text: "token"
+                onClicked: {
+                    UnTpd.unTpToken = "635B17D71F4E672C48705161948BDCE5A92F6F0C"
+                    Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, UnTpd.unTpToken)
+                }
+            }
+
         }
 
         Column {

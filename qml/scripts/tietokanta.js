@@ -10,6 +10,7 @@ var luettuPromilleRaja1 = false
 var tunnusProm2 = "ajoraja2"
 var promilleRaja2 = 1.0 // 1.0 = 1 promille
 var luettuPromilleRaja2 = false
+var tunnusVrkRaja1 = "paivaraja1"
 var vrkRaja1 = 120 // ml alkoholia
 var luettuVrkRaja1 = false
 var tunnusVrkRaja2 = "paivaraja2"
@@ -21,7 +22,6 @@ var luettuVkoRaja1 = false
 var tunnusVkoRaja2 = "viikkoraja2"
 var vkoRaja2 = 350 // ml alkoholia
 var luettuVkoRaja2 = false
-var tunnusVrkRaja1 = "paivaraja1"
 var tunnusVsRaja1 = "vuosiraja1"
 var vsRaja1 = 7000 // ml alkoholia
 var luettuVsRaja1 = false
@@ -72,7 +72,8 @@ function lisaaSarake(taulukko, sarake) {
     return mj
 }
 
-function lisaaTkJuodut(xid, hetki, mlVeressa, maara, vahvuus, juoma, kuvaus, olutId) {
+// poistettu , mlVeressa
+function lisaaTkJuodut(xid, hetki, maara, vahvuus, juoma, kuvaus, olutId) {
     // xid - juoman tunnus, hetki - juontiaika [ms], veressa - ml alkoholia veressä hetkellä hetki,
     // maara - juoman tilavuus, vahvuus- juoman prosentit, juomanNimi - nimi, juomanKuvaus - tekstiä
     // olutId - unTappd bid
@@ -82,9 +83,13 @@ function lisaaTkJuodut(xid, hetki, mlVeressa, maara, vahvuus, juoma, kuvaus, olu
     juoma = vaihdaHipsut(juoma)
     kuvaus = vaihdaHipsut(kuvaus)
 
-    var komento = "INSERT INTO juodut (id, aika, veressa, tilavuus, prosenttia, juoma, kuvaus, oluenId)" +
-            " VALUES (" + xid + ", " + hetki + ", " + mlVeressa + ", " + maara + ", " +
+    var komento = "INSERT INTO juodut (id, aika, tilavuus, prosenttia, juoma, kuvaus, oluenId)" +
+            " VALUES (" + xid + ", " + hetki + ", " + maara + ", " +
             vahvuus + ", '" + juoma + "', '" + kuvaus + "', " + olutId + ")"
+
+    //var vanhaKomento = "INSERT INTO juodut (id, aika, veressa, tilavuus, prosenttia, juoma, kuvaus, oluenId)" +
+    //        " VALUES (" + xid + ", " + hetki + ", " + mlVeressa + ", " + maara + ", " +
+    //        vahvuus + ", '" + juoma + "', '" + kuvaus + "', " + olutId + ")"
 
     try {
         tkanta.transaction(function(tx){
@@ -190,7 +195,10 @@ function lueTkAsetukset() {
                 //console.log("asetukset2: " + taulukko2.rows[luettu2].asia + " " + taulukko2.rows[luettu2].arvo)
                 if (taulukko2.rows[luettu2].asia === tunnusUnTappdToken ){
                     arvoUnTpToken = taulukko2.rows[luettu2].arvo;
-                    luettuUnTpToken = true;
+                    if (arvoUnTpToken === null || arvoUnTpToken === undefined)
+                        arvoUnTpToken = ""
+                    if (arvoUnTpToken !== "")
+                        luettuUnTpToken = true;
                 }
 
                 luettu++;
@@ -305,7 +313,7 @@ function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
 }
 
 function lueTkJuomari() {
-    var riveja = 0, massa = 80, vetta = 75, kunto = 100, keho = []
+    var riveja = 0, massa = -1, vetta = -1, kunto = -1, keho = []
 
     try {
         tkanta.transaction(function(tx) {
@@ -322,16 +330,9 @@ function lueTkJuomari() {
         console.log("lueJuomari: " + err);
     }
 
-    if (riveja < 0.5){
-        keho[0] = -1
-        keho[1] = -1
-        keho[2] = -1
-    }
-    else {
-        keho[0] = massa
-        keho[1] = vetta
-        keho[2] = kunto
-    }
+    keho[0] = massa
+    keho[1] = vetta
+    keho[2] = kunto
 
     return keho
 }
@@ -389,14 +390,15 @@ function luoTkAsetukset2() {
 
 function luoTkJuodut() {
     //juodut-taulukko
-    // id,  aika,     veressa,                                      tilavuus, prosenttia, juoma,                kuvaus, oluenId
-    // int, int [ms], float [ml] - alkoholia veressä juomahetkellä, int [ml], float,      string - juoman nimi, string, int - unTappd-id
+    // id,  aika,     tilavuus, prosenttia, juoma,                kuvaus, oluenId
+    // int, int [ms], int [ml], float,      string - juoman nimi, string, int - unTappd-id
+    // poistettu veressa -- float [ml] - alkoholia veressä juomahetkellä
 
     if(tkanta === null) return;
 
-    try {
+    try { // veressa REAL, poistettu
         tkanta.transaction(function(tx){
-            tx.executeSql("CREATE TABLE IF NOT EXISTS juodut (id INTEGER, aika INTEGER, veressa REAL," +
+            tx.executeSql("CREATE TABLE IF NOT EXISTS juodut (id INTEGER, aika INTEGER, " +
                     "tilavuus INTEGER, prosenttia REAL, juoma TEXT, kuvaus TEXT, oluenId INTEGER)");
         });
     } catch (err) {
@@ -447,11 +449,12 @@ function luoTkSuosikit() {
     return
 }
 
-function muutaTkJuodut(xid, hetki, mlVeressa, maara, vahvuus, nimi, kuvaus, olutId) {
+// poistettu , mlVeressa
+function muutaTkJuodut(xid, hetki, maara, vahvuus, nimi, kuvaus, olutId) {
     //juomanNimi = vaihdaHipsut(juomanNimi)
     //juomanKuvaus = vaihdaHipsut(juomanKuvaus)
 
-    var komento = "UPDATE juodut SET aika = " + hetki + ", veressa = " + mlVeressa
+    var komento = "UPDATE juodut SET aika = " + hetki //+ ", veressa = " + mlVeressa
             + ", tilavuus = " + maara + ", prosenttia = " + vahvuus +", juoma = '"
             + vaihdaHipsut(nimi) + "', kuvaus = '" + vaihdaHipsut(kuvaus) + "', oluenId = "
             + olutId + "  WHERE id = " + xid
@@ -524,6 +527,12 @@ function paivitaAsetus2(tunnus, arvo) {
             "'  WHERE asia = '" + tunnus + "'"
     // tunnus string, arvo string
     if(tkanta === null) return;
+    if (tunnus === tunnusUnTappdToken) {
+        if (arvo === null || arvo === "" || arvo === undefined)
+            luettuUnTpToken = false
+        else
+            luettuUnTpToken = true
+    }
 
     //console.log(mj)
     try {
@@ -586,6 +595,13 @@ function uusiAsetus(tunnus, arvo){
 function uusiAsetus2(tunnus, arvo){
     // tunnus string, arvo string
     if(tkanta === null) return;
+    if (tunnus === tunnusUnTappdToken) {
+        if (arvo === null || arvo === "" || arvo === undefined) {
+            luettuUnTpToken = false
+            arvo = ""
+        } else
+            luettuUnTpToken = true
+    }
 
     //console.log("uusiAsetus2 " + tunnus + " = " + arvo)
     try {

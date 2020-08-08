@@ -24,17 +24,31 @@ SAILFISHAPP_ICONS = 86x86 108x108 128x128 256x256
 
 DISTFILES += \
     qml/pages/asetukset.qml \
-    qml/pages/juomanMuokkaus.qml \
-    qml/pages/tietoja.qml \
-    qml/pages/Paaikkuna.qml \
-    qml/pages/Kansi.qml \
-    qml/pages/tilastot.qml \
-    qml/pages/demolaskuri.qml \
-    qml/pages/unTpBaarit.qml \
-    qml/pages/Juomari.qml \
     qml/pages/BarChart.qml \
+    qml/pages/demolaskuri.qml \
+    qml/pages/eiVerkkoa.qml \
+    qml/pages/juomanMuokkaus.qml \
+    qml/pages/Juomari.qml \
+    qml/pages/Kansi.qml \
+    qml/pages/KulutusKuvaajat.qml \
+    qml/pages/Paaikkuna.qml \
+    qml/pages/tietoja.qml \
+    qml/pages/tilastot.qml \
+    qml/pages/unTpAnsiomerkit.qml \
+    qml/pages/unTpBaarit.qml \
+    qml/pages/unTpCheckIn.qml \
+    qml/pages/unTpJuomispuheet.qml \
+    qml/pages/unTpKaverit.qml \
+    qml/pages/unTpKayttaja.qml \
+    qml/pages/UnTpKirjauksenKooste.qml \
+    qml/pages/unTpKirjautuminen.qml \
+    qml/pages/unTpOluet.qml \
+    qml/pages/unTpPub.qml \
+    qml/pages/unTpTietojaOluesta.qml \
+    qml/scripts/foursqr.js \
     qml/scripts/scripts.js \
     qml/scripts/tietokanta.js \
+    qml/scripts/unTap.js \
     harbour-juoppoko.desktop \
     rpm/harbour-juoppoko.yaml \
     rpm/harbour-juoppoko.changes.in \
@@ -48,8 +62,8 @@ DEFINES += \
      "CB_URL=\"\\\"$${_CB_URL}\\\"\"" \
      "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
      "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
-     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\""
-#     "JUOPPOKO_VERSION=\"\\\"2.3\\\"\""
+     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\""\
+     "JUOPPOKO_VERSION=\"\\\"2.3\\\"\""
 
 QT += positioning
 

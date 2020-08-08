@@ -38,34 +38,6 @@
 <context>
     <name>Paaikkuna</name>
     <message>
-        <source>wk</source>
-        <translation>vko</translation>
-    </message>
-    <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request finished</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
-    </message>
-    <message>
         <source>info</source>
         <translation>tietoja</translation>
     </message>
@@ -128,6 +100,10 @@
     <message>
         <source>Active friends</source>
         <translation>Kavereiden kirjaukset</translation>
+    </message>
+    <message>
+        <source>%1 drinks, latest %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -232,18 +208,6 @@
 <context>
     <name>demolaskuri</name>
     <message>
-        <source>delete</source>
-        <translation>poista</translation>
-    </message>
-    <message>
-        <source>deleting</source>
-        <translation>poistaa</translation>
-    </message>
-    <message>
-        <source>modify</source>
-        <translation>muokkaa</translation>
-    </message>
-    <message>
         <source>Demo</source>
         <translation>Demo</translation>
     </message>
@@ -274,14 +238,6 @@
     <message>
         <source>cheers!</source>
         <translation>skåål!</translation>
-    </message>
-    <message>
-        <source>time</source>
-        <translation>aika</translation>
-    </message>
-    <message>
-        <source>drink</source>
-        <translation>juoma</translation>
     </message>
     <message>
         <source>water</source>
@@ -349,10 +305,6 @@
 <context>
     <name>tietoja</name>
     <message>
-        <source>Here the values are expected to depend only on the amount of water in body, not on sex.</source>
-        <translation>Arvojen oletetaan tässä ohjelmassa riippuvan vain kehon nesteen määrästä.</translation>
-    </message>
-    <message>
         <source>Alcohol burning rate is also from the same site.</source>
         <translation>Alkoholin palamisnopeus samalta sivustolta.</translation>
     </message>
@@ -365,9 +317,14 @@
         <translation>Korkea alkoholipitoisuus voi aiheuttaa kooman tai tappaa. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
     </message>
     <message>
-        <source>The default limits are from 
- %1 according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
-        <translation>Oletusrajat ovat lähteestä %1, jonka mukaan matalan riskin raja on naisille 7 annosta viikossa ja miehille 14. Lisääntyneen riskin raja on 16 annosta naisille ja 24 miehille. </translation>
+        <source>The default limits are based on 
+ %1 
+ - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Here the limits depend only on the weight and the relative amount of water in body, not on sex.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -415,6 +372,37 @@
     <message>
         <source>drinking day ends at</source>
         <translation>ryyppypäivä vaihtuu</translation>
+    </message>
+</context>
+<context>
+    <name>unTap</name>
+    <message>
+        <source>request not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>posting GET-query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>posting POST-query</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -805,22 +793,6 @@
 <context>
     <name>unTpOluet</name>
     <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Beers in unTappd</source>
         <translation>UnTappdin oluet</translation>
     </message>
@@ -855,10 +827,6 @@
     <message>
         <source>change to order by popularity</source>
         <translation>suosituimmuusjärjestykseen</translation>
-    </message>
-    <message>
-        <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
     </message>
     <message>
         <source>remove from wish-list</source>

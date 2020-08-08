@@ -4,210 +4,14 @@ import Sailfish.Silica 1.0
 Page {
     id: sivu
     width: parent.width
-    anchors.leftMargin: 0.05*width
 
     property date alkuhetki: new Date()
     property string kelloMuoto: "HH:mm"
-    property date msSelvana: new Date()
-    property date msKunnossa: new Date()
-    property int paino
-    property real polttonopeus: 0.1267 // ml/kg/h -- 1 g/10 kg/h = 1.267 ml/10 kg/h
+    property alias paino: juoja.paino
     property real promilleja // g alkoholia / g vettä
-    property real promilleRaja1
+    property alias promilleRaja1: juoja.promilleRaja
     property date pvm: new Date()
-    property real tiheys: 0.7897 // alkoholin tiheys, g/ml
-    property int tunti: 60*60*1000 // ms
-    property int valittu
-    property real vetta: 0.65
-
-    function alkoholiaVeressa(hetki0, ml0, mlJuoma, vahvuus, hetki1)     {
-        var dt // tuntia
-        var ml1
-
-        dt = (hetki1 - hetki0)/tunti // ms -> h
-        if (dt < 0) {
-            dt = 0
-        }
-
-        ml1 = ml0 + mlJuoma*vahvuus/100 - palonopeus()*dt // vanhat pohjat + juotu - poltetut
-
-        if (ml1 < 0)
-            ml1 = 0
-
-        return ml1
-    }
-
-    function etsiPaikka(hetki, ind0) {
-        var edAika
-
-        if (ind0 > juomat.count -1)
-            ind0 = juomat.count -1
-        else if (ind0 < 0)
-            ind0 = 0
-
-        if (juomat.count > 0) { // jos juomalista ei ole tyhjä
-            edAika = lueJuomanAika(ind0)
-
-            while (hetki <= edAika) {
-                ind0 = ind0 - 1
-                if (ind0 > -0.5)
-                    edAika = lueJuomanAika(ind0)
-                else
-                    edAika = hetki - 1
-            }
-
-            while (hetki >= edAika) {
-                ind0 = ind0 + 1
-                if (ind0 < juomat.count) {
-                    edAika = lueJuomanAika(ind0)
-                } else {
-                   edAika = hetki + 1
-                }
-            }
-
-        } else
-            ind0 = 0
-
-        return ind0
-    }
-
-    function kopioiJuoma(qId) {
-        txtJuoma.text = lueJuomanTyyppi(qId)
-        txtMaara.text = lueJuomanMaara(qId)
-        voltit.text = lueJuomanVahvuus(qId).toFixed(1)
-
-        return
-    }
-
-    function laskePromillet(ms){
-        var ml0 = promilleja*paino/tiheys, til = 0, pros = 0 //, edellinen = etsiPaikka(ms, juomat.count -1)
-        var ms0 = alkuhetki.getTime(), ms1
-
-        //console.log("laskePromillet " + ml0.toFixed(2) + " " + juomat.count + " " + ms)
-
-        //ml0 = mlKehossa(edellinen-1, ms)
-
-        if (ms < ms0) return promilleja;
-
-        for (var i = 0; i < juomat.count; i++) {
-            ms1 = lueJuomanAika(i);
-            if (ms1 > ms){
-                i = juomat.count
-            } else {
-                ml0 = alkoholiaVeressa(ms0, ml0, til, pros, ms1)
-                til = lueJuomanMaara(i);
-                pros = lueJuomanVahvuus(i);
-                ms0 = ms1
-            }
-
-            //console.log("laskePromillet c i=" + i + " " + ml0.toFixed(2))
-
-        }
-
-        ml0 = alkoholiaVeressa(ms0, ml0, til, pros, ms)
-
-        //console.log("laskePromillet i=" + i + " " + ml0.toFixed(2) + " " + ms0 + " " + til + " " + pros + " " + ms)
-
-        return ml0*tiheys/(paino*vetta)
-    }
-
-    function lisaaListaan(hetki, mlVeressa, maara, vahvuus, juomanNimi) {
-        var paiva = new Date(hetki).toLocaleDateString(Qt.locale(),Locale.ShortFormat) // juomispäivä
-        var kello = new Date(hetki).toLocaleTimeString(Qt.locale(), kelloMuoto) // kellonaika
-        var ind = etsiPaikka(hetki,juomat.count-1)
-
-        if (ind < juomat.count) {
-            juomat.insert(ind, {"aikaMs": hetki, //"mlVeressa": mlVeressa,
-                                 "section": paiva, "juomaaika": kello, "juomatyyppi": juomanNimi,
-                                 "juomamaara": maara, "juomapros": vahvuus});
-            paivitaMlVeressa(hetki, ind);
-
-        } else
-            juomat.append({"aikaMs": hetki, //"mlVeressa": mlVeressa,
-                                 "section": paiva, "juomaaika": kello, "juomatyyppi": juomanNimi,
-                                 "juomamaara": maara, "juomapros": vahvuus});
-        return
-    }
-
-    function lueJuomanAika(xid) {
-        var ms = 0
-        if ((juomat.count > xid) && (xid > -0.5)) {
-            ms = juomat.get(xid).aikaMs
-        } else {
-            ms = alkuhetki.getTime()
-        }
-
-        return ms
-    }
-
-    function lueJuomanMaara(xid) {
-        var ml = 0
-        if ((xid < juomat.count) && (xid > -0.5)) {
-            ml = juomat.get(xid).juomamaara
-        }
-
-        return ml
-    }
-
-    function lueJuomanTyyppi(xid){
-        var tyyppi = ""
-        if ((juomat.count > xid) && (xid > -0.5)) {
-            tyyppi = juomat.get(xid).juomatyyppi
-        }
-
-        return tyyppi
-
-    }
-
-    function lueJuomanVahvuus(xid) {
-        var vahvuus = -0.001
-        if ((juomat.count > xid) && (xid > -0.5)) {
-            vahvuus = juomat.get(xid).juomapros
-        }
-
-        return vahvuus
-    }
-
-    /*
-    function lueMlVeressa(xid) {
-        var ml = 0
-        if ((juomat.count > xid) && (xid > -0.5)) {
-            ml = juomat.get(xid).mlVeressa
-        } else {
-            ml = promilleja*paino*vetta/tiheys
-        }
-
-        return ml
-    } // */
-
-    /*
-    function mlKehossa(xid, ms) {
-        var ml1
-
-        ml1 = alkoholiaVeressa(lueJuomanAika(xid), lueMlVeressa(xid), lueJuomanMaara(xid), lueJuomanVahvuus(xid), ms )
-
-        return ml1
-    } // */
-
-    function msRajalle(ml0, koko0, vahvuus0, promillea){
-        var mlRajalle, hRajalle
-
-        mlRajalle = ml0 + koko0*vahvuus0/100 - promillea*paino*vetta/tiheys//*1000
-        hRajalle = mlRajalle/palonopeus()
-
-        return Math.round(hRajalle*tunti)
-    }
-
-    function muutaJuoma(id, ms, maara, vahvuus, juomanNimi, juomanKuvaus)     { //, mlAlkoholia
-        var paiva = new Date(ms).toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-        var kello = new Date(ms).toLocaleTimeString(Qt.locale(), kelloMuoto)
-
-        juomat.set(id, {"section": paiva,"juomaaika": kello, "aikaMs": ms, //"mlVeressa": mlAlkoholia,
-                       "juomatyyppi": juomanNimi, "juomamaara": maara,
-                          "juomapros": vahvuus});               
-
-        return
-    }
+    property alias vetta: juoja.vetta
 
     function muutaUusi() {
         var pv0 = pvm.getDate(), kk0 = pvm.getMonth(), vs0 = pvm.getFullYear()
@@ -242,137 +46,6 @@ Page {
         return
     }
 
-    function muutaValittu(qId) {
-        var vanhaMaara = lueJuomanMaara(qId)
-        var vanhaVahvuus = lueJuomanVahvuus(qId)
-        var vanhaHetki = lueJuomanAika(qId)
-
-        var dialog = pageStack.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
-                        "aika": new Date(lueJuomanAika(qId)),
-                        "nimi": lueJuomanTyyppi(qId),
-                        "maara": vanhaMaara,
-                        "vahvuus": vanhaVahvuus,
-                        "juomanKuvaus": ""
-                     })
-
-        dialog.accepted.connect(function() {
-            muutaJuoma(qId, dialog.aika.getTime(), dialog.maara, //parseFloat(lueMlVeressa(qId)),
-                        dialog.vahvuus, dialog.nimi, "")
-            //paivitaMlVeressa(dialog.aika.getTime(), qId)
-            paivitaPromillet()
-            paivitaAjatRajoille()
-
-        })
-
-        return
-    }
-
-    function paivitaAjatRajoille() {
-        var ms1, ms0, prom = 0, ml0, koko0, vahvuus0, ind = juomat.count
-
-        var nytMs = pvm.getTime()        
-
-        /*
-        ms0 = lueJuomanAika(ind-1)
-        ml0 = lueMlVeressa(ind-1)
-        koko0 = lueJuomanMaara(ind-1)
-        vahvuus0 = lueJuomanVahvuus(ind-1) // */
-
-        if (ind > 0) {
-            ms0 = lueJuomanAika(ind-1)
-            prom = laskePromillet(ms0+1)
-        } else {
-            ms0 = alkuhetki.getTime()
-            prom = promilleja
-        }
-
-        ml0 = prom2ml(prom)
-
-        //console.log("paivitaAjatRajoille - alkoholia kehossa [ml]" + ml0 + " juomassa " + (lueJuomanMaara(ind-1)*lueJuomanVahvuus(ind-1)/100).toFixed(1))
-
-        // selväksi
-        ms1 = ms0 + msRajalle(ml0, 0, 0, 0) // msRajalle(ml0, koko0, vahvuus0, promillea)
-        msSelvana = new Date(ms1)
-
-        // ajokuntoon
-        ms1 = ms0 + msRajalle(ml0, 0, 0, promilleRaja1) //msRajalle(ml0, koko0, vahvuus0, promilleRaja1)
-        msKunnossa = new Date(ms1)
-
-        if ( msSelvana.getTime() > new Date().getTime() )
-            txtSelvana.text = msSelvana.toLocaleTimeString(Qt.locale(), kelloMuoto)
-        else
-            txtSelvana.text = " -"
-
-        if ( msKunnossa.getTime() > new Date().getTime() ) {
-            txtAjokunnossa.text = msKunnossa.toLocaleTimeString(Qt.locale(), kelloMuoto)
-        }
-        else {
-            txtAjokunnossa.text = " -"
-        }
-
-        return
-    }
-
-    /*
-    function paivitaMlVeressa(ms1, xInd) {
-        var ind = etsiPaikka(ms1, xInd)
-        var ms0, ml0, koko0, vahvuus0, id1, ml1, koko1, vahvuus1
-
-        ms0 = lueJuomanAika(ind-1)
-        ml0 = lueMlVeressa(ind-1)
-        koko0 = lueJuomanMaara(ind-1)
-        vahvuus0 = lueJuomanVahvuus(ind-1)
-
-        while (ind < juomat.count) {
-            ms1 = lueJuomanAika(ind)
-            ml1 = alkoholiaVeressa(ms0, ml0, koko0, vahvuus0, ms1 ) // paljonko tälle juomalle oli pohjia
-            if ( (ml1 > 0) || (lueMlVeressa(ind) > 0) ) {
-                juomat.set(ind,{"mlVeressa": ml1})
-                koko1 = lueJuomanMaara(ind)
-                vahvuus1 = lueJuomanVahvuus(ind)
-                ms0 = ms1
-                ml0 = ml1
-                koko0 = koko1
-                vahvuus0 = vahvuus1
-            } else
-                ind = juomat.count
-
-            ind++
-        }
-
-        return
-    } // */
-
-    function paivitaPromillet() {
-        var nytMs = pvm.getTime()
-        var ml0, prml
-
-        //console.log("paivitaPromillet - pvm " + pvm.getTime() )
-
-        prml = laskePromillet(nytMs)
-
-        if (prml < 3.0){
-            txtPromilleja.text = "" + prml.toFixed(2) + " ‰"
-        } else {
-            txtPromilleja.text = "> 3.0 ‰"
-        }
-
-        // huomion keräys, jos promilleRajat ylittyvät
-        if ( prml < promilleRaja1 ) {
-            txtPromilleja.color = Theme.primaryColor
-            txtPromilleja.font.pixelSize = Theme.fontSizeMedium
-        } else {
-            txtPromilleja.color = Theme.highlightColor
-            txtPromilleja.font.pixelSize = Theme.fontSizeLarge
-        }        
-
-        return prml
-    }
-
-    function palonopeus() {
-        return polttonopeus*paino
-    }
-
     function prom2ml(pro) {
         return pro*paino*vetta/tiheys
     }
@@ -394,6 +67,7 @@ Page {
         return;
     }
 
+    /*
     Component {
         id: rivityyppi
         ListItem {
@@ -450,12 +124,6 @@ Page {
                     visible: false
                     width: 0
                 }
-                /*
-                Label {
-                    text: mlVeressa
-                    visible: false
-                    width: 0
-                } // */
                 Label {
                     text: juomaaika
                     width: (Theme.fontSizeMedium*3.5).toFixed(0)
@@ -477,7 +145,7 @@ Page {
 
 
         } //listitem
-    } //rivityyppi
+    } //rivityyppi //*/
 
     SilicaFlickable {
         id: ylaosa
@@ -511,10 +179,11 @@ Page {
                     text: (vetta*100).toFixed(0)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 100}
-                    onTextChanged: {
+                    EnterKey.iconSource: "image://theme/icon-m-play"
+                    EnterKey.onClicked: {
                         vetta = text/100
-                        paivitaPromillet()
-                        paivitaAjatRajoille()
+                        juoja.laskeUudelleen()
+                        juoja.paivita(pvm.getDate())
                     }
                     label: qsTr("water") + " [%]"
                     width: Theme.fontSizeExtraSmall*7
@@ -524,10 +193,11 @@ Page {
                     text: paino
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 1; top: 1000}
-                    onTextChanged: {
+                    EnterKey.iconSource: "image://theme/icon-m-play"
+                    EnterKey.onClicked: {
                         paino = text*1
-                        paivitaPromillet()
-                        paivitaAjatRajoille()
+                        juoja.laskeUudelleen()
+                        juoja.paivita(pvm.getDate())
                     }
 
                     label: qsTr("weight") + " [kg]"
@@ -538,9 +208,10 @@ Page {
                     text: Number(promilleRaja1).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
-                    onTextChanged: {
+                    EnterKey.iconSource: "image://theme/icon-m-play"
+                    EnterKey.onClicked: {
                         promilleRaja1 = Number.fromLocaleString(Qt.locale(),text)
-                        paivitaAjatRajoille()
+                        juoja.paivita(pvm.getDate())
                     }
                     label: qsTr("limit") + " [‰]"
                     width: Theme.fontSizeExtraSmall*7
@@ -556,10 +227,12 @@ Page {
                     text: Number(promilleja).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
-                    onTextChanged: {
+                    EnterKey.iconSource: "image://theme/icon-m-play"
+                    EnterKey.onClicked: {
                         promilleja = Number.fromLocaleString(Qt.locale(),text)
-                        paivitaPromillet()
-                        paivitaAjatRajoille()
+                        juoja.pohjat = prom2ml(promilleja)
+                        juoja.laskeUudelleen()
+                        juoja.paivita(pvm.getDate())
                     }
                     label: "[‰]"
                     width: (Theme.fontSizeMedium*3.5).toFixed(0) //Theme.fontSizeExtraSmall*5
@@ -627,8 +300,6 @@ Page {
                             avaaPaivanValinta()
                     }
                 }
-
-
 
             }
 
@@ -791,6 +462,75 @@ Page {
                 color: Theme.secondaryColor
             }
 
+            Juomari {
+                id: juoja
+                pohjat: prom2ml(sivu.promilleja)
+                width: parent.width
+                height: (sivu.height - y) > oletusKorkeus? sivu.height - y : oletusKorkeus
+                promilleRaja: promilleRaja1
+                onJuomaPoistettu: {
+                    paivita()
+                }
+                onMuutaJuomanTiedot: {
+                    var dialog = pageStack.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
+                                    "aika": new Date(juodunAika(iMuutettava)),
+                                    "nimi": juodunNimi(iMuutettava),
+                                    "maara": juodunTilavuus(iMuutettava),
+                                    "vahvuus": juodunVahvuus(iMuutettava),
+                                    "juomanKuvaus": juodunKuvaus(iMuutettava),
+                                    "tilavuusMitta": Tkanta.arvoTilavuusMitta,
+                                    "olutId": juodunOlutId(iMuutettava)
+                                 })
+
+                    dialog.rejected.connect(function() {
+                        return tarkistaUnTpd()
+                    } )
+
+                    dialog.accepted.connect(function() {
+                        var ms = dialog.aika.getTime();
+                        muutaJuoma(iMuutettava, ms, dialog.maara, dialog.vahvuus, dialog.nimi,
+                                   dialog.juomanKuvaus, dialog.olutId);
+                        paivita();
+                        paivitaAjatRajoille();
+                    })
+                }
+                onPromillejaChanged: {
+                    var nytMs = pvm.getTime()
+                    var prml = juoja.promilleja
+
+                    if (prml < 3.0){
+                        txtPromilleja.text = "" + prml.toFixed(2) + " ‰"
+                    } else {
+                        txtPromilleja.text = "> 3.0 ‰"
+                    }
+
+                    // huomion keräys, jos promilleRajat ylittyvät
+                    if ( prml < promilleRaja1 ) {
+                        //txtPromilleja.color = Theme.highlightDimmerColor
+                        txtPromilleja.font.pixelSize = Theme.fontSizeMedium
+                        txtPromilleja.font.bold = false
+                    } else {
+                        //txtPromilleja.color = Theme.highlightColor
+                        txtPromilleja.font.pixelSize = Theme.fontSizeLarge
+                        txtPromilleja.font.bold = true
+                    }
+
+                    if (nytMs > juoja.rajalla.getTime()) // msKunnossa.getTime() // verrataan hetkeä nytMs listan viimeisen juoman jälkeiseen hetkeen
+                        txtAjokunnossa.text = " -"
+
+                    if (nytMs > juoja.selvana.getTime()) // msSelvana.getTime()
+                        txtSelvana.text = " -"
+
+                }
+                onValittuJuomaChanged: {
+                    txtJuoma.text = juodunNimi(valittuJuoma) //valitunNimi //Apuja.juomanNimi(i)
+                    txtMaara.text = juodunTilavuus(valittuJuoma) //valitunTilavuus //lueJuomanMaara(qId)
+                    voltit.text = juodunVahvuus(valittuJuoma) //valitunVahvuus //lueJuomanVahvuus(qId)
+                }
+
+            }
+
+            /*
             SilicaListView {
                 id: juomaLista
                 height: sivu.height - y
@@ -836,7 +576,7 @@ Page {
                 VerticalScrollDecorator {}
 
             }
-
+            // */
 
         }
 

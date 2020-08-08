@@ -35,7 +35,6 @@ ApplicationWindow
 {
     id: app
     property string versioNro: ""
-    property int args: Qt.application.arguments.length
 
     Paaikkuna {
         id: paaikkuna
@@ -49,6 +48,7 @@ ApplicationWindow
     cover: kansi
 
     Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta        
+        var args = Qt.application.arguments.length
         UnTpd.programName = Qt.application.arguments[0]
         versioNro = Qt.application.arguments[args-7]
         UnTpd.unTpdId = Qt.application.arguments[args-6]
@@ -57,6 +57,6 @@ ApplicationWindow
         FourSqr.appId = Qt.application.arguments[args-3]
         FourSqr.appSecret = Qt.application.arguments[args-2]
         FourSqr.fsqrVersion = Qt.application.arguments[args-1]
-
+        console.log("==> " + args + ", " + UnTpd.callbackURL + ", " + versioNro)
     }
 }

@@ -15,20 +15,21 @@ Page {
 
         Column {
             id: sarake
+            width: parent.width
 
             PageHeader {
                 title: "Juoppoko " + versioNro
             }
 
-            TextArea {
-                readOnly: true
-                color: Theme.highlightColor
+            LinkedLabel {
+                //color: Theme.highlightColor
                 //anchors.fill: parent
                 width: sivu.width
                 wrapMode: TextEdit.WordWrap
+                x: Theme.horizontalPageMargin
 
-                text: qsTr("The default limits are from \n %1 according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. ").arg(paihdelinkki) +
-                      qsTr("Here the values are expected to depend only on the amount of water in body, not on sex.") +
+                text: qsTr("The default limits are based on \n %1 \n - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. ").arg(paihdelinkki) +
+                      qsTr("Here the limits depend only on the weight and the relative amount of water in body, not on sex.") +
                       "\n \n" +
                       qsTr("Alcohol burning rate is also from the same site.") + "\n \n" +
                       qsTr("High blood alcohol content may cause coma or be deadly. To discourage competing, shown alcohol content is limited to 3.0 ‰.") + "\n \n" +

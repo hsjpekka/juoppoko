@@ -1,23 +1,10 @@
 .pragma library
 
-var callbackURL = ""
-var newBadges
-var newBadgesSet = false
-var notificationsRespond // JSON-objekti
-var oluetSuosionMukaan = true
-var oluenNimi = ""
-var oluenEtiketti = ""
-var oluenPanimo = ""
-var oluenTyyppi = ""
-var oluenVahvuus = 0.0
-var oluenHappamuus = 0
-var oluenId = 0
-var postFoursquare = false
-var postFacebook = false
-var postTwitter = false
-var programName = ""
-var queryLimit = 25
-var shout = ""
+var callbackURL = "", GET=1, newBadges, newBadgesSet = false, notificationsRespond // JSON-objekti
+var oluetSuosionMukaan = true, oluenNimi = "", oluenEtiketti = "", oluenPanimo = ""
+var oluenTyyppi = "", oluenVahvuus = 0.0, oluenHappamuus = 0, oluenId = 0
+var POST=0, postFoursquare = false, postFacebook = false, postTwitter = false
+var programName = "", queryLimit = 25, shout = ""
 var unTpdId = "" // ohjelman clientId
 var unTpOsoite = "https://api.untappd.com/v4" // url
 var unTpdSecret = "" // ohjelman salasana
@@ -137,7 +124,7 @@ function checkInData(beerId, tzone, venueId, position, lat, lng, shout, rating, 
 
     query += "bid=" + beerId + gmtOffset + timezone;
 
-    if (venueId != ""){
+    if (venueId != undefined && venueId != ""){
         query += "&geolat=" + lat;
         query += "&geolng=" + lng;
         query += "&foursquare_id=" + venueId;
@@ -175,12 +162,11 @@ function getBadges(targetName, offset, limit) { //(address1, appReg, auth, targe
     else
         query +=  userAut();
 
-    if (offset > 0) {
-        query += "&offset=" + offset
-    };
-    if (limit > 0) {
-        query += "&limit=" + limit
-    };
+    if (offset !== undefined && offset > 0)
+        query += "&offset=" + offset;
+
+    if (limit !== undefined && limit > 0)
+        query += "&limit=" + limit;
 
     return encodeURI(query);
 }
@@ -342,10 +328,10 @@ function getNotifications(offset, limit) { //(address1, auth, offset, limit)
 
     var query = unTpOsoite + endpoint + "?" + userAut();
 
-    if (offset > 0)
+    if (offset !== undefined && offset > 0)
         query += "&offset=" + offset;
 
-    if (limit > 0)
+    if (limit !== undefined && limit > 0)
         query += "&limit=" + limit;
 
     return encodeURI(query);
@@ -663,3 +649,107 @@ function toast(checkInId) { //(address1, auth, targetId)
 
     return encodeURI(query);
 }
+
+function xHttpUnTpd(getVaiPost, kysely, postOsoite, viestit, kunValmista, josVirhe) {
+    // getVaiPost - 1 = GET, 0 = Post; kunValmista(vastaus), josVirhe(vastaus)
+    var xhttp = new XMLHttpRequest()
+    var async = false, sync = true
+
+    xhttp.onreadystatechange = function () {
+        var vastaus = ""
+        //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
+        if (xhttp.readyState === 0)
+            viestit = qsTr("request not initialized") + ", " + xhttp.statusText
+        else if (xhttp.readyState === 1)
+            viestit = qsTr("server connection established") + ", " + xhttp.statusText
+        else if (xhttp.readyState === 2)
+            viestit = qsTr("request received") + ", " + xhttp.statusText
+        else if (xhttp.readyState === 3)
+            viestit = qsTr("processing request") + ", " + xhttp.statusText
+        else if (xhttp.readyState === 4){
+            //console.log(xhttp.responseText)
+            viestit = qsTr("request finished") + ", " + xhttp.statusText
+
+            if (xhttp.status === 200 ) {
+                vastaus = JSON.parse(xhttp.responseText);
+                kunValmista(vastaus)
+            } else {
+                console.log(xhttp.responseText)
+                try {
+                    vastaus = JSON.parse(xhttp.responseText);
+                    if ("developer_friendly" in vastaus.meta) {
+                        viestit = vastaus.meta.developer_friendly
+                    } else {
+                        viestit = "error: " + vastaus.meta.code + " - " + vastaus.meta.error_detail
+                    }
+                } catch (err) {
+                    viestit = "error: " + xhttp.responseText
+                    vastaus = xhttp.responseText
+                }
+
+                if ( typeof josVirhe === typeof function (){} )
+                    josVirhe(vastaus)
+            }
+        } else {
+            viestit = "error: " + xhttp.readyState + ", " + xhttp.statusText
+            console.log(viestit)
+            if ( typeof josVirhe === typeof function (){} )
+                josVirhe(vastaus)
+        }
+
+    }
+
+    if (getVaiPost > 0.5) {
+        viestit = qsTr("posting GET-query");
+        xhttp.open("GET", kysely, async);
+        xhttp.send();
+    } else {
+        viestit = qsTr("posting POST-query");
+        xhttp.open("POST", postOsoite, sync);
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhttp.send(kysely);
+    }
+
+    return;
+}
+
+/*
+// viestit - string, jota päivitetään, kunValmista(vastaus), josVirhe()
+function qqunTpdPost(osoite, kysely, viestit, kunValmista, josVirhe) {
+    var xhttp = new XMLHttpRequest()
+    var async = false, sync = true
+
+    xhttp.onreadystatechange = function () {
+        var vastaus = ""
+        //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
+        if (xhttp.readyState == 0)
+            viestit = qsTr("request not initialized") + ", " + xhttp.statusText
+        else if (xhttp.readyState == 1)
+            viestit = qsTr("server connection established") + ", " + xhttp.statusText
+        else if (xhttp.readyState == 2)
+            viestit = qsTr("request received") + ", " + xhttp.statusText
+        else if (xhttp.readyState == 3)
+            viestit = qsTr("processing request") + ", " + xhttp.statusText
+        else if (xhttp.readyState == 4){
+            //console.log(xhttp.responseText)
+            viestit = qsTr("request finished") + ", " + xhttp.statusText
+
+            vastaus = JSON.parse(xhttp.responseText);
+
+            kunValmista(vastaus)
+
+        } else {
+            console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
+            viestit = xhttp.readyState + ", " + xhttp.statusText
+            josVirhe()
+        }
+
+    }
+
+    viestit = qsTr("posting POST-query");
+    xhttp.open("POST", osoite, sync);
+    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhttp.send(kysely);
+
+    return;
+} // */

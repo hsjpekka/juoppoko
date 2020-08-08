@@ -30,6 +30,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import org.freedesktop.contextkit 1.0
 import "../scripts/unTap.js" as UnTpd
+import "../scripts/tietokanta.js" as Tkanta
 
 Dialog {
     id: sivu    
@@ -38,7 +39,7 @@ Dialog {
     property bool alkutoimet: true
     property int i1: 0
     property string juomanKuvaus
-    property real maara
+    property real maara: tilavuus
     property int maaraDesimaaleja: 0
     property real maaraMuutos : 1
     property real mlLisays
@@ -53,6 +54,7 @@ Dialog {
     property int tahtia: 0
     property int tauko0 : 0.8*1000 // ms
     property int tauko: tauko0
+    property int tilavuus
     property int tilavuusMitta//: 1 // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
     property real vahvuus
     property real yksikko: 1.0
@@ -157,6 +159,8 @@ Dialog {
         maara = maara + mlLisays
         if (maara < 0)
             maara = 0
+
+        tilavuus = maara*yksikko
 
         //maaranNaytto.value = maara.toFixed(1) + yksikkoTunnus
         maaranNaytto.text = maara.toFixed(maaraDesimaaleja) // + yksikkoTunnus
@@ -532,7 +536,7 @@ Dialog {
 
                         //yksikkoTxt.text = yksikko + " mL"
                         //maaranNaytto.value = maara.toFixed(maaraDesimaaleja) + yksikkoTunnus
-                        maaranNaytto.text = maara.toFixed(maaraDesimaaleja) // + yksikkoTunnus
+                        maaranNaytto.text = maara.toFixed(maaraDesimaaleja); // + yksikkoTunnus
 
                         //prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%"
                     }
@@ -749,17 +753,20 @@ Dialog {
 
     onDone: {
         if (result == DialogResult.Accepted) {
-            nimi = juoma.text
-            juomanKuvaus = kuvaus.text
+            nimi = juoma.text;
+            juomanKuvaus = kuvaus.text;
             if (nimi0 != nimi){ // nimi0 = joko juodut-tietokantaan talletettu tai untappedista haettu
-                console.log("nimi muuttunut")
-                olutId = 0
-                UnTpd.setBeer(olutId)
+                console.log("nimi muuttunut");
+                olutId = 0;
+                UnTpd.setBeer(olutId);
             }
 
             if (olutId > 0)
-                UnTpd.shout = kuvaus.text
-            maara = maara*yksikko
+                UnTpd.shout = kuvaus.text;
+            tilavuus = maara*yksikko;
+
+            Tkanta.arvoTilavuusMitta = tilavuusMitta;
+            Tkanta.paivitaAsetus(Tkanta.tunnusTilavuusMitta,Tkanta.arvoTilavuusMitta);
         }
     }
 

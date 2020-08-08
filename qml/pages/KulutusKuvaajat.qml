@@ -20,6 +20,15 @@ Item {
     property int    vrkVaihtuu: 0 // minuutteina, arvo vähennetään juoman ajasta - lasketaanko 01:12 juotu juoma edelliselle päivälle?
 
     signal pylvasValittu(int pylvasNro, real valitunArvo, string valitusNimike)
+    signal pitkaPainanta(int pylvasNro, real valitunArvo, string valitusNimike)
+
+    onTyyppiChanged: {
+        console.log("uusi tyyppi " + tyyppi)
+    }
+    onVrkVaihtuuChanged: {
+        // vuorokauden vaihtumisaika ei vaikuta jo piirrettyihin pylväisiin
+        console.log("vrk vaihtuu " + (vrkVaihtuu - vrkVaihtuu%60)/60 + ":" + vrkVaihtuu%60 )
+    }
 
     function etsiPaiva(vuosi, viikko, paiva) {
         var i = pvKulutus.count-1, nro = -1
@@ -33,8 +42,8 @@ Item {
             i--
         }
 
-        if (nro === -1)
-            console.log("ei tietoja päivältä " + vuosi + " - vko " + viikko + " - " + paiva)
+        //if (nro === -1)
+        //    console.log("ei tietoja päivältä " + vuosi + " - vko " + viikko + " - " + paiva)
 
         return nro
     }
@@ -52,8 +61,8 @@ Item {
             i--
         }
 
-        if (nro === -1)
-            console.log("ei tietoja viikolta " + vuosi + "-" + viikko)
+        //if (nro === -1)
+        //    console.log("ei tietoja viikolta " + vuosi + "-" + viikko)
 
         return nro
     }
@@ -84,7 +93,7 @@ Item {
         msJuoma = aikaMs - vrkVaihtuu*60*1000
 
         ajat = maaritaAjat(msJuoma)
-        vuosi = ajat[0] // vuosi = nyt.getFullYear() tai +/- 1
+        vuosi = ajat[0] // vuosi = nyt.getFullYear() tai +/- 1 viikolla 1/53
         viikko = ajat[1] // viikonNumero(msJuoma)
         paiva = ajat[2] // date.getDay() = 0 (su) - 6 (la) => 1 (ma) - 7 (su)
 
@@ -105,28 +114,31 @@ Item {
         return
     }
 
-    function lisaaTyhjiaPaivia(i, vuosi, viikko, paiva) {
+    function lisaaTyhjiaPaivia(vuosi, viikko, paiva) {
         // vuosi, viikko ja päivä ovat uuden juoman ajankohta
         // lisätään peräkkäisten kirjausten väliin jäävät päivät kuvaajiin
         var iPv, iVko, iVs, nVko
         if (pvKulutus.count === 0) // ensimmäinen juoma
             return
 
-        iPv = pvKulutus.get(pvKulutus.count-1).paiva
+        iPv = pvKulutus.get(pvKulutus.count-1).paiva + 1
         iVko = pvKulutus.get(pvKulutus.count-1).vkoNro
         iVs = pvKulutus.get(pvKulutus.count-1).vuosi
+
+        //console.log("iPv " + iPv + "-" + paiva + ", iVko " + iVko + "-" + viikko + ", iVs " + iVs + "-" + vuosi)
 
         while (iVs < vuosi) {
             nVko = viikonNumero(new Date(iVs,11,31,22,54,53,990).getTime())
             if (nVko === 1) // jos vuoden viimeinen viikko jää kovin vajaaksi
                 nVko = 52
             while (iVko <= nVko) {
+                if (iPv === 1)
+                    lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen)//talletaViikonArvo(iVs, iVko, 0)
                 while (iPv <= 7) {
                     lisaaPvArvo(iVs, iVko, iPv, 0, riskiAlhainen)//talletaPaivanArvo(iVs, iVko, iPv, 0)
                     iPv++
                 }
                 iPv=1
-                lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen)//talletaViikonArvo(iVs, iVko, 0)
                 iVko++
             }
             iPv = 1
@@ -135,12 +147,13 @@ Item {
         }
 
         while (iVko < viikko) {
+            if (iPv === 1)
+                lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen)
             while (iPv <= 7) {
                 lisaaPvArvo(iVs, iVko, iPv, 0, riskiAlhainen)
                 iPv++
             }
             iPv=1
-            lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen)
             iVko++
         }
 
@@ -153,13 +166,13 @@ Item {
     }
 
     function lisaaPvArvo(vuosi, viikko, paiva, maara, vari) {
-        console.log(" -- " + paiva + " - " + maara + " -- " + vari)
+        //console.log(" -- " + paiva + " - " + maara + " -- " + vari)
         return pvKulutus.append({ "vuosi": vuosi, "vkoNro": viikko, "paiva": paiva, "barValue": maara,
                                     "barLabel": paiva, "barColor": vari, "sect": vuosi + "-" + viikko })
     }
 
     function lisaaVkoArvo(vuosi, viikko, maara, vari) {
-        console.log(" -- " + viikko + " - " + maara + " -- " + vari)
+        //console.log(" -- " + viikko + " - " + maara + " -- " + vari)
         return vkoKulutus.append({ "vuosi": vuosi, "vkoNro": viikko, "barValue": maara,
                               "barLabel": viikko, "barColor": vari, "sect": vuosi })
     }
@@ -178,7 +191,7 @@ Item {
                 vuosi = vuosi0 - 1
         }
 
-        console.log(" " + vuosi + ", " + vk + ", " + pv)
+        //console.log(" " + vuosi + ", " + vk + ", " + pv)
 
         ajat[0] = vuosi
         ajat[1] = vk
@@ -195,20 +208,22 @@ Item {
     }
 
     function muutaPvArvo(i, arvo, vari) {
-        console.log(" -- " + i + " - " + arvo + " -- " + vari)
+        //console.log(" -- " + i + " - " + arvo + " -- " + vari)
         return pvKulutus.set(i, {"barValue": arvo, "barColor": vari})
     }
 
     function muutaVkoArvo(i, arvo, vari) {
-        console.log(" -- " + i + " - " + arvo + " -- " + vari)
+        //console.log(" -- " + i + " - " + arvo + " -- " + vari)
         return vkoKulutus.set(i, {"barValue": arvo, "barColor": vari})
     }
 
     function talletaPaivanArvo(vuosi, viikko, paiva, maara) {
         var i = etsiPaiva(vuosi, viikko, paiva), vari
+        if (maara < 0)
+            maara = 0
         vari = variPaivalle(maara)
 
-        console.log("talleta " + i + ", " + maara + ", " + vari)
+        //console.log("talleta " + i + ", " + maara + ", " + vari)
 
         if (pvKulutus.count === 0 || i < 0) {
             lisaaPvArvo(vuosi, viikko, paiva, maara, vari)
@@ -221,9 +236,11 @@ Item {
 
     function talletaViikonArvo(vuosi, viikko, maara) {
         var i = etsiViikko(vuosi, viikko), vari
+        if (maara < 0)
+            maara = 0
         vari = variViikolle(maara)
 
-        console.log("talleta viikko " + i + ", " + maara + ", " + vari)
+        //console.log("talleta viikko " + i + ", " + maara + ", " + vari)
 
         if (vkoKulutus.count === 0 || i < 0) {
             lisaaVkoArvo(vuosi, viikko, maara, vari)
@@ -347,6 +364,9 @@ Item {
         onBarSelected: { //(int barNr, real barValue, string barLabel)
             pylvasValittu(barNr, barValue, barLabel)
             console.log("pylvään " + barNr + " korkeus " + barValue + " skaala " + scale)
+        }
+        onBarPressAndHold: {
+            pitkaPainanta(barNr, barValue, barLabel)
         }
     }
 

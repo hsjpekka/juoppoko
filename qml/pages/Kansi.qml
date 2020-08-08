@@ -68,6 +68,7 @@ CoverBackground {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: Theme.fontSizeLarge
+        color: Theme.highlightColor
         //text: naytaPromillet() //paaikkuna.calculatePermille(new Date().getTime()).toFixed(2) + " ‰"
         //font.pixelSize: Theme.fontSizeMedium
     }
@@ -77,6 +78,7 @@ CoverBackground {
         anchors.top: promilleja.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: Theme.fontSizeLarge
+        color: Theme.highlightColor
     }
 
     TextField {
@@ -86,9 +88,11 @@ CoverBackground {
         anchors.topMargin: Theme.fontSizeLarge
         horizontalAlignment: TextInput.AlignHCenter
         text: paaikkuna.nykyinenJuoma
-        label: paaikkuna.nykyinenMaara + " ml"
+        label: maara + " ml"
         width: parent.width*0.8
         readOnly: true
+        property string maara: paaikkuna.nykyinenMaara
+        property string pros: paaikkuna.nykyinenProsentti
     }
 
     Timer {
@@ -108,7 +112,9 @@ CoverBackground {
         CoverAction {
             iconSource: "image://theme/icon-cover-new"
             onTriggered: {
-                paaikkuna.uusiJuoma(new Date().getTime(), new Date().getTime(), paaikkuna.nykyinenMaara(), paaikkuna.nykyinenProsentti(), juoma.text, "", paaikkuna.olutId)
+                var nyt = new Date().getTime()
+                paaikkuna.uusiJuoma(nyt, nyt, parseInt(juoma.maara), parseFloat(juoma.pros),
+                                    juoma.text, "", paaikkuna.olutId)
                 paaikkuna.paivitaAjatRajoille()
                 paivita()
             }
