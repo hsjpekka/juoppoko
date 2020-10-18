@@ -13,14 +13,15 @@ Name:       harbour-juoppoko
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    BAC calculator and alcohol logbook
-Version:    2.3
-Release:    1
+Version:    3.0
+Release:    2
 Group:      Qt/Qt
 License:    LICENSE
 URL:        http://example.org/
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-juoppoko.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
+Requires:   contextkit-declarative-qt5
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)

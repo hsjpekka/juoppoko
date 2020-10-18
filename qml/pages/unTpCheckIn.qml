@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQml 2.2
 import Sailfish.Silica 1.0
 import QtPositioning 5.2
+import "../components"
 import "../scripts/unTap.js" as UnTpd
 import "../scripts/foursqr.js" as FourSqr
 
@@ -10,28 +11,29 @@ Dialog {
     anchors.leftMargin: Theme.paddingLarge
     anchors.rightMargin: Theme.paddingLarge
 
-    property string baarinTunnus: ""
-    property int valittuBaari: 0
-    property int hakunro: 0
-    property int hakusade: 50
     property string baari: ""
-    property bool haettu: false
-    property int ikoninKoko: 88 // 32, 44, 64 ja 88 saatavilla
+    property string baarinTunnus: ""
+    property bool   haettu: false
+    property int    hakunro: 0
+    property int    hakusade: 500
+    property int    ikoninKoko: 88 // 32, 44, 64 ja 88 saatavilla
+    //property int    valittuBaariNr: 0
 
-    property bool naytaSijainti: true
-    property alias ppiiri: pituuspiiri.text
-    property alias lpiiri: leveyspiiri.text
-    property bool sijaintiTuore: false
     property string aikaaSitten: ""
+    property alias  lpiiri: leveyspiiri.text
+    property bool   naytaSijainti: true
+    property alias  ppiiri: pituuspiiri.text
+    property bool   sijaintiTuore: false
 
-    property bool face: false
-    property bool foursq: false
-    property bool tweet: false
+    property bool   face: false
+    property bool   foursq: false
+    property bool   tweet: false
 
-    property bool asetuksetNakyvat: false
-    property bool julkaisutNakyvat: false
+    property bool   asetuksetNakyvat: false
+    property bool   julkaisutNakyvat: false
 
-    function haeBaareja(haku) {
+    /*
+    function qqhaeBaareja(haku) {
         var xhttp = new XMLHttpRequest();
         var kysely = ""
         var pp, lp, maara=25, luokat = "", tark = ""
@@ -94,6 +96,7 @@ Dialog {
 
         return
     }
+    // */
 
     function haunAloitus(hakuteksti) {
         tyhjennaLista()
@@ -101,7 +104,7 @@ Dialog {
         haettu = true
         kuvaBaari.source = ""
 
-        return haeBaareja(hakuteksti)
+        return fsYhteys.haeBaareja(hakuteksti)
     }
 
     function kopioiBaari(nro) {
@@ -162,7 +165,6 @@ Dialog {
                                          "baarinPituusPiiri": pitpii,
                                          "baarinLeveysPiiri": levpii
                                      });
-
     }
 
     function onkoTietoa(tietue, kentta){
@@ -179,6 +181,26 @@ Dialog {
         return onko
     }
 
+    function naytaKapakanTiedot(jsonVastaus) {
+        var kapakkaId, mj="", i=0
+        try {
+            pubiId = jsonVastaus.response.venue.items[0].venue_id
+            if (jsonVastaus.response.venue.count > 1) {
+                while (i<jsonVastaus.response.venue.count) {
+                    mj += jsonVastaus.response.venue.items[i].venue_name + ", "
+                    i++
+                }
+                console.log("löydettyjä " + i + ": " + mj)
+            }
+            pageContainer.push(Qt.resolvedUrl("../pages/unTpTarjoaja.qml"),
+                               {"tunniste": kapakkaId })
+        } catch (err) {
+            console.log("error: " + err)
+        }
+
+        return
+    }
+
     function paivitaHaetut(vastaus) { // vastaus = JSON(fourSqr-vastaus)
         var haetut = vastaus.response.venues
         var i=0, n=haetut.length, j, m
@@ -187,11 +209,11 @@ Dialog {
 
         while (i<n) {
             tyyppi = ""
-            if (onkoTietoa(haetut[i],"categories")) {
+            if ("categories" in haetut[i]) {
                 var luokat = haetut[i].categories
                 tyyppi = luokat[0].name
-                if (onkoTietoa(luokat[0],"icon"))
-                    if (onkoTietoa(luokat[0].icon,"prefix"))
+                if ("icon" in luokat[0])
+                    if ("prefix" in luokat[0].icon)
                         kuvake = luokat[0].icon.prefix + ikoninKoko + luokat[0].icon.suffix
                 j = 1
                 m = luokat.length
@@ -199,8 +221,8 @@ Dialog {
                     if (luokat[j].primary == true) {
                         tyyppi = luokat[j].name
                         j = m
-                        if (onkoTietoa(luokat[i],"icon"))
-                            if (onkoTietoa(luokat[i].icon,"prefix"))
+                        if ("icon" in luokat[i])
+                            if ("prefix" in luokat[i].icon)
                                 kuvake = luokat[j].icon.prefix + ikoninKoko + luokat[j].icon.suffix
                     }
                     j++
@@ -208,7 +230,7 @@ Dialog {
             }
 
             nimi = ""
-            if (onkoTietoa(haetut[i],"name"))
+            if ("name" in haetut[i])
                 nimi = haetut[i].name
 
             osoite = ""
@@ -255,11 +277,12 @@ Dialog {
     }
 
     function tyhjennaLista() {
-        var i=0, n=loydetytBaarit.count//baariLista.count
-        while (i<n) {
-            loydetytBaarit.remove(0)
-            i++
-        }
+        //var i=0, n=loydetytBaarit.count//baariLista.count
+        //while (i<n) {
+        //    loydetytBaarit.remove(0)
+        //    i++
+        //}
+        loydetytBaarit.clear();
 
         return
     }
@@ -299,9 +322,15 @@ Dialog {
             width: sivu.width
             //highlightedColor: Theme.highlightColor
             onClicked: {
-                valittuBaari = baariLista.indexAt(mouseX,y+mouseY)
-                kopioiBaari(valittuBaari)
+                var kuppilaNr = baariLista.indexAt(mouseX,y+mouseY)
+                //valittuBaariNr = baariLista.indexAt(mouseX,y+mouseY)
+                kopioiBaari(kuppilaNr)
             }
+
+            //property string baarinId: baariId
+            //property string katuosoite: osoite
+            //property string pipi: baarinPituusPiiri
+            //property string lepi: baarinLeveysPiiri
 
             Row {
                 x: Theme.paddingLarge
@@ -313,8 +342,8 @@ Dialog {
                     border.width: 1
                     radius: 5
                     color: "transparent"
-                    border.color: (baarinId.text == baarinTunnus) ? Theme.highlightColor : "transparent"
-
+                    border.color: (baarinTiedot.baarinId == baarinTunnus) ? Theme.highlightColor :
+                                                                            "transparent"
                     Image {
                         id: baarinIkoni
                         source: kuvake
@@ -325,12 +354,6 @@ Dialog {
 
                 }
 
-                Label {
-                    id: baarinId
-                    text: baariId
-                    visible: false
-                }
-
                 TextField {
                     id: baarinNimi
                     text: nimi
@@ -339,12 +362,21 @@ Dialog {
                     width: sivu.width - baarinIkoni.width - 2*Theme.paddingLarge
                     //width: 0.5*sivu.width - x
                     //color: baarinTiedot.highlighted ? Theme.highlightColor : Theme.primaryColor
-                    color: (baarinId.text == baarinTunnus) ? Theme.highlightColor : Theme.primaryColor
+                    color: (baarinTiedot.baarinId == baarinTunnus) ? Theme.highlightColor :
+                                                                     Theme.primaryColor
                     onClicked: {
-                        valittuBaari = baariLista.indexAt(mouseX,baarinTiedot.y+0.5*height)
-                        kopioiBaari(valittuBaari)
+                        var kuppilaNr = baariLista.indexAt(mouseX,baarinTiedot.y+0.5*height)
+                        //valittuBaariNr = baariLista.indexAt(mouseX,baarinTiedot.y+0.5*height)
+                        kopioiBaari(kuppilaNr)
                     }
                     //z: -1
+                }
+
+                /*
+                Label {
+                    id: baarinId
+                    text: baariId
+                    visible: false
                 }
 
                 Text {
@@ -362,6 +394,7 @@ Dialog {
                     text: baarinLeveysPiiri
                     visible: false
                 }
+                // */
 
             } // row
         }
@@ -376,6 +409,61 @@ Dialog {
         width: sivu.width
 
         VerticalScrollDecorator {}
+
+        XhttpYhteys {
+            id: fsYhteys
+            anchors.top: parent.top
+            z: 1
+            onValmis: {
+                var jsonVastaus
+                try {
+                    jsonVastaus = JSON.parse(httpVastaus)
+                    if (toiminto === "baareja")
+                        paivitaHaetut(jsonVastaus)
+                    else if (toiminto === "untpdInfo")
+                        naytaKapakanTiedot(jsonVastaus)
+                } catch (err) {
+                    console.log("error: " + err)
+                }
+            }
+
+            property int hakuNro: 0
+
+            function haeBaareja(haku) {
+                var pp, lp, maara=25, luokat = "", tark = ""
+                var kysely = ""
+
+                if (paikkatieto.position.longitudeValid)
+                    pp = paikkatieto.position.coordinate.longitude
+                else
+                    pp = FourSqr.lastLong;
+
+                if (paikkatieto.position.latitudeValid)
+                    lp = paikkatieto.position.coordinate.latitude
+                else
+                    lp = FourSqr.lastLat;
+
+                // 4d4b7105d754a06374d81259 - food
+                // 4d4b7105d754a06376d81259 - nightlife spot
+                if (tyyppiRajaus.checked)
+                    luokat = "4d4b7105d754a06374d81259,4d4b7105d754a06376d81259"
+                else
+                    luokat = "";
+
+                kysely = FourSqr.searchVenue(tark, true, lp, pp, hakusade, maara,
+                                                      luokat, haku);
+                xHttpGet(kysely, "baareja");
+
+                return
+            }
+
+            function haeUnTpdId(frSqrId) {
+                var kysely = UnTpd.lookupFoursquare(frSqrId)
+                xHttpGet(kysely, "untpdInfo")
+                return
+            }
+
+        }
 
         Column {
             id: column
@@ -553,9 +641,19 @@ Dialog {
                 }
             }
 
-            Row {
-                id: valittuRivi
+            ListItem {
+                id: valittuKuppila
+                width: parent.width - x
+                contentHeight: kuvaBaari.height > txtBaari.height ? kuvaBaari.height : txtBaari.height
                 x: Theme.paddingMedium
+                menu: ContextMenu {
+                    visible: valittuKuppila.kuppilaId > 0
+                    MenuItem {
+                        text: qsTr("venue info")
+                    }
+                }
+
+                property int kuppilaId: -1
 
                 Image {
                     id: kuvaBaari
@@ -563,13 +661,15 @@ Dialog {
 
                 TextField {
                     id: txtBaari
-                    width: sivu.width - kuvaBaari.width - valittuRivi.x - valittuRivi.spacing
+                    width: parent.width - kuvaBaari.width
                     color: asemanTalletus.checked ? Theme.highlightColor : Theme.highlightDimmerColor
                     readOnly: true
+                    label: qsTr("check-in location")
                     //x: Theme.paddingLarge
                 }
             }
 
+            /*
             Row {
                 id: hakurivi
                 spacing: Theme.paddingSmall
@@ -586,14 +686,13 @@ Dialog {
 
                 TextField {
                     id: haettava
-                    placeholderText: qsTr("search text")
+                    placeholderText: qsTr("place")
                     //label: qsTr("search text")
                     //text:
                     width: sivu.width - 2*hakurivi.x - tyhjennaHaku.width
                            - hae.width - 2*hakurivi.spacing
                 }
 
-                // /*
                 IconButton {
                     id: hae
                     icon.source: "image://theme/icon-m-search"
@@ -602,29 +701,40 @@ Dialog {
                     onClicked: {
                         haunAloitus(haettava.text)
                     }
-                }// */
-            } // hakurivi
+                }
+            } // hakurivi */
 
-            BusyIndicator {
-                id: hetkinen
-                size: BusyIndicatorSize.Medium
-                x: 0.5*(sivu.width - width)
-                running: false
-                visible: running
-            }
+            SearchField {
+                id: haettava
+                canHide: false
+                width: parent.width
+                placeholderText: qsTr("place")
+                EnterKey.iconSource: "image://theme/icon-m-search"
+                EnterKey.onClicked: {
+                    focus = false
+                    minTauko.stop();
+                    haunAloitus(text);
+                }
+                onTextChanged: {
+                    if (text.length > 2)
+                        minTauko.restart()
+                }
 
-            Label {
-                id: fourSqrViestit
-                x: 0.5*(sivu.width - width)
-                text: qsTr("starting search")
-                color: Theme.secondaryHighlightColor
-                visible: hetkinen.running
+                Timer {
+                    id: minTauko
+                    interval: 1000
+                    running: false
+                    repeat: false
+                    onTriggered: haunAloitus(haettava.text)
+                }
             }
 
             SilicaListView {
                 id: baariLista
-                height: sivu.height - piilotusRivi.y - piilotusRivi.height
-                        - txtBaari.height - hakurivi.height - 3*column.spacing
+                property int minKorkeus: 4*Theme.fontSizeMedium
+                property int vapaana: sivu.height - piilotusRivi.y - piilotusRivi.height
+                                      - txtBaari.height - haettava.height - 3*column.spacing
+                height: vapaana > minKorkeus ? vapaana : minKorkeus
                 width: sivu.width
                 clip: true
                 highlightFollowsCurrentItem: true
@@ -642,7 +752,7 @@ Dialog {
                     if (atYEnd) {
                         //console.log("siirtyminen loppui " + atYEnd)
                         hakunro = hakunro + 1
-                        haeBaareja(haettava.text)
+                        fsYhteys.haeBaareja(haettava.text)
                     }
 
                 }

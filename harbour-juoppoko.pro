@@ -23,19 +23,19 @@ OTHER_FILES += \
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 256x256
 
 DISTFILES += \
+    qml/components/BarChart.qml \
+    qml/components/Juomari.qml \
+    qml/components/KulutusKuvaajat.qml \
+    qml/components/XhttpYhteys.qml \
     qml/pages/asetukset.qml \
-    qml/pages/BarChart.qml \
     qml/pages/demolaskuri.qml \
     qml/pages/eiVerkkoa.qml \
     qml/pages/juomanMuokkaus.qml \
-    qml/pages/Juomari.qml \
     qml/pages/Kansi.qml \
-    qml/pages/KulutusKuvaajat.qml \
     qml/pages/Paaikkuna.qml \
     qml/pages/tietoja.qml \
     qml/pages/tilastot.qml \
     qml/pages/unTpAnsiomerkit.qml \
-    qml/pages/unTpBaarit.qml \
     qml/pages/unTpCheckIn.qml \
     qml/pages/unTpJuomispuheet.qml \
     qml/pages/unTpKaverit.qml \
@@ -44,6 +44,7 @@ DISTFILES += \
     qml/pages/unTpKirjautuminen.qml \
     qml/pages/unTpOluet.qml \
     qml/pages/unTpPub.qml \
+    qml/pages/unTpTarjoaja.qml \
     qml/pages/unTpTietojaOluesta.qml \
     qml/scripts/foursqr.js \
     qml/scripts/scripts.js \
@@ -63,7 +64,8 @@ DEFINES += \
      "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
      "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
      "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\""\
-     "JUOPPOKO_VERSION=\"\\\"2.3\\\"\""
+     "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
+     "JUOPPOKO_VERSIO=\"\\\"3.0.1\\\"\""
 
 QT += positioning
 

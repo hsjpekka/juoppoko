@@ -28,7 +28,6 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import org.freedesktop.contextkit 1.0
 import "../scripts/unTap.js" as UnTpd
 import "../scripts/tietokanta.js" as Tkanta
 
@@ -110,22 +109,6 @@ Dialog {
         return
     }
 
-    function avaaUnTappdHaku() {
-        var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
-            "olut": juoma.text, "vahvuus": vahvuus} )
-        dialog.accepted.connect( function() {
-            juoma.text = dialog.olut
-            nimi0 = dialog.olut
-            vahvuus = dialog.vahvuus
-            olutId = dialog.olutId
-            valitunEtiketti.source = UnTpd.oluenEtiketti
-            //tahtiaRivi.visible = ( > 0) ? true : false
-            //console.log("avaaUnTappd: olutId " + olutId)
-        })
-
-        return
-    }
-
     function laskeMuutos(mX, x0, Lx){ // mouseX, mouseArea.x, mouseArea.width
         var arvo = 0, dx1
         dx1 = mX-x0
@@ -182,11 +165,6 @@ Dialog {
         return
     }
 
-    ContextProperty {
-        id: networkOnline
-        key: 'Internet.NetworkState'
-    }
-
     Timer {
         id: mlAjastin
         interval: tauko
@@ -214,6 +192,25 @@ Dialog {
         //height: column.height
         contentHeight: column.height
 
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("search UnTappd")
+                onClicked: {
+                    var dialog = pageContainer.push(Qt.resolvedUrl("unTpOluet.qml"),{
+                        "olut": juoma.text, "vahvuus": vahvuus} )
+                    dialog.accepted.connect( function() {
+                        juoma.text = dialog.olut
+                        nimi0 = dialog.olut
+                        vahvuus = dialog.vahvuus
+                        olutId = dialog.olutId
+                        valitunEtiketti.source = UnTpd.oluenEtiketti
+                        //tahtiaRivi.visible = ( > 0) ? true : false
+                        //console.log("avaaUnTappd: olutId " + olutId)
+                    })
+                }
+            }
+        }
+
         VerticalScrollDecorator {}
 
         Column {
@@ -226,43 +223,31 @@ Dialog {
                 title: qsTr("Drink")
             } // */
 
+            /*
             Row { //etsi untappedistä
                 x: Theme.paddingLarge
                 spacing: Theme.paddingLarge
 
-                Image {
-                    id: valitunEtiketti
-                    source: "./tuoppi.png"
-                    width: Theme.fontSizeMedium*3
-                    height: width
-                }
 
                 Button {
                     id: avaaUnTappd
                     text: qsTr("search UnTappd")
                     onClicked: {
-                        if (networkOnline.value === 'connected') {
-                            /*var dialog = pageStack.push(Qt.resolvedUrl("unTpOluet.qml"),{
-                                "olut": juoma.text, "vahvuus": vahvuus} )
-                            dialog.accepted.connect( function() {
-                                juoma.text = dialog.olut
-                                nimi0 = dialog.olut
-                                vahvuus = dialog.vahvuus
-                                olutId = dialog.olutId
-                                valitunEtiketti.source = UnTpd.oluenEtiketti
-                                //tahtiaRivi.visible = ( > 0) ? true : false
-                                //console.log("avaaUnTappd: olutId " + olutId)
-                            })//*/
-                            avaaUnTappdHaku()
-                        } else {
-                            var dialog = pageStack.push(Qt.resolvedUrl("eiVerkkoa.qml") )
-                            dialog.accepted.connect( avaaUnTappdHaku )
-                        }
+                        var dialog = pageContainer.push(Qt.resolvedUrl("unTpOluet.qml"),{
+                            "olut": juoma.text, "vahvuus": vahvuus} )
+                        dialog.accepted.connect( function() {
+                            juoma.text = dialog.olut
+                            nimi0 = dialog.olut
+                            vahvuus = dialog.vahvuus
+                            olutId = dialog.olutId
+                            valitunEtiketti.source = UnTpd.oluenEtiketti
+                            //tahtiaRivi.visible = ( > 0) ? true : false
+                            //console.log("avaaUnTappd: olutId " + olutId)
+                        })
                     }
-
-                    }
-                //}
+                }
             }
+            // */
 
             Row {
                 TextField {
@@ -299,8 +284,16 @@ Dialog {
             Row { //arvostelu
                 id: tahtiaRivi
                 visible: (olutId > 0) ? true : false
-                x: Theme.paddingLarge
-                spacing: (sivu.width - 2*x - 5*arvostelu1.width - 4*arvostelu15.width)/8
+                height: visible? implicitHeight : 0
+                x: Theme.horizontalPageMargin
+                spacing: (parent.width - 2*x - valitunEtiketti.width - 5*arvostelu1.width - 4*arvostelu15.width)/9
+
+                Image {
+                    id: valitunEtiketti
+                    source: "./tuoppi.png"
+                    width: Theme.iconSizeMedium
+                    height: width
+                }
 
                 IconButton {
                     id: arvostelu1
@@ -419,7 +412,7 @@ Dialog {
                     id: kello
 
                     function openTimeDialog() {
-                        var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                        var dialog = pageContainer.push("Sailfish.Silica.TimePickerDialog", {
                                     hourMode: DateTime.TwentyFourHours,
                                     hour: aika.getHours(),
                                     minute: aika.getMinutes()
@@ -447,7 +440,7 @@ Dialog {
                     property date selectedDate
 
                     function openDateDialog() {
-                        var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
+                        var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
                                     date: aika
                                  })
 

@@ -1,5 +1,5 @@
 .pragma library
-
+/*
 var juotu = []  //tkid: id, ms: aika, mlVeri: veressa, nimi: juoma, maara: tilavuus,
                 //pros: prosenttia, teksti: kuvaus, juomaId: olutId
 
@@ -119,16 +119,6 @@ function etsiPaikka(hetki) {
             return 0
     }
 
-    /*
-    while (hetki >= edAika) {
-        ind0 = ind0 + 1
-        if (ind0 < juotu.length) {
-            edAika = juomanAika(ind0)
-        } else {
-            edAika = hetki + 1
-        }
-    } // */
-
     return ind0 + 1
 }
 
@@ -219,18 +209,6 @@ function lisaaValiin(id, aika, veressa, tilavuus, prosenttia, juoma, kuvaus, olu
         i++
     }
 
-    /*
-    j = juotu.length - 1
-    while (j > i ){
-        asetaJuomanArvot(j, juomanTkId(j-1), juomanAika(j-1), mlVeressa(j-1),
-                         juomanNimi(j-1), juomanTilavuus(j-1), juomanVahvuus(j-1),
-                         juomanKuvaus(j-1), juomanId(j-1))
-        j--
-    }
-
-    asetaJuomanArvot(j, id, aika, veressa, juoma, tilavuus, prosenttia, kuvaus, olutId)
-    // */
-
     return juotu.splice(i, 0 , {"tkid": id, "ms": aika, "mlVeri": veressa, "nimi": juoma,
                             "maara": tilavuus, "pros": prosenttia, "teksti": kuvaus,
                             "juomaId": olutId})
@@ -273,6 +251,7 @@ function poistaJuoma(juomaId) {
 
     return i
 }
+// */
 
 function vyohyke(aika) {
     var m0, m1

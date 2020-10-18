@@ -36,27 +36,30 @@
 
 int main(int argc, char *argv[])
 {
-    char *strings[argc+7]; // + s1-s7
-    char *s1 = JUOPPOKO_VERSION; //JUOPPOKO_VERSION;
+    char *strings[argc+8]; // + s1-s8
+    char *s1 = JUOPPOKO_VERSIO;
     char *s2 = UTPD_ID;
     char *s3 = UTPD_SECRET;
     char *s4 = CB_URL;
     char *s5 = FSQ_ID;
     char *s6 = FSQ_SECRET;
     char *s7 = FSQ_VERSION;
+    char *s8 = CC_KOHDE;
     int i=0;
 
     for (i=0; i<argc; i++){
         strings[i] = argv[i];
     }
 
-    strings[argc] = s1; // program version
+    strings[argc] = s8; // onko käännös pc:lle (i486) vai puhelimeen ("")
+    argc++;
+    strings[argc] = s1; // ohjelman versio
     argc++;
     strings[argc] = s2; // unTappd appId
     argc++;
     strings[argc] = s3; // unTappd salasana
     argc++;
-    strings[argc] = s4; // redirectUrl
+    strings[argc] = s4; // redirect url
     argc++;
     strings[argc] = s5; // 4square appId
     argc++;

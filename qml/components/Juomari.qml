@@ -7,13 +7,14 @@ Item {
     height: oletusKorkeus
 
     // muutettavat
+    property bool   alustus: false
     property string kelloMuoto: "HH:mm"
     property real   maksa: 1.0 // maksan toimintakyky (1.0 normaali)
+    property alias  nakyma: juomaLista
     property real   paino: 80 // juomarin paino, kg
     property real   pohjat: 0.0 // ml alkoholia ensimmäisen juoman hetkellä (demo)
     property real   promilleRaja: 0.0 //
     property real   vetta: 0.65 // juomarin vesipitoisuus (miehet 75%, naiset 65%)
-    property alias  nakyma: juomaLista
 
     // luettavat
     property real   alkoholia: 0 // ml alkoholia kehossa
@@ -50,17 +51,13 @@ Item {
         // ind0 = aloituskohta
         var ind0 = juomat.count -1
 
-        //console.log("etsiSeuraava 1 - " + hetki + ", juomia " + juomat.count)
+        if (!alustus) {
+            if (hetki === undefined)
+                ind0 = -1
 
-        //if (ind0 < 0) // tyhjä lista
-        //    return 0
-        if (hetki === undefined)
-            ind0 = -1
-
-        while (ind0 >= 0 && hetki < juodunAika(ind0)) {
-            ind0--
-            //if (ind0 < 0)
-                //return 0
+            while (ind0 >= 0 && hetki < juodunAika(ind0)) {
+                ind0--
+            }
         }
 
         return ind0 + 1
@@ -77,14 +74,21 @@ Item {
         // lasketaan paljonko veressä on alkoholia juomishetkellä
         veressa = mlKehossa(hetki)
 
+        if (juomanKuvaus === undefined)
+            juomanKuvaus = ""
+        if (oluenId === undefined)
+            oluenId = -1
+
         juomat.lisaa(tkId, hetki, veressa, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId)
 
-        selvana = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, 0) + hetki)
-        rajalla = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, promilleRaja) + hetki)
+        if (!alustus) {
+            selvana = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, 0) + hetki)
+            rajalla = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, promilleRaja) + hetki)
 
-        paivita(new Date().getTime())
+            paivita(new Date().getTime())
 
-        juomaLista.positionViewAtEnd()
+            juomaLista.positionViewAtEnd()
+        }
 
         return
     }
@@ -151,6 +155,21 @@ Item {
         return pros
     }
 
+    function juotuAikana(kesto, loppuHetki) {
+        var ml = 0, i = juomat.count, t0, ti, t1 = loppuHetki;
+        if (t1 === undefined)
+            t1 = new Date().getTime();
+        t0 = t1 - kesto;
+        while (juodunAika(i) > t1 && i >= 0)
+            i--;
+        while ( i >= 0 && juodunAika(i) >= t0 ) {
+            ml = ml + juodunTilavuus(i)*juodunVahvuus(i)/100
+            i--;
+        }
+
+        return ml
+    }
+
     function mlKehossa(ms) {
         // laskee, paljonko alkoholia on veressä hetkellä ms
         // xid on edellisen juoman kohta
@@ -209,6 +228,10 @@ Item {
 
     function promillejaHetkella(aika) { // g alkoholia/kg keho
         return mlKehossa(aika)*tiheys/(paino*vetta)
+    }
+
+    function prom2ml(pro) {
+        return pro*paino*vetta/tiheys
     }
 
     //sisäiseen käyttöön
@@ -467,6 +490,7 @@ Item {
     SilicaListView {
         id: juomaLista
         anchors.fill: parent
+        highlightFollowsCurrentItem: !alustus
         clip: true
 
         model: juomat

@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 import "../scripts/unTap.js" as UnTpd
 
 Dialog {
@@ -14,10 +15,9 @@ Dialog {
     property bool toiveissa: false
 
     property bool hakuMuuttuu: false
-    property int hakunro: 0
-    property bool hakuvirhe: false
-    property int oluitaPerHaku: 25
-    property int valittuOlut: 0
+    property int qqhakunro: 0
+    //property bool hakuvirhe: false
+    //property int valittuOlut: 0
 
     property bool jarjestysTapa: true
 
@@ -72,40 +72,25 @@ Dialog {
     }
     // */
 
-    function kunOluetHaettu(vastaus) {
+    /*
+    function qqkunOluetHaettu(vastaus) {
         hakuvirhe = false
         hetkinen.running = false
         paivitaHaetut(vastaus)
         return
     }
 
-    function josOluenHaussaVirhe(vastaus) {
+    function qqjosOluenHaussaVirhe(vastaus) {
         hakuvirhe = true
         hetkinen.running = false
         return
     }
-
-    function haeOluita(hakuteksti) {
-        var kysely = ""
-        var lajittelu = jarjestysTapa ? "checkin" : "name"
-
-        if (hakuteksti === "")
-            return
-
-        kysely = UnTpd.searchBeer(hakuteksti, hakunro*oluitaPerHaku, oluitaPerHaku, lajittelu)
-
-        hetkinen.running = true
-
-        UnTpd.xHttpUnTpd(UnTpd.GET, kysely, "", unTpdViestit.text, kunOluetHaettu,
-                         josOluenHaussaVirhe)
-
-        return
-    }
+    // */
 
     function haunAloitus(hakuteksti) {
         tyhjennaLista()
-        hakunro = 0
-        haeOluita(hakuteksti)
+        unTpKysely.hakunro = 0
+        unTpKysely.haeOluita(hakuteksti)
         return
     }
 
@@ -128,13 +113,7 @@ Dialog {
         return
     }
 
-    function lisaaListaan(olut, panimo, voltit, hapokkuus, tyyppi, tarra, unTpId, toive) {
-
-        return loydetytOluet.append({"oluenMerkki": olut, "panimo": panimo, "olutTyyppi": tyyppi,
-                             "etiketti": tarra, "unTpId": unTpId, "alkoholia": voltit,
-                             "hapot": hapokkuus, "toive": toive });        
-    }
-
+    /*
     function josLisattyToiveisiin(vastaus) {
         if (vastaus.response.result === "success") {
             if (vastaus.response.action === "add")
@@ -149,9 +128,10 @@ Dialog {
     function josLisaysEpaonnistui(vastaus) {
         sekunti.start()
         return
-    }
+    } // */
 
-    function lisaaToiveisiin(lisaysVaiPoisto) {
+    /*
+    function qqlisaaToiveisiin(lisaysVaiPoisto) {
         var kysely = ""
         hetkinen.running = true
 
@@ -172,10 +152,11 @@ Dialog {
         return
 
     }
+    // */
 
     function naytaJuoma(olutQ, idQ, panimoQ, tyyppiQ, vahvuusQ, hapotQ, etikettiQ) {
-        valittuOlutMerkki.text = olutQ
-        valittuOlutMerkki.label = panimoQ
+        valittuOlut.text = olutQ
+        valittuOlut.label = panimoQ
         if (idQ > 0) {
             valitunTietoja.text = tyyppiQ
             valitunTietoja.label =  vahvuusQ + " %, " + qsTr("ibu %1").arg(hapotQ)
@@ -199,7 +180,7 @@ Dialog {
             ibu = vastaus.response.beers.items[i].beer.beer_ibu
             toive = vastaus.response.beers.items[i].beer.wish_list
 
-            lisaaListaan(merkki, panimo, voltit, ibu, tyyppi, etiketti, bid, toive)
+            loydetytOluet.lisaa(merkki, panimo, voltit, ibu, tyyppi, etiketti, bid, toive)
             i++
         }
 
@@ -266,17 +247,10 @@ Dialog {
     }
 
     function tyhjennaLista() {
-        /*
-        var i=loydetytOluet.count
-
-        while (i>0) {
-            loydetytOluet.remove(i-1)
-            i--
-        } // */
-
         return loydetytOluet.clear()
     }
 
+    /*
     Timer{
         id: sekunti
         interval: 1*1000
@@ -284,6 +258,17 @@ Dialog {
         repeat: false
         onTriggered: {
             hetkinen.running = false
+        }
+    }
+    // */
+
+    ListModel {
+        id: loydetytOluet
+
+        function lisaa(olut, panimo, voltit, hapokkuus, tyyppi, tarra, unTpId, toive) {
+            return append({"oluenMerkki": olut, "panimo": panimo, "olutTyyppi": tyyppi,
+                                 "etiketti": tarra, "unTpId": unTpId, "alkoholia": voltit,
+                                 "hapot": hapokkuus, "toive": toive });
         }
     }
 
@@ -294,8 +279,8 @@ Dialog {
             height: Theme.fontSizeMedium*3
             width: sivu.width
             onClicked: {
-                valittuOlut = juomaLista.indexAt(mouseX,y+mouseY)
-                kopioiJuoma(valittuOlut)
+                //valittuOlut =
+                kopioiJuoma(juomaLista.indexAt(mouseX,y+mouseY))
             }
 
             Row {
@@ -315,11 +300,12 @@ Dialog {
                     readOnly: true
                     width: sivu.width - x
                     onClicked: {
-                        valittuOlut = juomaLista.indexAt(mouseX,oluenTiedot.y+0.5*height)
-                        kopioiJuoma(valittuOlut)
+                        //valittuOlut =
+                        kopioiJuoma(juomaLista.indexAt(mouseX,oluenTiedot.y+0.5*height))
                     }
                 }
 
+                /*
                 Label {
                     text: unTpId
                     color: Theme.secondaryColor
@@ -348,8 +334,7 @@ Dialog {
                     text: toive
                     color: Theme.secondaryColor
                     visible: false
-                }
-
+                } // */
             } // row
         }
 
@@ -363,6 +348,13 @@ Dialog {
 
         PullDownMenu{
             MenuItem {
+                text: qsTr("search breweries")
+                onClicked: {
+                    pageContainer.push(Qt.resolvedUrl("unTpHaePanimoita.qml"))
+                }
+            }
+
+            MenuItem {
                 text: jarjestysTapa ? qsTr("change to alphabetical order") : qsTr("change to order by popularity")
                 onClicked: {
                     jarjestysTapa = !jarjestysTapa
@@ -373,16 +365,16 @@ Dialog {
 
             MenuItem {
                 text: toiveissa? qsTr("remove from wish-list") : qsTr("add to wish-list")
-                visible: (UnTpd.unTpToken != "" && panimo != "")? true : false
+                visible: (UnTpd.unTpToken > "" && olutId > 0)? true : false
                 onClicked: {
-                    lisaaToiveisiin(!toiveissa)
+                    unTpKysely.lisaaToiveisiin(!toiveissa)
                 }
             }
 
             MenuItem {
                 text: qsTr("sign in UnTappd")
                 visible: (UnTpd.unTpToken == "") ? true : false
-                onClicked: pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
+                onClicked: pageContainer.push(Qt.resolvedUrl("unTpKayttaja.qml"))
             }
 
         }
@@ -390,7 +382,7 @@ Dialog {
         Column {
             id: column
             spacing: Theme.paddingLarge
-            width: sivu.width
+            width: parent.width
             //anchors.fill: parent
 
             DialogHeader {
@@ -418,6 +410,7 @@ Dialog {
                 }
             }
 
+            /*
             BusyIndicator {
                 id: hetkinen
                 size: BusyIndicatorSize.Medium
@@ -433,17 +426,18 @@ Dialog {
                 color: Theme.secondaryColor
                 visible: (hetkinen.running || hakuvirhe)
             }
+            // */
 
             Item { // valittu juoma
                 id: valittuRivi
                 x: Theme.paddingLarge
                 width: sivu.width - 2*x
-                height: valittuOlutMerkki.height + valitunTietoja.height
+                height: valittuOlut.height + valitunTietoja.height
 
                 Image {
                     id: valitunEtiketti
                     source: "tuoppi.png"
-                    width: valittuOlutMerkki.height // etiketit 92*92 untappedin tietokannassa
+                    width: valittuOlut.height // etiketit 92*92 untappedin tietokannassa
                     height: width
                     //x: valittuRivi.x
                     //anchors.left: valittuRivi.anchors.left // ei toimi
@@ -451,7 +445,7 @@ Dialog {
                 }
 
                 TextField {
-                    id: valittuOlutMerkki
+                    id: valittuOlut
                     placeholderText: qsTr("selected beer")
                     color: Theme.primaryColor
                     readOnly: true
@@ -466,9 +460,9 @@ Dialog {
                     color: Theme.primaryColor
                     readOnly: true
                     text: " "
-                    x: valittuOlutMerkki.x
-                    y: valittuOlutMerkki.y + 3 +
-                       (valittuOlutMerkki.height > valitunEtiketti.height ? valittuOlutMerkki.height : valitunEtiketti.height)
+                    x: valittuOlut.x
+                    y: valittuOlut.y + 3 +
+                       (valittuOlut.height > valitunEtiketti.height ? valittuOlut.height : valitunEtiketti.height)
                     //anchors.left: valitunEtiketti.anchors.right
                     //anchors.top: valittuOlutMerkki.anchors.bottom
                 }
@@ -477,13 +471,14 @@ Dialog {
                     anchors.fill: valittuRivi// parent
                     onClicked: {
                         if (panimo != "")
-                            pageStack.push(Qt.resolvedUrl("unTpTietojaOluesta.qml"),{
+                            pageContainer.push(Qt.resolvedUrl("unTpTietojaOluesta.qml"),{
                                             "olutId": olutId } )
                     }
                 }
 
             } // valittu juoma
 
+            /*
             Row {
                 id: hakurivi
                 spacing: Theme.paddingSmall
@@ -503,6 +498,8 @@ Dialog {
                     //label: qsTr("search text")
                     //text:
                     width: sivu.width - tyhjennaHaku.width - hae.width - 2*hakurivi.spacing
+                    EnterKey.iconSource: "image://theme/icon-m-search"
+                    EnterKey.onClicked: haunAloitus(text)
                 }
 
                 // /*
@@ -513,8 +510,96 @@ Dialog {
                     onClicked: {
                         haunAloitus(haettava.text)
                     }
-                }// */
-            } // hakurivi
+                }//
+            } // hakurivi */
+
+            SearchField {
+                id: haettava
+                width: parent.width
+                text: ""
+                placeholderText: qsTr("beer")
+                EnterKey.iconSource: "image://theme/icon-m-search"
+                EnterKey.onClicked: {
+                    focus = false
+                    minTauko.stop();
+                    haunAloitus(text);
+                }
+                onTextChanged: {
+                    if (text.length > 2)
+                        minTauko.restart()
+                }
+
+                Timer {
+                    id: minTauko
+                    interval: 1000
+                    running: false
+                    repeat: false
+                    onTriggered: haunAloitus(haettava.text)
+                }
+            }
+
+            XhttpYhteys {
+                id: unTpKysely
+                width: parent.width
+                unohdaVanhat: true
+                onValmis: {
+                    var jsonVastaus;
+                    try {
+                        jsonVastaus = JSON.parse(httpVastaus)
+                        if (toiminto === "oluidenHaku") {
+                            paivitaHaetut(jsonVastaus)
+                        } else if (toiminto === "toiveet") {
+                            if (jsonVastaus.response.result === "success") {
+                                if (jsonVastaus.response.action === "add")
+                                    toiveissa = true
+                                else // (vastaus.response.action === "remove")
+                                    toiveissa = false
+                            }
+                        }
+                    } catch (err) {
+                        console.log("" + err)
+                    }
+                }
+
+                property int hakunro: 0
+                property int oluitaPerHaku: 25
+                //property string toiminto: ""
+
+                function haeOluita(hakuteksti) {
+                    var lajittelu = jarjestysTapa ? "checkin" : "name"
+                    var kysely = "";
+
+                    if (hakuteksti === "")
+                        return
+
+                    //toiminto = "oluidenHaku";
+                    kysely = UnTpd.searchBeer(hakuteksti, hakunro*oluitaPerHaku, oluitaPerHaku,
+                                              lajittelu);
+
+                    xHttpGet(kysely, "oluidenHaku");
+
+                    return
+                }
+
+                function lisaaToiveisiin(lisaysVaiPoisto) {
+                    var kysely = ""
+                    if (olutId < 1) {
+                        viesti = qsTr("no beer selected")
+                        naytaViesti = true
+                        return
+                    }
+
+                    //toiminto = "toiveet";
+                    if (lisaysVaiPoisto)
+                        kysely = UnTpd.addToWishList(olutId)
+                    else
+                        kysely = UnTpd.removeFromWishList(olutId);
+
+                    xHttpGet(kysely, "toiveet");
+
+                    return
+                }
+            }
 
             SilicaListView {
                 id: juomaLista
@@ -522,9 +607,7 @@ Dialog {
                 width: sivu.width
                 clip: true
 
-                model: ListModel {
-                    id: loydetytOluet
-                }
+                model: loydetytOluet
 
                 delegate: oluidenTiedot
 
@@ -534,8 +617,8 @@ Dialog {
                     //console.log("siirtyminen loppui")
                     if (atYEnd) {
                         //console.log("siirtyminen loppui " + atYEnd)
-                        hakunro = hakunro + 1
-                        haeOluita(haettava.text)
+                        unTpKysely.hakunro++;
+                        unTpKysely.haeOluita(haettava.text)
                     }
                 }
             }
@@ -560,7 +643,7 @@ Dialog {
 
     onAccepted: {
         if (olutId > 0) {
-            olut = valittuOlutMerkki.text
+            olut = valittuOlut.text
         }
 
         talletaJuoma()

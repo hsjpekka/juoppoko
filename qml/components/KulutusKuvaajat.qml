@@ -6,6 +6,8 @@ Item {
     width: parent.width
     height: Theme.itemSizeLarge
 
+    property alias  nykyinen: pylvaikko.currentIndex
+    property bool   alustus: false
     property alias  pylvasKuvaaja: pylvaikko
     property string riskiAlhainen: "green"
     property string riskiKohonnut: "yellow"
@@ -97,7 +99,7 @@ Item {
         viikko = ajat[1] // viikonNumero(msJuoma)
         paiva = ajat[2] // date.getDay() = 0 (su) - 6 (la) => 1 (ma) - 7 (su)
 
-        console.log("uusin " + vuosi + " " + viikko + "-" + paiva + " skaalat " + skaalaVko + " " + skaalaPv)
+        //console.log("uusin " + vuosi + " " + viikko + "-" + paiva + " skaalat " + skaalaVko + " " + skaalaPv)
 
         lisaaTyhjiaPaivia(vuosi, viikko, paiva)
 
@@ -105,7 +107,7 @@ Item {
         ml0 = juotuViikolla(vuosi, viikko)
         talletaViikonArvo(vuosi, viikko, ml0 + alkoholiaMl)
 
-        console.log("juotu viikolla " + ml0 + " ja " + alkoholiaMl)
+        //console.log("juotu viikolla " + ml0 + " ja " + alkoholiaMl)
 
         // paivakuvaajan päivitys
         ml0 = juotuPaivalla(vuosi, viikko, paiva)
@@ -359,8 +361,10 @@ Item {
         id: pylvaikko
         anchors.fill: parent
         orientation: ListView.Horizontal
-        model: (tyyppi === 0) ? vkoKulutus : pvKulutus
+        model: alustus? undefined : ( (tyyppi === 0) ? vkoKulutus : pvKulutus )
         scale: tyyppi === 0 ? height/skaalaVko : height/skaalaPv
+        visible: !alustus
+        highlightFollowsCurrentItem: !alustus
         onBarSelected: { //(int barNr, real barValue, string barLabel)
             pylvasValittu(barNr, barValue, barLabel)
             console.log("pylvään " + barNr + " korkeus " + barValue + " skaala " + scale)

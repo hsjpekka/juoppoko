@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQml 2.0
 import Sailfish.Silica 1.0
+import "../components"
 import "../scripts/unTap.js" as UnTpd
 
 Page {
@@ -70,7 +71,8 @@ Page {
         return
     }
 
-    function kommentoi() {
+    /*
+    function qqkommentoi() {
         var xhttp = new XMLHttpRequest();
         var osoite, kysely
 
@@ -118,6 +120,7 @@ Page {
 
         return
     }
+    // */
 
     function onkoTietoa(tietue, kentta){
         var kentat = Object.keys(tietue)
@@ -133,7 +136,8 @@ Page {
         return onko
     }
 
-    function poistaSanottu(valittu) {
+    /*
+    function qqpoistaSanottu(valittu) {
         var id = sanotut.get(valittu).commentId
         var sanoja = sanotut.get(valittu).kayttajaTunnus
         var xhttp = new XMLHttpRequest();
@@ -180,6 +184,7 @@ Page {
 
         return
     }
+    // */
 
     Component {
         id: puhekupla
@@ -196,18 +201,20 @@ Page {
             menu: ContextMenu {
                 MenuItem {
                     text: qsTr("delete")
-                    enabled: muokkausOikeudet.text == "true" ? true : false
+                    enabled: kupla.muokkausOikeudet
                     onClicked: {
                         //console.log("valittu1 " + valittu + ", aika " + lueJuomanAika(valittu-1))                        
                         sanotutLista.currentItem.remorseAction(qsTr("deleting"), function () {
                             var valittu = sanotutLista.currentIndex
-                            poistaSanottu(valittu)
+                            uTYhteys.poistaSanottu(valittu)
                         })
 
                     }
                 }
 
             }
+
+            property bool muokkausOikeudet: oikeudet
 
             Row {
                 id: kuplarivi
@@ -220,28 +227,29 @@ Page {
                     width: height
                 }
 
-                    Column {
-                        id: kuplanTekstit
-                        spacing: Theme.paddingSmall
+                Column {
+                    id: kuplanTekstit
+                    spacing: Theme.paddingSmall
 
-                        Label{
-                            id: puheenpitaja
-                            text: puhuja
-                            width: sivu.width - kupla.x - kasvot.width - 2*kuplarivi.spacing
-                            color: Theme.secondaryHighlightColor
-                        }
-
-                        Label {
-                            id: puhe
-                            text: sanottu
-                            width: puheenpitaja.width - (x - puheenpitaja.x)
-                            color: Theme.highlightColor
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            x: Theme.paddingMedium
-                        }
-
+                    Label{
+                        id: puheenpitaja
+                        text: puhuja
+                        width: sivu.width - kupla.x - kasvot.width - 2*kuplarivi.spacing
+                        color: Theme.secondaryHighlightColor
                     }
 
+                    Label {
+                        id: puhe
+                        text: sanottu
+                        width: puheenpitaja.width - (x - puheenpitaja.x)
+                        color: Theme.highlightColor
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        x: Theme.paddingMedium
+                    }
+
+                }
+
+                /*
                 Text{
                     id: kayttaja
                     text: kayttajaTunnus
@@ -259,9 +267,9 @@ Page {
                     text: oikeudet
                     visible: false
                 }
+                // */
+
             }
-
-
         }
     }
 
@@ -275,9 +283,69 @@ Page {
             MenuItem {
                 text: qsTr("post")
                 enabled: (juttuni.text != "") ? true : false
-                onClicked: kommentoi()
+                onClicked: uTYhteys.kommentoi()
             }
 
+        }
+
+        XhttpYhteys {
+            id: uTYhteys
+            anchors.top: parent.top
+            z: 1
+            onValmis: {
+                var jsonVastaus;
+                //console.log("yhteydenotto valmis: " + httpVastaus.length)
+                try {
+                    jsonVastaus = JSON.parse(httpVastaus);
+                    if (toiminto === "poistaKommentti") {
+                        if (jsonVastaus.response.result == "success") {
+                            keskustelu = jsonVastaus.response.comments
+                            sanotut.remove(valittu)
+                            viesteja--
+                        }
+                    } else if (toiminto === "kommentoi") {
+                        var vika = jsonVastaus.response.comments.count - 1
+
+                        keskustelu = jsonVastaus.response.comments
+                        kirjoitaSanotut(jsonVastaus.response.comments.items[vika])
+                        juttuni.text = ""
+                    }
+                } catch (err) {
+                    console.log("" + err)
+                }
+            }
+
+            property string toiminto: ""
+            property int    valittu: -1
+
+            function kommentoi() {
+                var posoite, kysely
+                //oiminto = "kommentoi";
+
+                posoite = UnTpd.addCommentAddress(ckdId)
+                kysely = UnTpd.addCommentString(juttuni.text)
+
+                xHttpPost(kysely, posoite, "kommentoi");
+
+                return
+            }
+
+            function poistaSanottu(nro) {
+                var id = sanotut.get(nro).commentId;
+                //var sanoja = sanotut.get(nro).kayttajaTunnus;
+                var po = UnTpd.removeComment(id), kysely="";
+
+                //toiminto = "poistaKommentti";
+                valittu = nro;
+                //haku = _post;
+                //kysely = ""
+                //postOsoite = UnTpd.removeComment(id);
+
+                xHttpPost(kysely, po, "poistaKommentti");
+
+                return
+
+            }
         }
 
         Column{
@@ -289,6 +357,7 @@ Page {
                 title: qsTr("Comments")
             }
 
+            /*
             BusyIndicator {
                 id: hetkinen
                 size: BusyIndicatorSize.Medium
@@ -306,6 +375,7 @@ Page {
                 visible: (hetkinen.running || hakuvirhe)
                 wrapMode: Text.WordWrap
             }
+            // */
 
             Row {// kuka ja missä
                 id: juojaRivi
@@ -411,10 +481,12 @@ Page {
 
             }
 
-            TextArea{
+            TextField{
                 id: juttuni
                 width: sivu.width
                 placeholderText: qsTr("my comment")
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.onClicked: juttuni.focus = false
                 text: ""
                 label: qsTr("my comment")
             }

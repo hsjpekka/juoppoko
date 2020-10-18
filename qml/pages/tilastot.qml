@@ -8,43 +8,56 @@ Dialog {
     property real tanaan: mlAikana(paiva) // paaikkuna.mlAikana(paiva)
     property real mlViikossa: mlAikana(7*paiva)
     property real mlKuussa: mlAikana(30*paiva) // paaikkuna.mlAikana(30*paiva)
+    property real mlVuodessa: vuodessa()
     property int valittuKuvaaja // 0 - viikkokulutus, 1 - paivakulutus, oli 2 - paivaruudukko
     property int ryyppyVrk
+    property var juodut
 
-    function mlAikana(jakso) { // jakso = ms nykyhetkestä (tai tulevasta juoman hetkestä)
-        var nyt = new Date().getTime()
-        var ml = 0
-        var i = Apuja.juomienMaara() - 1
-
-        if ( Apuja.juomanAika(i) > nyt)
-            nyt = Apuja.juomanAika(i)
-
-        while ( (i >=0 ) && (Apuja.juomanAika(i) >= nyt - jakso)){
-            ml = ml + Apuja.juomanTilavuus(i)*Apuja.juomanVahvuus(i)/100
+    function mlAikana(kesto, loppu) { // jakso = ms nykyhetkestä (tai tulevasta juoman hetkestä)
+        //var nyt = new Date().getTime()
+        var ml = 0, i = juodut.length - 1, t0, t1 = loppu;
+        //Apuja.juomienMaara() - 1
+        if (t1 === undefined)
+            t1 = new Date().getTime();
+        if (t1 < juodut[i].ms)
+            t1 = juodut[i].ms;
+        t0 = t1 - kesto;
+        while ( i >= 0 && juodut[i].ms > t1)
+            i--;
+        while (i >= 0 && juodut[i].ms >= t0) {
+            ml += juodut[i].ml;
             i--
         }
+
+        console.log(" zzz " + juodut[juodut.length-1].ms + ", " + juodut[juodut.length-1].ml)
+        //if ( Apuja.juomanAika(i) > nyt)
+        //    nyt = Apuja.juomanAika(i)
+
+        //while ( (i >=0 ) && (Apuja.juomanAika(i) >= nyt - jakso)){
+        //    ml = ml + Apuja.juomanTilavuus(i)*Apuja.juomanVahvuus(i)/100
+        //    i--
+        //}
 
         return ml
     }
 
-    function mlVuodessa() {
-        var nyt = new Date().getTime()
-        var suhde = 1
-        var i = Apuja.juomienMaara() - 1
+    function vuodessa() {
+        var nyt = new Date().getTime();
+        var suhde = 1, i = juodut.length - 1;
 
-        if (Apuja.juomanAika(i) > nyt)
-            nyt = Apuja.juomanAika(i)
+        if (juodut[i].ms > nyt)
+            nyt = juodut[i].ms;
 
-        if (Apuja.juomanAika(0) > nyt - 365*paiva){
-            suhde = (nyt-Apuja.juomanAika(0))/(365*paiva)
+        if (juodut[0].ms > nyt - 365*paiva){
+            suhde = (nyt-juodut[0].ms)/(365*paiva);
             if (suhde < 1/52)
-                suhde = 1/52
-
+                suhde = 1/52;
             txtVuodessa.font.italic = !txtVuodessa.font.italic
         }
 
-        return mlAikana(365*paiva)/suhde
+        console.log("oo  " + suhde);
 
+        return mlAikana(365*paiva)/suhde
     }
 
     function kellonAika(hh,mm) {
@@ -167,9 +180,10 @@ Dialog {
                 Label {
                     id: txtViikossa
                     color: Theme.highlightColor
-                    text: mlViikossa.toFixed(1) + " ml"
+                    text: qsTr("%1 ml, equals to %2 l in year").arg(mlViikossa.toFixed(1)).arg((mlViikossa*52/1000).toFixed(1))
+                    //text: mlViikossa.toFixed(1) + " ml"
                 }
-
+                /*
                 Label {
                     color: Theme.highlightColor
                     text: qsTr(", equals to ")
@@ -178,7 +192,7 @@ Dialog {
                 Label {
                     color: Theme.highlightColor
                     text: (mlViikossa*52/1000).toFixed(1) + " l " + qsTr("in year")
-                }
+                }// */
 
             } // viikossa
 
@@ -192,9 +206,9 @@ Dialog {
                 Label {
                     id: txtKuussa
                     color: Theme.highlightColor
-                    text: mlKuussa.toFixed(1) + " ml"
+                    text: qsTr("%1 ml, equals to %2 l in year").arg(mlKuussa.toFixed(1)).arg((mlKuussa/30*365/1000).toFixed(1))
                 }
-
+                /*
                 Label {
                     color: Theme.highlightColor
                     text: qsTr(", equals to ")
@@ -203,7 +217,7 @@ Dialog {
                 Label {
                     color: Theme.highlightColor
                     text: (mlKuussa/30*365/1000).toFixed(1) + " l " + qsTr("in year")
-                }
+                } //*/
 
 
             } // kuussa
@@ -217,9 +231,10 @@ Dialog {
                 Label {
                     id: txtVuodessa
                     color: Theme.highlightColor
-                    text: (mlVuodessa()/1000).toFixed(1) + " l"
+                    text: qsTr("%1 l in year, equals to %2 ml in week").arg((mlVuodessa/1000).toFixed(1)).arg((mlVuodessa/52).toFixed(1))
+                    //text: (mlVuodessa/1000).toFixed(1) + " l"
                 }
-
+                /*
                 Label {
                     color: Theme.highlightColor
                     text: qsTr(", equals to ")
@@ -228,7 +243,7 @@ Dialog {
                 Label {
                     color: Theme.highlightColor
                     text: (mlVuodessa()/52).toFixed(1) + " ml " + qsTr("in week")
-                }                
+                }// */
 
             } // vuodessa
 
@@ -244,7 +259,7 @@ Dialog {
                 property int valittuMinuutti: ryyppyVrk - valittuTunti*60
 
                 function valitseAika() {
-                    var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                    var dialog = pageContainer.push("Sailfish.Silica.TimePickerDialog", {
                                     hourMode: DateTime.TwentyFourHours,
                                     hour: valittuTunti,
                                     minute: valittuMinuutti

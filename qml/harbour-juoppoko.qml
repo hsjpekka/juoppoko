@@ -31,10 +31,11 @@ import Sailfish.Silica 1.0
 import "pages"
 import "scripts/unTap.js" as UnTpd
 import "scripts/foursqr.js" as FourSqr
-ApplicationWindow
-{
-    id: app
+
+ApplicationWindow{
+    id: juoppoko
     property string versioNro: ""
+    property string kone: ""
 
     Paaikkuna {
         id: paaikkuna
@@ -50,6 +51,7 @@ ApplicationWindow
     Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta        
         var args = Qt.application.arguments.length
         UnTpd.programName = Qt.application.arguments[0]
+        kone = Qt.application.arguments[args-8]
         versioNro = Qt.application.arguments[args-7]
         UnTpd.unTpdId = Qt.application.arguments[args-6]
         UnTpd.unTpdSecret = Qt.application.arguments[args-5]
@@ -57,6 +59,6 @@ ApplicationWindow
         FourSqr.appId = Qt.application.arguments[args-3]
         FourSqr.appSecret = Qt.application.arguments[args-2]
         FourSqr.fsqrVersion = Qt.application.arguments[args-1]
-        console.log("==> " + args + ", " + UnTpd.callbackURL + ", " + versioNro)
+        console.log("==> " + args + ", " + UnTpd.callbackURL + ", " + versioNro + " .. " + kone)
     }
 }

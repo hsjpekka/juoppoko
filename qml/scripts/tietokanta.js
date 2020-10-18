@@ -303,8 +303,6 @@ function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
                 //}
             }
         }
-
-
     } catch (err) {
         console.log("lueJuodut: " + err);
     }

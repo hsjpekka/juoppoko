@@ -1,164 +1,87 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 import "../scripts/unTap.js" as UnTpd
 
 Page {
     id: sivu
-    property int sivuNro: 0
-    property int merkkejaSivulla: 50
-    property int reunus: Theme.paddingLarge
+    //property int hakuNro: 0
+    //property int merkkejaSivulla: 50
+    property bool   haeKaikki: true
+    property bool   kaikkiHaettu: false
     property string kayttajaTunnus: "" // itse, jos ""
-    property bool haeKaikki: true
-    property bool kaikkiHaettu: false
-    property bool naytaKuvaus: false
+    property bool   naytaKuvaus: false
 
-    function haeMerkit() {
-        var xhttp = new XMLHttpRequest();
-        var kysely = ""
-
-        hetkinen.running = true
-
-        kysely = UnTpd.getBadges(kayttajaTunnus, sivuNro*merkkejaSivulla, merkkejaSivulla)
-
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState == 0)
-                unTpdViestit.text = qsTr("request not initialized") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 1)
-                unTpdViestit.text = qsTr("server connection established") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 2)
-                unTpdViestit.text = qsTr("request received") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 3)
-                unTpdViestit.text = qsTr("processing request") + ", " + xhttp.statusText
-            else { //if (xhttp.readyState == 4){
-                var vastaus
-
-                if (xhttp.status == 200) {
-                    vastaus = JSON.parse(xhttp.responseText)
-                    //console.log(xhttp.responseText)
-                    kirjoitaTiedot(vastaus)
-                } else {
-                    console.log("Badges Info: " + xhttp.status + ", " + xhttp.statusText)
-                    unTpdViestit.text = "Badges Info: " + xhttp.status + ", " + xhttp.statusText
-                }
-
-                hetkinen.running = false
-            }
-
-        }
-
-        xhttp.open("GET", kysely, true)
-        xhttp.send();
-
-        return
-    }
-
-    function kirjoitaTiedot(jsonVastaus) { // JSON.parse()
-        var merkkiTiedot = jsonVastaus.response
+    function lueMerkit(merkkiTiedot) {
         var i = 0, taso = "", mj = ""
-
-        if (merkkiTiedot.count < merkkejaSivulla){
-            kaikkiHaettu = true
-        }
+        console.log("merkkejä " + merkkiTiedot.count)
 
         while (i < merkkiTiedot.count){
             if (merkkiTiedot.items[i].is_level)
                 taso = merkkiTiedot.items[i].levels.count + ""
 
-            //lisaaPieniMerkki(merkkiTiedot.items[i].media.badge_image_lg,
-              //                  merkkiTiedot.items[i].media.badge_image_sm,
-                //                merkkiTiedot.items[i].badge_description,
-                  //              merkkiTiedot.items[i].badge_name,
-                    //            taso, merkkiTiedot.items[i].created_at)
-            lisaaIsoMerkki(merkkiTiedot.items[i].media.badge_image_lg,
+            isotMerkit.lisaaIsoMerkki(merkkiTiedot.items[i].media.badge_image_lg,
                            merkkiTiedot.items[i].badge_name,
                             merkkiTiedot.items[i].badge_description,
                             merkkiTiedot.items[i].created_at)
 
             i++
         }
-
         return
     }
-
-    /*
-    function kuvaustenNaytto(arvo) {
-        var i = 0, N = isotMerkit.count
-        while (i < N) {
-            //console.log("ansiomerkit, kuvaustenNaytto " + i + ", " + arvo + ", " + isotMerkit.get(i).merkinKuvaus.visible)
-            //isotMerkit.get(i).merkinKuvaus.visible = arvo
-            i++
-        }
-
-        return
-    } // */
-
-    function lisaaIsoMerkki(merkki, nimi, kuvaus, paivays){
-        var mj= kuvaus + "\n \n" + paivays
-        isotMerkit.append({"nimi": nimi, "merkinUrl": merkki, "kuvaus": mj })
-        valitutMerkit.positionViewAtBeginning()
-
-        return
-    }
-
-    /*
-    function lisaaPieniMerkki(iso, pieni, kuvaus, nimi, taso, paivays){
-        pienetMerkit.append({"merkinUrl": iso, "pikkuMerkinUrl": pieni, "kuvaus": kuvaus,
-                                "merkinNimi": nimi, "taso": taso, "ansaittu": paivays })
-        kaikkiMerkit.positionViewAtBeginning()
-        return
-    }
-    // */
 
     function naytaUudet(){
-        var i = 0, mj = ""
+        var i = 0, mj = "", merkit = UnTpd.newBadges
         if (UnTpd.newBadgesSet) {
-            while (i < UnTpd.newBadges.count) {
-                if (UnTpd.newBadges.items[i].is_local_badge)
+            while (i < merkit.count) {
+                if (merkit.items[i].is_local_badge)
                     mj = qsTr("Local Badge")
                 //else
                     //mj = qsTr("not Local Badge")
 
-                if (UnTpd.newBadges.items[i].venue_name != ""){
+                if (merkit.items[i].venue_name > ""){
                     if (mj !== "")
                         mj += "\n"
-                    mj += UnTpd.newBadges.items[i].venue_name
+                    mj += merkit.items[i].venue_name
                 }
 
-                lisaaIsoMerkki(UnTpd.newBadges.items[i].badge_image.lg,
-                               UnTpd.newBadges.items[i].badge_name,
-                               UnTpd.newBadges.items[i].badge_description,
+                isotMerkit.lisaaIsoMerkki(merkit.items[i].badge_image.lg,
+                               merkit.items[i].badge_name,
+                               merkit.items[i].badge_description,
                                mj)
                 i++
             }
         }
         else {
-            lisaaIsoMerkki("",qsTr("No badges during this session!"), "", qsTr("Depressing."))
+            isotMerkit.lisaaIsoMerkki("",qsTr("No badges during this session!"), "", qsTr("Depressing."))
         }
 
         return
     }
 
     function tyhjennaIsotMerkit(){
-        var i = isotMerkit.count
-        while (i>0) {
-            isotMerkit.remove(0)
-            i--
-        }
+        //var i = isotMerkit.count
+        //while (i>0) {
+        //    isotMerkit.remove(0)
+        //    i--
+        //}
+        isotMerkit.clear()
+        uTYhteys.hakuNro = 0
 
         return
     }
 
-    /*
-    function tyhjennaPienetMerkit(){
-        var i = pienetMerkit.count
-        while (i>0) {
-            pienetMerkit.remove(0)
-            i--
-        }
+    ListModel {
+        id: isotMerkit
+        function lisaaIsoMerkki(merkki, nimi, kuvaus, paivays){
+            var mj= kuvaus + "\n \n" + paivays
+            console.log("erkki " + nimi + ", " + isotMerkit.count)
+            isotMerkit.append({"nimi": nimi, "merkinUrl": merkki, "kuvaus": mj })
+            valitutMerkit.positionViewAtBeginning()
 
-        return
+            return
+        }
     }
-    // */
 
     Component {
         id: ansiomerkki
@@ -166,11 +89,15 @@ Page {
             id: ansio1
             width: sivu.width
             height: merkkinaytto.height + Theme.paddingLarge
+            property int reunus: Theme.paddingLarge
 
             Rectangle {
-                height: ansio1.height
-                width: ansio1.width - 2*(reunus + border.width)
-                x: 0.5*(sivu.width - width)
+                anchors.fill: parent
+                anchors.leftMargin: reunus + border.width
+                anchors.rightMargin: anchors.leftMargin
+                //height: ansio1.height
+                //width: ansio1.width - 2*(reunus + border.width)
+                //x: 0.5*(sivu.width - width)
                 border.width: 2
                 border.color: Theme.secondaryHighlightColor
                 radius: Theme.paddingMedium
@@ -217,99 +144,38 @@ Page {
         }
     }
 
-    /*
-    Component {
-        id: pikkumerkki
-
-        ListItem {
-            id: pikkulista
-            contentHeight: pikkukuva.height > pikkuNimi.height ? pikkukuva.height : pikkuNimi.height
-
-            onClicked: {
-                tyhjennaIsotMerkit()
-                lisaaIsoMerkki(isoKuva.text, pikkuNimi.text, pikkuKuvaus.text, paivamaara.text)
-            }
-
-            Row {
-                Image {
-                    id: pikkukuva
-                    source: pikkuMerkinUrl
-                    width: 92
-                    height: 92
-                }
-
-                TextField {
-                    id: pikkuNimi
-                    text: merkinNimi
-                    width: sivu.width - pikkukuva.width - ansiotaso.width - 2*reunus
-                    label: qsTr("name")
-                    readOnly: true
-                    onClicked: {
-                        tyhjennaIsotMerkit()
-                        lisaaIsoMerkki(isoKuva.text, pikkuNimi.text, pikkuKuvaus.text,
-                                       paivamaara.text)
-                    }
-                    //visible: false
-                }
-
-                TextArea {
-                    id: pikkuKuvaus
-                    text: kuvaus
-                    visible: false
-                    readOnly: true
-                }
-
-                TextField {
-                    id: ansiotaso
-                    text: taso
-                    width: font.pixelSize*4
-                    label: qsTr("level")
-                    readOnly: true
-                    onClicked: {
-                        //tyhjennaIsotMerkit()
-                        //lisaaIsoMerkki(isoKuva.text, pikkuNimi.text, pikkuKuvaus.text,
-                          //             paivamaara.text)
-                    }
-                    //visible: false
-                }
-
-                Label {
-                    id: isoKuva
-                    text: merkinUrl
-                    visible: false
-                }
-
-                Label {
-                    id: paivamaara
-                    text: ansaittu
-                    visible: false
-                }
-
-            }
-
-        }
-    }
-    // */
-
-    SilicaFlickable {
-        id: alue
+    SilicaListView {
+        id: valitutMerkit
         anchors.fill: parent
-        height: sarake.height
-        width: sivu.width
-        contentHeight: sarake.height
+        //anchors.leftMargin: Theme.horizontalPageMargin
+        //anchors.rightMargin: Theme.horizontalPageMargin
+        //height: sivu.height// - y
+        //width: sivu.width
+        //clip: true
+
+        model: isotMerkit
+        header: PageHeader {
+            title: qsTr("Badges")
+        }
+
+        delegate: ansiomerkki
+        onMovementEnded: {
+            if (atYEnd && !kaikkiHaettu) {
+                uTYhteys.haeMerkit()
+            }
+        }
 
         PullDownMenu {
             MenuItem {
                 text: haeKaikki? qsTr("show new ones") : qsTr("show all")
                 onClicked: {
-                    haeKaikki = !haeKaikki
-                    tyhjennaIsotMerkit()
+                    haeKaikki = !haeKaikki;
+                    tyhjennaIsotMerkit();
                     //tyhjennaPienetMerkit()
                     if (haeKaikki) {
-                        naytaKuvaus = false
-                        haeMerkit()
-                    }
-                    else
+                        naytaKuvaus = false;
+                        uTYhteys.haeMerkit()
+                    } else
                         naytaUudet()
                 }
             }
@@ -323,95 +189,49 @@ Page {
             }
         }
 
-        Column {
-            id: sarake
-            width: sivu.width
-            anchors.leftMargin: Theme.paddingLarge
-            anchors.rightMargin: Theme.paddingLarge
-
-            PageHeader {
-                id: otsikko
-                title: qsTr("Badges")
-            }
-
-            BusyIndicator {
-                id: hetkinen
-                size: BusyIndicatorSize.Medium
-                anchors.horizontalCenter: parent.horizontalCenter
-                running: false
-                visible: running
-            }
-
-            Label {
-                id: unTpdViestit
-                text: "..."
-                color: Theme.secondaryHighlightColor
-                visible: hetkinen.running
-                anchors.horizontalCenter: sarake.horizontalCenter
-                //x: 0.5*(sivu.width - width)
-            }
-
-            /*
-            SilicaListView {
-                id: kaikkiMerkit
-                height: 0.3*sivu.height
-                width: sivu.width
-                clip: false //true
-
-                model: ListModel {
-                    id: pienetMerkit
-                }
-
-                delegate: pikkumerkki
-
-                onMovementEnded: {
-                    //console.log("siirtyminen loppui")
-                    if (atYEnd && !kaikkiHaettu) {
-                        //console.log("siirtyminen loppui " + atYEnd)
-                        sivuNro = sivuNro + 1
-                        haeMerkit()
+        XhttpYhteys {
+            id: uTYhteys
+            anchors.top: parent.top
+            z: 1
+            onValmis: {
+                var jsonVastaus, merkkitiedot
+                try {
+                    jsonVastaus = JSON.parse(httpVastaus)
+                    if (jsonVastaus.response.count < merkkejaPerHaku){
+                        kaikkiHaettu = true
                     }
+                    lueMerkit(jsonVastaus.response)
+
+                } catch (err) {
+                    console.log("" + err)
                 }
+                hakuNro++
+            }
 
-                VerticalScrollDecorator {}
+            property int hakuNro: 0
+            property int merkkejaPerHaku: 25
+            property string toiminto: ""
 
-            } // valitutMerkit-lista
-            // */
+            function haeMerkit() {
+                var kysely = ""
+                kysely = UnTpd.getBadges(kayttajaTunnus, hakuNro*merkkejaPerHaku,
+                                                  merkkejaPerHaku);
+                xHttpGet(kysely);
 
-            /*
-            Rectangle {
-                height: 1
-                width: alue.width - 2*reunus
-                color: "grey"
-            } // */
+                return
+            }
 
-            SilicaListView {
-                id: valitutMerkit
-                height: sivu.height - y
-                width: sivu.width
-                clip: true
-
-                model: ListModel {
-                    id: isotMerkit
-                }
-
-                delegate: ansiomerkki
-
-                VerticalScrollDecorator {}
-
-            } // valitutMerkit-lista
-
-        } // column
+        }
 
         VerticalScrollDecorator {}
-    } // flickable
+
+    } // valitutMerkit-lista
 
     Component.onCompleted: {
-        console.log("kayttaja: " + kayttajaTunnus)
+        console.log("kayttaja: " + kayttajaTunnus + ", " + haeKaikki)
         if (haeKaikki)
-            haeMerkit()
+            uTYhteys.haeMerkit()
         else
             naytaUudet()
-
     }
 }

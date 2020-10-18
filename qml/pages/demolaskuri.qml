@@ -1,5 +1,6 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
+import "../components"
 
 Page {
     id: sivu
@@ -17,7 +18,7 @@ Page {
         var pv0 = pvm.getDate(), kk0 = pvm.getMonth(), vs0 = pvm.getFullYear()
         var h0 = pvm.getHours(), m0 = pvm.getMinutes()
 
-        var dialog = pageStack.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
+        var dialog = pageContainer.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
                         "aika": pvm,
                         "nimi": txtJuoma.text,
                         "maara": txtMaara.text,
@@ -46,10 +47,6 @@ Page {
         return
     }
 
-    function prom2ml(pro) {
-        return pro*paino*vetta/tiheys
-    }
-
     function uusiJuoma(hetki, mlVeressa, maara, vahvuus, juomanNimi)     {
         //var lisayskohta = etsiPaikka(hetki, juomat.count -1) // mihin kohtaan uusi juoma kuuluu juomien historiassa?
         //var ml0
@@ -57,12 +54,7 @@ Page {
 
         // lasketaan paljonko veressä on alkoholia juomishetkellä
         //mlVeressa = mlKehossa(lisayskohta-1, hetki)
-
-        lisaaListaan(hetki, mlVeressa, maara, vahvuus, juomanNimi) //
-
-        paivitaPromillet();
-
-        paivitaAjatRajoille();
+        juoja.juo(juoja.annoksia, hetki, mlVeressa, maara, vahvuus, juomanNimi)
 
         return;
     }
@@ -229,8 +221,8 @@ Page {
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
                     EnterKey.iconSource: "image://theme/icon-m-play"
                     EnterKey.onClicked: {
-                        promilleja = Number.fromLocaleString(Qt.locale(),text)
-                        juoja.pohjat = prom2ml(promilleja)
+                        promilleja = Number.fromLocaleString(Qt.locale(), text)
+                        juoja.pohjat = juoja.prom2ml(promilleja)
                         juoja.laskeUudelleen()
                         juoja.paivita(pvm.getDate())
                     }
@@ -250,7 +242,7 @@ Page {
                     property int valittuMinuutti0: alkuhetki.getMinutes()
 
                     function openTimeDialog0() {
-                        var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                        var dialog = pageContainer.push("Sailfish.Silica.TimePickerDialog", {
                                         hourMode: DateTime.TwentyFourHours,
                                         hour: alkuhetki.getHours(),
                                         minute: alkuhetki.getMinutes()
@@ -261,9 +253,8 @@ Page {
                             valittuMinuutti0 = dialog.minute
                             alkuhetki = new Date(alkuhetki.getFullYear(), alkuhetki.getMonth(), alkuhetki.getDate(), valittuTunti0, valittuMinuutti0, 0, 0)
                             kello0.value = alkuhetki.toLocaleTimeString(Qt.locale(), kelloMuoto)
-
-                            paivitaPromillet()
-                            paivitaAjatRajoille()
+                            juoja.laskeUudelleen()
+                            juoja.paivita(pvm.getDate())
                         })
                     }
 
@@ -279,7 +270,7 @@ Page {
                     property date valittuPaiva0: alkuhetki
 
                     function avaaPaivanValinta() {
-                        var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
+                        var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
                                         date: alkuhetki
                                      })
 
@@ -289,8 +280,8 @@ Page {
                                            alkuhetki.getHours(), alkuhetki.getMinutes(), 0, 0)
                             value = alkuhetki.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
 
-                            paivitaPromillet()
-                            paivitaAjatRajoille()
+                            juoja.laskeUudelleen()
+                            juoja.paivita(pvm.getDate())
                         })
                     }
 
@@ -350,7 +341,7 @@ Page {
                     property int valittuMinuutti: pvm.getMinutes()
 
                     function openTimeDialog() {
-                        var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                        var dialog = pageContainer.push("Sailfish.Silica.TimePickerDialog", {
                                         hourMode: DateTime.TwentyFourHours,
                                         hour: pvm.getHours(),
                                         minute: pvm.getMinutes()
@@ -360,11 +351,9 @@ Page {
                             valittuTunti = dialog.hour
                             valittuMinuutti = dialog.minute
                             pvm = new Date(pvm.getFullYear(), pvm.getMonth(), pvm.getDate(), valittuTunti, valittuMinuutti, 0, 0)
-
                             value = pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
 
-                            paivitaPromillet()
-                            paivitaAjatRajoille()
+                            juoja.paivita(pvm.getDate())
                         })
                     }
 
@@ -380,7 +369,7 @@ Page {
                     property date valittuPaiva: pvm
 
                     function avaaPaivanValinta() {
-                        var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
+                        var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
                                         date: pvm
                                      })
 
@@ -388,11 +377,9 @@ Page {
                             valittuPaiva = dialog.date
                             pvm = new Date(valittuPaiva.getFullYear(), valittuPaiva.getMonth(), valittuPaiva.getDate(),
                                            pvm.getHours(), pvm.getMinutes(), 0, 0)
-
                             value = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
 
-                            paivitaPromillet()
-                            paivitaAjatRajoille()
+                            juoja.paivita(pvm.getDate())
                         })
                     }
 
@@ -448,7 +435,6 @@ Page {
                     onClicked: {
                         uusiJuoma(pvm.getTime(), 0.0, parseInt(txtMaara.text),
                                  parseFloat(voltit.text), txtJuoma.text)
-                        juomaLista.positionViewAtEnd()
 
                         //console.log("cheers - " + pvm.getTime() )
 
@@ -472,7 +458,7 @@ Page {
                     paivita()
                 }
                 onMuutaJuomanTiedot: {
-                    var dialog = pageStack.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
+                    var dialog = pageContainer.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
                                     "aika": new Date(juodunAika(iMuutettava)),
                                     "nimi": juodunNimi(iMuutettava),
                                     "maara": juodunTilavuus(iMuutettava),
@@ -482,16 +468,12 @@ Page {
                                     "olutId": juodunOlutId(iMuutettava)
                                  })
 
-                    dialog.rejected.connect(function() {
-                        return tarkistaUnTpd()
-                    } )
-
                     dialog.accepted.connect(function() {
                         var ms = dialog.aika.getTime();
                         muutaJuoma(iMuutettava, ms, dialog.maara, dialog.vahvuus, dialog.nimi,
                                    dialog.juomanKuvaus, dialog.olutId);
                         paivita();
-                        paivitaAjatRajoille();
+                        juoja.paivitaAjatRajoille();
                     })
                 }
                 onPromillejaChanged: {
@@ -581,9 +563,7 @@ Page {
         }
 
         Component.onCompleted: {
-            paivitaPromillet()
-            paivitaAjatRajoille()
+            //juoja.paivita(pvm.getDate())
         }
     }
-
 }

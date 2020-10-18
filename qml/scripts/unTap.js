@@ -1,14 +1,16 @@
 .pragma library
 
-var callbackURL = "", GET=1, newBadges, newBadgesSet = false, notificationsRespond // JSON-objekti
+var callbackURL = "", newBadges, newBadgesSet = false, notificationsRespond // JSON-objekti
 var oluetSuosionMukaan = true, oluenNimi = "", oluenEtiketti = "", oluenPanimo = ""
 var oluenTyyppi = "", oluenVahvuus = 0.0, oluenHappamuus = 0, oluenId = 0
-var POST=0, postFoursquare = false, postFacebook = false, postTwitter = false
+var postFoursquare = false, postFacebook = false, postTwitter = false
 var programName = "", queryLimit = 25, shout = ""
+var kayttaja = ""
 var unTpdId = "" // ohjelman clientId
 var unTpOsoite = "https://api.untappd.com/v4" // url
 var unTpdSecret = "" // ohjelman salasana
 var unTpToken = "" // käyttäjän valtuutus
+var yhteys = ""
 
 function setBeer(beerId){
     if (beerId != oluenId) {
@@ -148,9 +150,9 @@ function checkInData(beerId, tzone, venueId, position, lat, lng, shout, rating, 
 
 function getBadges(targetName, offset, limit) { //(address1, appReg, auth, targetName, offset, limit)
     //USERNAME (string, optional) - The username that you wish to call the request upon.
-        //If you do not provide a username - the feed will return results from the authenticated user
-        //(if the access_token is provided) //"hsjpekka"
-    //offset (int, optional) - The numeric offset that you what results to start //"&offset=132"
+    //    If you do not provide a username - the feed will return results from the authenticated user
+    //    (if the access_token is provided) //"hsjpekka"
+    //offset (int, optional) - The numeric offset that you want the results to start //"&offset=132"
     //limit (int, optional) - The number of results to return, max of 50, default is 25 //"&limit=32"
     //authentication not required
 
@@ -162,10 +164,10 @@ function getBadges(targetName, offset, limit) { //(address1, appReg, auth, targe
     else
         query +=  userAut();
 
-    if (offset !== undefined && offset > 0)
+    if (offset > 0)
         query += "&offset=" + offset;
 
-    if (limit !== undefined && limit > 0)
+    if (limit > 0)
         query += "&limit=" + limit;
 
     return encodeURI(query);
@@ -650,7 +652,8 @@ function toast(checkInId) { //(address1, auth, targetId)
     return encodeURI(query);
 }
 
-function xHttpUnTpd(getVaiPost, kysely, postOsoite, viestit, kunValmista, josVirhe) {
+/*
+function qqxHttpUnTpd(getVaiPost, kysely, postOsoite, viestit, kunValmista, josVirhe) {
     // getVaiPost - 1 = GET, 0 = Post; kunValmista(vastaus), josVirhe(vastaus)
     var xhttp = new XMLHttpRequest()
     var async = false, sync = true
@@ -712,7 +715,7 @@ function xHttpUnTpd(getVaiPost, kysely, postOsoite, viestit, kunValmista, josVir
 
     return;
 }
-
+// */
 /*
 // viestit - string, jota päivitetään, kunValmista(vastaus), josVirhe()
 function qqunTpdPost(osoite, kysely, viestit, kunValmista, josVirhe) {

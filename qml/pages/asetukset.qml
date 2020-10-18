@@ -95,7 +95,7 @@ Dialog {
         PullDownMenu {
             MenuItem {
                 text: qsTr("info")
-                onClicked: pageStack.push(Qt.resolvedUrl("tietoja.qml"))
+                onClicked: pageContainer.push(Qt.resolvedUrl("tietoja.qml"))
 
             }
 
@@ -107,7 +107,7 @@ Dialog {
             MenuItem {
                 text: qsTr("set up unTappd")
                 onClicked: {
-                    pageStack.push(Qt.resolvedUrl("unTpKayttaja.qml"))
+                    pageContainer.push(Qt.resolvedUrl("unTpKayttaja.qml"))
                 }
             }
 

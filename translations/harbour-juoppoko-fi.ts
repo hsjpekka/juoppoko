@@ -5,27 +5,27 @@
     <name>Juomari</name>
     <message>
         <source>delete</source>
-        <translation type="unfinished">poista</translation>
+        <translation>poista</translation>
     </message>
     <message>
         <source>deleting</source>
-        <translation type="unfinished">poistaa</translation>
+        <translation>poistaa</translation>
     </message>
     <message>
         <source>modify</source>
-        <translation type="unfinished">muokkaa</translation>
+        <translation>muokkaa</translation>
     </message>
     <message>
         <source>time</source>
-        <translation type="unfinished">aika</translation>
+        <translation>aika</translation>
     </message>
     <message>
         <source>drink</source>
-        <translation type="unfinished">juoma</translation>
+        <translation>juoma</translation>
     </message>
     <message>
         <source>vol-%</source>
-        <translation type="unfinished">til-%</translation>
+        <translation>til-%</translation>
     </message>
 </context>
 <context>
@@ -95,14 +95,88 @@
     </message>
     <message>
         <source>Pints nearby</source>
-        <translation>Lähikuppiloissa juotuja</translation>
+        <translation>lähistöllä juotuja</translation>
     </message>
     <message>
         <source>Active friends</source>
-        <translation>Kavereiden kirjaukset</translation>
+        <translation>kavereiden kirjaukset</translation>
     </message>
     <message>
         <source>%1 drinks, latest %2</source>
+        <translation>juomia %1, viimeisin %2</translation>
+    </message>
+    <message>
+        <source>some error in transmission</source>
+        <translation>virhe tiedon siirrossa</translation>
+    </message>
+    <message>
+        <source>new friend requests: %1</source>
+        <translation>uusia kaveripyyntöjä: %1</translation>
+    </message>
+</context>
+<context>
+    <name>UnTpKirjauksenKooste</name>
+    <message>
+        <source>user data</source>
+        <translation>käyttäjän tiedot</translation>
+    </message>
+    <message>
+        <source>beer info</source>
+        <translation>tietoja oluesta</translation>
+    </message>
+    <message>
+        <source>venue info</source>
+        <translation>kapakan tiedot</translation>
+    </message>
+    <message>
+        <source>venue activity</source>
+        <translation>kapakassa nautittuja</translation>
+    </message>
+</context>
+<context>
+    <name>XhttpYhteys</name>
+    <message>
+        <source>request not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server connection established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>processing request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>posting GET-query</source>
+        <translation>lähettää GET-kyselyä</translation>
+    </message>
+    <message>
+        <source>posting POST-query</source>
+        <translation>lähettää POST-kyselyä</translation>
+    </message>
+    <message>
+        <source>press &apos;x&apos; to interrupt</source>
+        <translation>keskeytä &apos;x&apos;:stä</translation>
+    </message>
+    <message>
+        <source>no net</source>
+        <translation>ei verkkoa</translation>
+    </message>
+    <message>
+        <source>not connected</source>
+        <translation>ei yhdistetty</translation>
+    </message>
+    <message>
+        <source>error: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -264,15 +338,15 @@
     <name>eiVerkkoa</name>
     <message>
         <source>No network</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei verkkoa</translation>
     </message>
     <message>
         <source>You don&apos;t seem to have network connection. Internet.NetworkState %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Verkkoyhteyttä ei näytä olevan. Internet.NetworkState %1</translation>
     </message>
     <message>
         <source>Do you want to try to search UnTappd anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Haluatko silti yrittää etsi UnTappdistä?</translation>
     </message>
 </context>
 <context>
@@ -320,11 +394,13 @@
         <source>The default limits are based on 
  %1 
  - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
-        <translation type="unfinished"></translation>
+        <translation>Raja-arvot on lähteestä %1, jonka mukaan turvallinen määrä
+        naisille on 7 annosta viikossa ja miehille 14. Ja lisääntyneen riskin raja on naisille 16
+        annosta viikosssa ja miehille 24.</translation>
     </message>
     <message>
-        <source>Here the limits depend only on the weight and the relative amount of water in body, not on sex.</source>
-        <translation type="unfinished"></translation>
+        <source>Here the limits depend only on the amount of water in body, not on sex.</source>
+        <translation>Tässä rajojen oletetaan riippuvan vain kehossa olevan nesteen määrästä, ei sukupuolesta.</translation>
     </message>
 </context>
 <context>
@@ -342,20 +418,12 @@
         <translation>viimeinen viikko</translation>
     </message>
     <message>
-        <source>, equals to </source>
-        <translation>, vastaa </translation>
-    </message>
-    <message>
         <source>in year</source>
         <translation>vuodessa</translation>
     </message>
     <message>
         <source>last month</source>
         <translation>viimeinen kuukausi</translation>
-    </message>
-    <message>
-        <source>in week</source>
-        <translation>viikossa</translation>
     </message>
     <message>
         <source>chart</source>
@@ -373,56 +441,17 @@
         <source>drinking day ends at</source>
         <translation>ryyppypäivä vaihtuu</translation>
     </message>
-</context>
-<context>
-    <name>unTap</name>
     <message>
-        <source>request not initialized</source>
-        <translation type="unfinished"></translation>
+        <source>%1 ml, equals to %2 l in year</source>
+        <translation>%1 ml, vastaa %2 l vuodessa</translation>
     </message>
     <message>
-        <source>server connection established</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>request finished</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>posting GET-query</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>posting POST-query</source>
-        <translation type="unfinished"></translation>
+        <source>%1 l in year, equals to %2 ml in week</source>
+        <translation>%1 l vuodessa, vastaa %2 ml viikossa</translation>
     </message>
 </context>
 <context>
     <name>unTpAnsiomerkit</name>
-    <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Badges</source>
         <translation>Ansiomerkit</translation>
@@ -457,38 +486,7 @@
     </message>
 </context>
 <context>
-    <name>unTpBaarit</name>
-    <message>
-        <source>Beer provider</source>
-        <translation>Oluen tarjoaja</translation>
-    </message>
-    <message>
-        <source>venue</source>
-        <translation>liike</translation>
-    </message>
-</context>
-<context>
     <name>unTpCheckIn</name>
-    <message>
-        <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
-    </message>
-    <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Satellite</source>
         <translation>satelliitti</translation>
@@ -512,14 +510,6 @@
     <message>
         <source>check-in details</source>
         <translation>kirjauksen yksityiskohdat</translation>
-    </message>
-    <message>
-        <source>search text</source>
-        <translation>hakusanat</translation>
-    </message>
-    <message>
-        <source>starting search</source>
-        <translation>hakua aloitetaan</translation>
     </message>
     <message>
         <source>search settings</source>
@@ -577,33 +567,91 @@
         <source>searches in all categories</source>
         <translation>älä rajaa hakua</translation>
     </message>
+    <message>
+        <source>place</source>
+        <translation>paikka</translation>
+    </message>
+    <message>
+        <source>check-in location</source>
+        <translation>kirjattava paikka</translation>
+    </message>
+    <message>
+        <source>venue info</source>
+        <translation>tarjoilupaikan tiedot</translation>
+    </message>
+</context>
+<context>
+    <name>unTpHaePanimoita</name>
+    <message>
+        <source>Breweries</source>
+        <translation>Panimot</translation>
+    </message>
+    <message>
+        <source>selected brewery</source>
+        <translation>valittu panimo</translation>
+    </message>
+    <message>
+        <source>brewery</source>
+        <translation>panimo</translation>
+    </message>
+</context>
+<context>
+    <name>unTpIlmoitukset</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Ilmoituksia</translation>
+    </message>
+    <message>
+        <source>new comments - %1, new toasts %2</source>
+        <translation>uusia kommentteja - %1, maljoja %2</translation>
+    </message>
+    <message>
+        <source>Comments &amp; Toasts</source>
+        <translation>Kommentit ja Maljat</translation>
+    </message>
+    <message>
+        <source>new friend requests - %1</source>
+        <translation>uusia kaveripyytöjä - %1</translation>
+    </message>
+    <message>
+        <source>Friend requests</source>
+        <translation>Kaveripyynnöt</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <translation>Viestit</translation>
+    </message>
+    <message>
+        <source>Venues</source>
+        <translation>Kuppilat</translation>
+    </message>
+    <message>
+        <source>Veunes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>News</source>
+        <translation>Uutiset</translation>
+    </message>
+    <message>
+        <source>Others</source>
+        <translation>Muuta</translation>
+    </message>
+    <message>
+        <source>No notifications</source>
+        <translation>ei ilmoituksia</translation>
+    </message>
+    <message>
+        <source>Show titles only</source>
+        <translation>Näytä vain otsikot</translation>
+    </message>
+    <message>
+        <source>Show details</source>
+        <translation>Näytä myös kooste</translation>
+    </message>
 </context>
 <context>
     <name>unTpJuomispuheet</name>
-    <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request finished</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
-    </message>
     <message>
         <source>delete</source>
         <translation>poista</translation>
@@ -621,36 +669,19 @@
         <translation>Sanottuja</translation>
     </message>
     <message>
-        <source>starting search</source>
-        <translation>hakua aloitetaan</translation>
-    </message>
-    <message>
         <source>my comment</source>
         <translation>sanottavani</translation>
     </message>
 </context>
 <context>
+    <name>unTpKaveripyynto</name>
+    <message>
+        <source>Send friend request?</source>
+        <translation>Lähetä kaveripyyntö?</translation>
+    </message>
+</context>
+<context>
     <name>unTpKaverit</name>
-    <message>
-        <source>posting query</source>
-        <translation>lähetetään kyselyä</translation>
-    </message>
-    <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
-    </message>
     <message>
         <source>my friends</source>
         <translation>kaverini</translation>
@@ -660,16 +691,76 @@
         <translation>%1 kaveria</translation>
     </message>
     <message>
-        <source>starting search</source>
-        <translation>hakua aloitetaan</translation>
+        <source>accept request</source>
+        <translation>hyväksy pyyntö</translation>
+    </message>
+    <message>
+        <source>accepting</source>
+        <translation>hyväksyy</translation>
+    </message>
+    <message>
+        <source>reject request</source>
+        <translation>hylkää pyyntö</translation>
+    </message>
+    <message>
+        <source>rejecting</source>
+        <translation>hylkää</translation>
+    </message>
+    <message>
+        <source>show info</source>
+        <translation>näytä tiedot</translation>
+    </message>
+    <message>
+        <source>remove friend</source>
+        <translation>poista kaveri</translation>
+    </message>
+    <message>
+        <source>removing friendship</source>
+        <translation>poistaa kaveruutta</translation>
+    </message>
+    <message>
+        <source>show friends</source>
+        <translation>näytä kaverit</translation>
+    </message>
+    <message>
+        <source>show requests</source>
+        <translation>näytä pyynnöt</translation>
+    </message>
+    <message>
+        <source>friend request accepted</source>
+        <translation>kaveripyyntö hyväksytty</translation>
+    </message>
+    <message>
+        <source>friend request rejected</source>
+        <translation>kaveripyyntö hylätty</translation>
+    </message>
+    <message>
+        <source>friend removed</source>
+        <translation>kaveruus poistettu</translation>
+    </message>
+    <message>
+        <source>accepting was not successfull</source>
+        <translation>hyväksyntä ei onnistunut</translation>
+    </message>
+    <message>
+        <source>rejecting was not successfull</source>
+        <translation>hylkäys ei onnistunut</translation>
+    </message>
+    <message>
+        <source>removal was not successfull</source>
+        <translation>poisto ei onnistunut</translation>
+    </message>
+    <message>
+        <source>an error occurred</source>
+        <translation>joku virhe tapahtui</translation>
+    </message>
+    <message>
+        <source>friend requests</source>
+        <translation>kaveripyynnöt</translation>
     </message>
 </context>
 <context>
     <name>unTpKayttaja</name>
-    <message>
-        <source>user info: </source>
-        <translation>tietoja käyttäjästä:</translation>
-    </message>
     <message>
         <source>UnTappd account</source>
         <translation>UnTappd-tili</translation>
@@ -759,24 +850,28 @@
         <translation>omat tietoni</translation>
     </message>
     <message>
-        <source>beer info</source>
-        <translation>tietoja oluesta</translation>
-    </message>
-    <message>
-        <source>untoast</source>
-        <translation>ei maljaa sittenkään</translation>
-    </message>
-    <message>
-        <source>toast</source>
-        <translation>malja sille!</translation>
-    </message>
-    <message>
-        <source>comment</source>
-        <translation>huikkaa</translation>
-    </message>
-    <message>
         <source></source>
         <translation></translation>
+    </message>
+    <message>
+        <source>send friend request</source>
+        <translation>lähetä kaveripyyntö</translation>
+    </message>
+    <message>
+        <source>notifications</source>
+        <translation>ilmoitukset</translation>
+    </message>
+    <message>
+        <source>search user</source>
+        <translation>hae käyttäjä</translation>
+    </message>
+    <message>
+        <source>username</source>
+        <translation>käyttäjätunnus</translation>
+    </message>
+    <message>
+        <source>hide search</source>
+        <translation>piilota haku</translation>
     </message>
 </context>
 <context>
@@ -789,6 +884,38 @@
         <source>sign out</source>
         <translation>kirjaudu ulos</translation>
     </message>
+    <message>
+        <source>CODE or url containing CODE</source>
+        <translation>CODE tai url, jossa CODE on</translation>
+    </message>
+    <message>
+        <source>open in external browser</source>
+        <translation>avaa selaimessa</translation>
+    </message>
+    <message>
+        <source>unTappd login url</source>
+        <translation>unTappd kirjautumisosoite</translation>
+    </message>
+    <message>
+        <source>plain CODE</source>
+        <translation>pelkkä CODE</translation>
+    </message>
+    <message>
+        <source>use SilicaWebView</source>
+        <translation>käytä SilicaWebView&apos;tä</translation>
+    </message>
+    <message>
+        <source>To allow this app to use your unTappd-profile, use either an external browser (pull down menu) and follow the instructions below, or use the webview.</source>
+        <translation>Anna oikeudet unTappd-tiliisi joko käyttämällä ulkoista selainta (vetovalikosta) ja seuraamalla alla olevia ohjeita, tai selainikkunaa.</translation>
+    </message>
+    <message>
+        <source>After logging in, the browser will redirect you to a non-existing url %1. Copy the url, or just the CODE, to the text field below, and press enter.</source>
+        <translation>Kirjautumisen jälkeen selain yrittää avata sivun %1, jota ei ole. Kopioi osoite, tai vain parametri CODE, alla olevaan tekstikenttään, ja paina enteriä.</translation>
+    </message>
+    <message>
+        <source>If you have problems with the default browser, paste the login url below to the address field of another browser.</source>
+        <translation>Jos selaimen kanssa on ongelmia, kopioi alla oleva osoite johonkin muuhun selaimeen, ja yritä uudelleen.</translation>
+    </message>
 </context>
 <context>
     <name>unTpOluet</name>
@@ -799,14 +926,6 @@
     <message>
         <source>selected beer</source>
         <translation>valittu olut</translation>
-    </message>
-    <message>
-        <source>search text</source>
-        <translation>hakusanat</translation>
-    </message>
-    <message>
-        <source>starting search</source>
-        <translation>hakua aloitetaan</translation>
     </message>
     <message>
         <source>no beer selected</source>
@@ -840,29 +959,76 @@
         <source>sign in UnTappd</source>
         <translation>kirjaudu UnTappdiin</translation>
     </message>
+    <message>
+        <source>beer</source>
+        <translation>olut</translation>
+    </message>
+    <message>
+        <source>search breweries</source>
+        <translation>etsi panimoita</translation>
+    </message>
+</context>
+<context>
+    <name>unTpPanimo</name>
+    <message>
+        <source>brewing</source>
+        <translation>panee</translation>
+    </message>
+    <message>
+        <source>not producing</source>
+        <translation>ei toiminnassa</translation>
+    </message>
+    <message>
+        <source>lat: </source>
+        <translation>leveys: </translation>
+    </message>
+    <message>
+        <source>, lng: </source>
+        <translation>, pituus: </translation>
+    </message>
+    <message>
+        <source>beer info</source>
+        <translation>tietoja oluesta</translation>
+    </message>
+    <message>
+        <source>pints around</source>
+        <translation>tuoppeja maisemissa</translation>
+    </message>
+    <message>
+        <source>Brewery</source>
+        <translation>Panimo</translation>
+    </message>
+    <message>
+        <source>category</source>
+        <translation>luokitus</translation>
+    </message>
+    <message>
+        <source>address</source>
+        <translation>osoite</translation>
+    </message>
+    <message>
+        <source>city</source>
+        <translation>kaupunki</translation>
+    </message>
+    <message>
+        <source>top beers</source>
+        <translation>parhaat oluet</translation>
+    </message>
+    <message>
+        <source>no brewery selected (brewery id &lt; 1)</source>
+        <translation>panimoa ei valittu (id &lt; 1)</translation>
+    </message>
+    <message>
+        <source>statistics</source>
+        <translation>tilastoja</translation>
+    </message>
+    <message>
+        <source>search breweries</source>
+        <translation>etsi panimoja</translation>
+    </message>
 </context>
 <context>
     <name>unTpPub</name>
-    <message>
-        <source>posting query</source>
-        <translation type="unfinished">lähetetään kyselyä</translation>
-    </message>
-    <message>
-        <source>request not initialized</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>no check-ins nearby! ??</source>
         <translation>ei kirjauksia lähistöllä!??</translation>
@@ -870,18 +1036,6 @@
     <message>
         <source>no activity</source>
         <translation>ei toimintaa</translation>
-    </message>
-    <message>
-        <source>request finished</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>user data</source>
-        <translation>käyttäjän tiedot</translation>
-    </message>
-    <message>
-        <source>toast</source>
-        <translation>malja sille!</translation>
     </message>
     <message>
         <source>check pubs nearby</source>
@@ -892,36 +1046,107 @@
         <translation>kaljarinki</translation>
     </message>
     <message>
-        <source>pints by friends</source>
-        <translation>kavereiden kaljat</translation>
-    </message>
-    <message>
-        <source>pints nearby</source>
-        <translation>lähistöllä juodut</translation>
-    </message>
-    <message>
         <source>Seems like you haven&apos;t logged in UnTappd. That may limit the number of queries per day.</source>
         <translation>Et näytä kirjautuneen UnTappdiin. Se saattaa rajata kyselyjen päivittäistä määrää.</translation>
     </message>
     <message>
-        <source>starting search</source>
-        <translation>hakua aloitetaan</translation>
+        <source>refresh</source>
+        <translation>päivitä</translation>
+    </message>
+    <message>
+        <source>nobody&apos;s drinking this?</source>
+        <translation>tätä ei juo kukaan?</translation>
+    </message>
+    <message>
+        <source>This brewery is tapped. No check-ins.</source>
+        <translation>Panimon hanoissa vikaa? Ei kirjauksia. </translation>
+    </message>
+    <message>
+        <source>Nobody here!</source>
+        <translation>Täällä ei ketään!</translation>
+    </message>
+    <message>
+        <source>Friends</source>
+        <translation>Kaverit</translation>
+    </message>
+    <message>
+        <source>Pints around</source>
+        <translation>Tuoppeja maisemissa</translation>
+    </message>
+    <message>
+        <source>Checking friends</source>
+        <translation>Kavereiden kaljat</translation>
+    </message>
+    <message>
+        <source>Pints</source>
+        <translation>Lähistö</translation>
+    </message>
+    <message>
+        <source>Beer activity</source>
+        <translation>Oluen tarjoilu</translation>
+    </message>
+    <message>
+        <source>Brewery activity</source>
+        <translation>Panimon tuotteita</translation>
+    </message>
+    <message>
+        <source>Venue activity</source>
+        <translation>Kapakan meininki</translation>
+    </message>
+</context>
+<context>
+    <name>unTpTarjoaja</name>
+    <message>
+        <source>public</source>
+        <translation>julkinen</translation>
+    </message>
+    <message>
+        <source>private</source>
+        <translation>yksityinen</translation>
+    </message>
+    <message>
+        <source>lat: </source>
+        <translation>leveys: </translation>
+    </message>
+    <message>
+        <source>, lng: </source>
+        <translation>, pituus: </translation>
     </message>
     <message>
         <source>beer info</source>
         <translation>tietoja oluesta</translation>
     </message>
     <message>
-        <source>untoast</source>
-        <translation>ei maljaa sittenkään</translation>
+        <source>brewery info</source>
+        <translation>panimon tiedot</translation>
     </message>
     <message>
-        <source>comment</source>
-        <translation>huikkaa</translation>
+        <source>people here</source>
+        <translation>ihmisiä täällä</translation>
     </message>
     <message>
-        <source>refresh</source>
-        <translation>päivitä</translation>
+        <source>Beer provider</source>
+        <translation>Oluen tarjoaja</translation>
+    </message>
+    <message>
+        <source>category</source>
+        <translation>luokitus</translation>
+    </message>
+    <message>
+        <source>address</source>
+        <translation>osoite</translation>
+    </message>
+    <message>
+        <source>city</source>
+        <translation>kaupunki</translation>
+    </message>
+    <message>
+        <source>statistics</source>
+        <translation>tilastoja</translation>
+    </message>
+    <message>
+        <source>top beers</source>
+        <translation>parhaat oluet</translation>
     </message>
 </context>
 <context>
@@ -929,22 +1154,6 @@
     <message>
         <source>no beer selected</source>
         <translation>olutta ei valittu</translation>
-    </message>
-    <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
     </message>
     <message>
         <source>add to wish-list</source>
@@ -1005,6 +1214,14 @@
     <message>
         <source>remove from wish-list</source>
         <translation>poista toivelistalta</translation>
+    </message>
+    <message>
+        <source>brewery info</source>
+        <translation>panimon tiedot</translation>
+    </message>
+    <message>
+        <source>pints around</source>
+        <translation>tuoppeja maisemissa</translation>
     </message>
 </context>
 </TS>
