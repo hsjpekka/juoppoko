@@ -44,10 +44,12 @@ CoverBackground {
 
     function paivita() {
         promilleja.text = naytaPromillet()
-        if (paaikkuna.juomari.rajalla.getTime() < new Date().getTime()){
+        if (paaikkuna.juomari.rajalla === undefined) {
+            kunnossa.text = ""
+        } else if (paaikkuna.juomari.rajalla.getTime() < new Date().getTime()){
             kunnossa.text = ""
         } else {
-            kunnossa.text = paaikkuna.promilleRaja1 + qsTr(" ‰ at ") + paaikkuna.juomari.rajalla.toLocaleTimeString(Qt.locale(),"HH:mm")
+            kunnossa.text = paaikkuna.juomari.promilleRaja + qsTr(" ‰ at ") + paaikkuna.juomari.rajalla.toLocaleTimeString(Qt.locale(),"HH:mm")
         }
 
         return
@@ -98,11 +100,11 @@ CoverBackground {
     Timer {
         id: updateTimer
         interval: 5*60*1000 // min*s*ms
-        running: visible
+        running: status === Cover.Active
         repeat: true
         onTriggered: {
             paivita()
-            console.log("kansi näkyy " + kansi.visible)
+            //console.log("kansi näkyy " + kansi.visible)
         }
     }
 
@@ -123,9 +125,14 @@ CoverBackground {
 
     onVisibleChanged: {
         if (visible) {
-            paivita()
+            //paivita()
         }
     }
 
-    Component.onCompleted: paivita()
+    //Component.onCompleted: paivita()
+    onStatusChanged: {
+        if (status === Cover.Activating || status === Cover.Active) {
+            paivita()
+        }
+    }
 }

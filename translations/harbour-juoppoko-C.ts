@@ -506,10 +506,6 @@
         <translation>lähdevirhe</translation>
     </message>
     <message>
-        <source>check-in details</source>
-        <translation>kirjauksen yksityiskohdat</translation>
-    </message>
-    <message>
         <source>search settings</source>
         <translation>hakuasetukset</translation>
     </message>
@@ -536,14 +532,6 @@
     <message>
         <source>location determined %1 hours ago</source>
         <translation>sijainti määritetty %1 tuntia sitten</translation>
-    </message>
-    <message>
-        <source>shows location</source>
-        <translation>näyttää sijainnin</translation>
-    </message>
-    <message>
-        <source>hides location</source>
-        <translation>piilottaa sijainnin</translation>
     </message>
     <message>
         <source>location not determined</source>
@@ -575,6 +563,22 @@
     </message>
     <message>
         <source>venue info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>venue activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check-in location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>shows co-ordinates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hides place</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -659,16 +663,20 @@
         <translation>poistaa</translation>
     </message>
     <message>
-        <source>post</source>
-        <translation>julkaise</translation>
-    </message>
-    <message>
         <source>Comments</source>
         <translation>Sanottuja</translation>
     </message>
     <message>
         <source>my comment</source>
         <translation>sanottavani</translation>
+    </message>
+    <message>
+        <source>posted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>empty strings not posted</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -903,15 +911,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To allow this app to use your unTappd-profile, use either an external browser (pull down menu) and follow the instructions below, or use the webview.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>After logging in, the browser will redirect you to a non-existing url %1. Copy the url, or just the CODE, to the text field below, and press enter.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If you have problems with the default browser, paste the login url below to the address field of another browser.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sign in unTappd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>After signing in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Problems with the browser?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To use your unTappd-profile, sign in at %1 and follow the instructions below, or try the webview (pull down menu).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>After signing in, the browser will redirect you to a non-existing address %1. Copy the address, or just the CODE, to the text field below, and press enter.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -968,10 +988,6 @@
 </context>
 <context>
     <name>unTpPanimo</name>
-    <message>
-        <source>brewing</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>not producing</source>
         <translation type="unfinished"></translation>

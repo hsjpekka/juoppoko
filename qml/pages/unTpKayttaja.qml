@@ -34,7 +34,6 @@ Page {
 
     function kirjoitaKirjaukset(jsonVastaus) {
         var vastaus = jsonVastaus.response.checkins
-        //var kirjaus = jsonVastaus.response.checkins.items
         var id, aika = "", bid, etiketti, merkki, lausahdus, maljoja, omaMalja, huutoja, baari,
                 panimo, osallistunut, pubId
         var i=0, N = vastaus.count, aikams, paivays = new Date()
@@ -57,19 +56,24 @@ Page {
             pvm = paivays
             aika = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
 
-            //if (lausahdus == "" ) {
-            for (kentta in vastaus.items[i].venue) {
+            if ("venue_name" in vastaus.items[i].venue) {
+                baari = vastaus.items[i].venue.venue_name
+                //if (baari === "kotsaa") {
+                    //console.log("" + JSON.stringify(vastaus.items[i]))
+                //}
+            } else
+                baari = ""
+            if ("venue_id" in vastaus.items[i].venue)
+                pubId = vastaus.items[i].venue.venue_id
+            else
+                pubId = -1
+            /* for (kentta in vastaus.items[i].venue) {
                 if (kentta === "venue_name") {
-                    //console.log(merkki + " - " + vastaus.items[i].venue.venue_name)
                     baari = vastaus.items[i].venue.venue_name
-                } else if (kentta === "venue_id ") {
+                } else if (kentta === "venue_id") {
                     pubId = vastaus.items[i].venue.venue_id
-                        //console.log(merkki + " + " + kentta)
                 }
-            }
-                //if (baari != "")
-                    //lausahdus = baari
-                //else
+            } // */
             panimo = vastaus.items[i].brewery.brewery_name
             //}
 
@@ -77,7 +81,7 @@ Page {
             omaMalja = vastaus.items[i].toasts.auth_toast
             huutoja = vastaus.items[i].comments.count
             osallistunut = olenkoJutellut(vastaus.items[i].comments)
-            kirjausLista.lisaaListaan(id, bid, aika, "", kayttaja, "", etiketti, merkki, panimo,
+            kirjausLista.lisaa(id, bid, aika, "", kayttaja, "", etiketti, merkki, panimo,
                                       baari, pubId, maljoja, omaMalja, lausahdus, huutoja,
                                       vastaus.items[i].comments, osallistunut)
             i++
@@ -199,6 +203,7 @@ Page {
             //kayttis: kayttajatunnus
             //juomari: tekija
             pubi: paikka //
+            pubiId: baariId
             tarra: etiketti
             kalja: olut
             valmistaja: panimo //
@@ -336,7 +341,7 @@ Page {
             function lueKayttajanKirjaukset(tunnus, eka) { // jos tunnus = "" hakee omat tiedot
                 var kysely;
                 //toiminto = "kirjaukset";
-                kysely = UnTpd.getUserFeed(tunnus, eka, 0, 0);
+                kysely = UnTpd.getUserFeed(tunnus, eka);
                 xHttpGet(kysely, "kirjaukset");
                 return
             }
@@ -588,6 +593,10 @@ Page {
                                     uTYhteys.lueKayttajanTiedot(kayttaja);
                                     uTYhteys.lueKayttajanKirjaukset(kayttaja, 0)
                                 }
+
+                                if (uusi._muuttunut) {
+                                    uTYhteys.lueKayttajanTiedot(kayttaja);
+                                }
                             })
                         }
                     }
@@ -670,7 +679,7 @@ Page {
             avaaKirjautumissivu = false
             haeKayttajatiedot = false
             uTYhteys.lueKayttajanTiedot(kayttaja)
-            uTYhteys.lueKayttajanKirjaukset(kayttaja, 0)
+            uTYhteys.lueKayttajanKirjaukset(kayttaja)
         }
     }
 

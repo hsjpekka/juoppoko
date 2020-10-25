@@ -114,13 +114,13 @@ Item {
 
     function tarkistaVerkko() {
         var tulos = verkko.value//"connected"
-        console.log("tarkistetaan")
+        //console.log("tarkistetaan")
         if (kone === "i486") {
             tulos = "connected"
         } else if (tulos !== "connected") {
             console.log(qsTr("not connected") + ": " + tulos + ", " + verkko.status)
         }
-        console.log("tarkistettu")
+        //console.log("tarkistettu")
         return tulos
     }
 
@@ -157,7 +157,7 @@ Item {
         }
 
         xhttp.onreadystatechange = function () {
-            var vst=toiminto;
+            var vst=toiminto, tilaNro, tila;
             naytaKeskeytys.restart();
             yhteys.nakyville(); //yhteys.state = "nakyvilla";
             if (yhteys.keskeyta) {
@@ -165,7 +165,11 @@ Item {
                 yhteys.piiloon();
                 console.log("query aborted by user")
             }
-            console.log(vst + " - " + xhttp.readyState + " - " + xhttp.status)
+            if ("readyState" in xhttp)
+                tilaNro = xhttp.readyState
+            if ("status" in xhttp)
+                tila = xhttp.status
+            console.log(vst + " - " + tilaNro + " - " + tila)
             if (xhttp.readyState === 0)
                 viestit.text = qsTr("request not initialized")
             else if (xhttp.readyState === 1)
@@ -228,7 +232,7 @@ Item {
             xhttp.send(kysely)
         }
 
-        console.log("-- " + kysely)
+        //console.log(">>> " + kysely)
 
         return
     }

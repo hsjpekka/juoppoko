@@ -8,7 +8,7 @@ SilicaListView {
 
     property real   barWidth: Theme.fontSizeMedium
     property alias  chartData: listData
-    property color  labelColor: Theme.secondaryHighlightColor
+    property color  labelColor: Theme.highlightColor
     property real   labelFontSize: Theme.fontSizeExtraSmall
     property real   labelWidth: Theme.fontSizeMedium*1.5
     property real   scale: 1 // bar height = barValue*scale
@@ -87,20 +87,34 @@ SilicaListView {
             id: valueLabel
             text: showBarValue === 2 ? barItem.bValue : ""
             font.pixelSize: labelFontSize
+            font.bold: inFront
             horizontalAlignment: barChartView.orientation === ListView.Horizontal?
                                      Text.AlignHCenter : Text.AlignLeft
             x: barChartView.orientation === ListView.Horizontal ?
-                   0.5*(parent.width - width) : (defX > parent.width ? parent.width - width : defX)
+                   0.5*(parent.width - width) : defX
+                   //(defX > parent.width ? parent.width - width : defX)
                    //chartBar.x + chartBar.width + Theme.paddingSmall
             y: barChartView.orientation === ListView.Horizontal ? // chartBar.y - height - Theme.paddingSmall
-                    (defY < 0 ? 0 : defY) : 0.5*(parent.contentHeight - height)
+                    //defY : 0.5*(parent.contentHeight - height)
+                    (inFront ? 0 : defY) : 0.5*(parent.contentHeight - height)
             color: labelColor
             width: barChartView.orientation === ListView.Horizontal? parent.width : labelWidth
 
             property int defX: chartBar.x + chartBar.width + Theme.paddingSmall
             property int defY: chartBar.y - height - Theme.paddingSmall
-        }
+            property bool inFront: defY < -chartBar.y
 
+            //*
+            Rectangle {
+                id: tausta
+                anchors.fill: parent
+                color: "black" //Theme.highlightDimmerColor
+                opacity: Theme.opacityHigh
+                visible: parent.inFront ? (valueLabel.text > "") : false
+                z:-1
+            }
+            // */
+        }
     }//listitem
 
     section {

@@ -9,13 +9,13 @@ Dialog {
     property string oluenEtiketti: ""
     property string panimo: ""
     property string olutTyyppi: ""
-    property int olutId: 0
-    property real vahvuus: 0
-    property int happamuus: 0
+    property int olutId: -1
+    property real vahvuus: -1
+    property int happamuus: -1
     property bool toiveissa: false
 
-    property bool hakuMuuttuu: false
-    property int qqhakunro: 0
+    //property bool hakuMuuttuu: false
+    //property int qqhakunro: 0
     //property bool hakuvirhe: false
     //property int valittuOlut: 0
 
@@ -167,21 +167,21 @@ Dialog {
     }
 
     function paivitaHaetut(vastaus) { // vastaus = JSON(unTappd-vastaus)
-        var i=0, n=vastaus.response.beers.count
-        var merkki, panimo, tyyppi, etiketti, voltit, bid, ibu, toive
+        var i=0, n=vastaus.response.beers.count;
+        var merkki, panimo, tyyppi, etiketti, voltit, bid, ibu, toive;
 
         while (i<n) {
-            merkki = vastaus.response.beers.items[i].beer.beer_name
-            bid = vastaus.response.beers.items[i].beer.bid
-            tyyppi = vastaus.response.beers.items[i].beer.beer_style
-            voltit = vastaus.response.beers.items[i].beer.beer_abv
-            etiketti = vastaus.response.beers.items[i].beer.beer_label
-            panimo = vastaus.response.beers.items[i].brewery.brewery_name
-            ibu = vastaus.response.beers.items[i].beer.beer_ibu
-            toive = vastaus.response.beers.items[i].beer.wish_list
+            merkki = vastaus.response.beers.items[i].beer.beer_name;
+            bid = vastaus.response.beers.items[i].beer.bid;
+            tyyppi = vastaus.response.beers.items[i].beer.beer_style;
+            voltit = vastaus.response.beers.items[i].beer.beer_abv;
+            etiketti = vastaus.response.beers.items[i].beer.beer_label;
+            panimo = vastaus.response.beers.items[i].brewery.brewery_name;
+            ibu = vastaus.response.beers.items[i].beer.beer_ibu;
+            toive = vastaus.response.beers.items[i].beer.wish_list;
 
-            loydetytOluet.lisaa(merkki, panimo, voltit, ibu, tyyppi, etiketti, bid, toive)
-            i++
+            loydetytOluet.lisaa(merkki, panimo, voltit, ibu, tyyppi, etiketti, bid, toive);
+            i++;
         }
 
         return
@@ -235,13 +235,13 @@ Dialog {
     } //*/
 
     function talletaJuoma() {
-        UnTpd.oluenEtiketti = oluenEtiketti
-        UnTpd.oluenNimi = olut
-        UnTpd.oluenPanimo = panimo
-        UnTpd.oluenId = olutId
-        UnTpd.oluenTyyppi = olutTyyppi
-        UnTpd.oluenVahvuus = vahvuus
-        UnTpd.oluenHappamuus = happamuus
+        UnTpd.oluenEtiketti = oluenEtiketti;
+        UnTpd.oluenHappamuus = happamuus;
+        UnTpd.oluenId = olutId;
+        UnTpd.oluenNimi = olut;
+        UnTpd.oluenPanimo = panimo;
+        UnTpd.oluenTyyppi = olutTyyppi;
+        UnTpd.oluenVahvuus = vahvuus;
 
         return
     }
@@ -628,17 +628,14 @@ Dialog {
     }
 
     Component.onCompleted: {
-        haettava.text = olut
-        panimo = UnTpd.oluenPanimo
+        haettava.text = olut;
+        panimo = UnTpd.oluenPanimo;
         if (panimo != "") {
             naytaJuoma(UnTpd.oluenNimi, UnTpd.oluenId, UnTpd.oluenPanimo, UnTpd.oluenTyyppi,
-                        UnTpd.oluenVahvuus, UnTpd.oluenHappamuus, UnTpd.oluenEtiketti)
-            vahvuus = UnTpd.oluenVahvuus
+                        UnTpd.oluenVahvuus, UnTpd.oluenHappamuus, UnTpd.oluenEtiketti);
+            vahvuus = UnTpd.oluenVahvuus;
         }
-        olutId = UnTpd.oluenId
-
-        //console.log("onCompleted: olutId = " + olutId)
-
+        olutId = UnTpd.oluenId;
     }
 
     onAccepted: {
@@ -646,6 +643,6 @@ Dialog {
             olut = valittuOlut.text
         }
 
-        talletaJuoma()
+        talletaJuoma();
     }
 }

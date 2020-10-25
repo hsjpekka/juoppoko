@@ -162,8 +162,10 @@ Page {
             //paivitaAsetus2(Tkanta.tunnusUnTappdToken, UnTpd.unTpToken)
 
             tarkistaUnTpd()
-            if (unTpdKaytossa)
+            if (unTpdKaytossa) {
+                uTYhteys.unTpdKayttaja()
                 uTYhteys.unTpdOnkoUutisia()
+            }
             //paivitaAsetus2(Tkanta.tunnusUnTappdToken, UnTpd.unTpToken)
             //}
             juoja.paivita()
@@ -171,6 +173,10 @@ Page {
 
         dialog.rejected.connect(function() {
             tarkistaUnTpd()
+            if (unTpdKaytossa) {
+                uTYhteys.unTpdKayttaja()
+                uTYhteys.unTpdOnkoUutisia()
+            }
         })
 
         return
@@ -233,6 +239,8 @@ Page {
             unTpdKaytossa = true
         else
             unTpdKaytossa = false
+
+        console.log("untappd " + unTpdKaytossa)
 
         keho = Tkanta.lueTkJuomari()
 
@@ -437,7 +445,7 @@ Page {
         z: 1
         onValmis: {
             var jsonVastaus;
-            console.log("yhteydenotto valmis: " + httpVastaus.length)
+            //console.log("yhteydenotto valmis: " + httpVastaus.length)
             try {
                 jsonVastaus = JSON.parse(httpVastaus);
                 if (toiminto === "checkIn") {
@@ -445,6 +453,7 @@ Page {
                 } else if (toiminto === "uutiset") {
                     unTpdIlmoitaUutisista(jsonVastaus)
                 } else if (toiminto === "kayttaja") {
+                    //console.log(" --- " + httpVastaus)
                     if ("user" in jsonVastaus.response)
                         UnTpd.kayttaja = jsonVastaus.response.user.user_name
                 }
@@ -492,8 +501,8 @@ Page {
 
             huuto = tuoppi.kuvaus;
 
-            if (txtJuoma.arvostelu > 0)
-                tahtia = txtJuoma.arvostelu/2 + 0.5
+            if (tuoppi.arvostelu > 0)
+                tahtia = tuoppi.arvostelu/2 + 0.5
             else
                 tahtia = 0;
 
@@ -555,6 +564,7 @@ Page {
         function unTpdKayttaja() {
             var kysely
             //toiminto = "kayttaja"
+            //console.log("kysy käyttäjä")
             kysely = UnTpd.getUserInfo("", "true")
             xHttpGet(kysely, "kayttaja")
             return
@@ -711,7 +721,7 @@ Page {
 
             KulutusKuvaajat {
                 id: kuvaaja
-                width: parent.width
+                width: parent.width - 2*x
                 height: sivu.height/8
                 alustus: alustusKaynnissa
                 tyyppi: Tkanta.nakyvaKuvaaja
@@ -722,6 +732,13 @@ Page {
                 vrkVaihtuu: Tkanta.vrkVaihtuu
                 pylvasKuvaaja.barWidth: Theme.fontSizeExtraSmall
                 pylvasKuvaaja.labelWidth: pylvasKuvaaja.barWidth + 0.5*Theme.paddingSmall
+                x: Theme.horizontalPageMargin
+                onAlustusChanged: {
+                    if (!alustus) {
+                        //nykyinen = pylvasKuvaaja.count - 1
+                        //pylvasKuvaaja.positionViewAtEnd()
+                    }
+                }
                 onPitkaPainanta: {
                     tilastojenTarkastelu()
                 }
@@ -904,6 +921,7 @@ Page {
                 id: tuoppi
                 property string kuvaus: ""
                 property int olutId: 0 // oluen unTappd-tunnus
+                property int arvostelu: 0
                 //spacing: (sivu.width - txtJuoma.width - txtMaara.width - voltit.width - Theme.paddingMedium)/2
 
                 function muutaUusi() {
@@ -918,7 +936,7 @@ Page {
                                     "juomanKuvaus": tuoppi.kuvaus,
                                     "tilavuusMitta": Tkanta.arvoTilavuusMitta,
                                     "olutId": olutId,
-                                    "tahtia": txtJuoma.arvostelu
+                                    "tahtia": tuoppi.arvostelu
                                  })
 
                     dialog.rejected.connect(function() {
@@ -959,7 +977,7 @@ Page {
                             kirjaus.kirjaaUnTp = false
                         }
 
-                        txtJuoma.arvostelu = dialog.tahtia
+                        tuoppi.arvostelu = dialog.tahtia
 
                         //console.log("" + juomanKuvaus + ", " + arvostelu)
 
@@ -976,13 +994,12 @@ Page {
                     readOnly: true
                     color: Theme.primaryColor
                     text: qsTr("beer")
-                    label: arvostelu > 0 ? "" + (arvostelu/2+0.5).toFixed(1) + "/5" : " "
+                    label: tuoppi.arvostelu > 0 ? "" + (tuoppi.arvostelu/2+0.5).toFixed(1) + "/5" : " "
                     onClicked: {
                         tuoppi.muutaUusi()
                         //console.log("-- " + juomanKuvaus)
                     }
 
-                    property int arvostelu: 0
                 }
 
                 TextField {
@@ -1123,7 +1140,6 @@ Page {
                     if (!alustusKaynnissa && unTpdKaytossa)
                         uTYhteys.unTpdOnkoUutisia()
                 }
-
                 onMuutaJuomanTiedot: { // signaali (int iMuutettava) // hetki, maara, vahvuus, nimi, kuvaus, oId
                     var dialog = pageContainer.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
                                     "aika": new Date(juodunAika(iMuutettava)),
@@ -1170,7 +1186,8 @@ Page {
                     txtMaara.text = juoja.juodunTilavuus(valittuJuoma) //valitunTilavuus //lueJuomanMaara(qId)
                     voltit.text = juoja.juodunVahvuus(valittuJuoma) //valitunVahvuus //lueJuomanVahvuus(qId)
                     tuoppi.olutId = juoja.juodunOlutId(valittuJuoma) //valitunOlutId //Apuja.juomanId(i)
-                    UnTpd.setBeer(tuoppi.olutId)
+                    UnTpd.olutVaihtuu(tuoppi.olutId)
+                    tuoppi.arvostelu = 0
                 }
 
                 property bool luettu: false
@@ -1258,6 +1275,7 @@ Page {
         // <-- pois
         alustusKaynnissa = false
         asetustenKysely.start()
+        paivitaAjatRajoille()
 
         console.log("alkutoimet ohi, juoja.luettu=" + juoja.luettu )
     }

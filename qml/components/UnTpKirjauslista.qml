@@ -1,10 +1,24 @@
 import QtQuick 2.0
 
 ListModel {
-    function lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut,
+    function lisaa(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut,
                           panimo, baari, baariId, maljoja, kohotinko, huuto, juttuja, juttuLista,
                           jutellut){
-
+        //console.log(" --- " + kirjaus + ", " + kayttajatunnus + ", " + olut + ", " + baari + ", " + baariId);
+        if (kuva === undefined)
+            kuva = "";
+        if (nimi === undefined)
+            nimi = "";
+        if (etiketti === undefined)
+            etiketti = "";
+        if (baari === undefined)
+            baari = "";
+        if (baariId === undefined)
+            baariId = -1;
+        if (huuto === undefined)
+            huuto = ""
+        if (jutellut === undefined)
+            jutellut = false
         return append({"checkinId": kirjaus, "bid": bid, "section": aika,
                           "osoite": kuva, "kayttajatunnus": kayttajatunnus,
                           "tekija": nimi, "paikka": baari, "baariId": baariId,

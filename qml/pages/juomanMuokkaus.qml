@@ -45,10 +45,10 @@ Dialog {
     property string nimi
     property string nimi0
     property int olutId: 0
-    property real ozImp: 28.413
-    property real ozUs: 29.574
-    property real pintUs: 16*ozUs
-    property real pintImp: 20*ozImp
+    readonly property real ozImp: 28.413
+    readonly property real ozUs: 29.574
+    readonly property real pintUs: 16*ozUs
+    readonly property real pintImp: 20*ozImp
     property real prosLisays
     property int tahtia: 0
     property int tauko0 : 0.8*1000 // ms
@@ -58,6 +58,14 @@ Dialog {
     property real vahvuus
     property real yksikko: 1.0
     property string yksikkoTunnus: " ml"
+
+    property string _haetunEtiketti
+    property string _haetunNimi
+    property int _haetunId
+    property string _haetunPanimo
+    property string _haetunTyyppi
+    property real _haetunVahvuus
+    property int _haetunHappamuus
 
     function asetaYksikotMl() {
         maara = maara*yksikko
@@ -196,14 +204,17 @@ Dialog {
             MenuItem {
                 text: qsTr("search UnTappd")
                 onClicked: {
-                    var dialog = pageContainer.push(Qt.resolvedUrl("unTpOluet.qml"),{
-                        "olut": juoma.text, "vahvuus": vahvuus} )
+                    var dialog = pageContainer.push(Qt.resolvedUrl("unTpOluet.qml"), {
+                                        "olut": juoma.text
+                                    })
                     dialog.accepted.connect( function() {
-                        juoma.text = dialog.olut
-                        nimi0 = dialog.olut
-                        vahvuus = dialog.vahvuus
-                        olutId = dialog.olutId
-                        valitunEtiketti.source = UnTpd.oluenEtiketti
+                        juoma.text = dialog.olut;
+                        nimi0 = dialog.olut;
+                        vahvuus = dialog.vahvuus;
+                        if (olutId !== dialog.olutId)
+                            tahtia = 0;
+                        olutId = dialog.olutId;
+                        valitunEtiketti.source = UnTpd.oluenEtiketti;
                         //tahtiaRivi.visible = ( > 0) ? true : false
                         //console.log("avaaUnTappd: olutId " + olutId)
                     })
@@ -223,32 +234,6 @@ Dialog {
                 title: qsTr("Drink")
             } // */
 
-            /*
-            Row { //etsi untappedistä
-                x: Theme.paddingLarge
-                spacing: Theme.paddingLarge
-
-
-                Button {
-                    id: avaaUnTappd
-                    text: qsTr("search UnTappd")
-                    onClicked: {
-                        var dialog = pageContainer.push(Qt.resolvedUrl("unTpOluet.qml"),{
-                            "olut": juoma.text, "vahvuus": vahvuus} )
-                        dialog.accepted.connect( function() {
-                            juoma.text = dialog.olut
-                            nimi0 = dialog.olut
-                            vahvuus = dialog.vahvuus
-                            olutId = dialog.olutId
-                            valitunEtiketti.source = UnTpd.oluenEtiketti
-                            //tahtiaRivi.visible = ( > 0) ? true : false
-                            //console.log("avaaUnTappd: olutId " + olutId)
-                        })
-                    }
-                }
-            }
-            // */
-
             Row {
                 TextField {
                     id: juoma
@@ -258,36 +243,35 @@ Dialog {
                     readOnly: false
                     width: sivu.width - tyhjennaHaku.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin
                     onTextChanged: {
-                        if (!alkutoimet)
+                        if (!alkutoimet) {
                             olutId = 0
-                        //tahtiaRivi.visible = false
-                        //console.log("nimi muuttunut")
+                        }
                     }
-                    EnterKey.onClicked: tahtiaRivi.focus = true
+                    EnterKey.onClicked: focus = false
                 }
 
                 IconButton {
                     id: tyhjennaHaku
                     icon.source: "image://theme/icon-m-clear"
-                    //width: Theme.fontSizeMedium*3
                     onClicked: {
-                        //juoma.text = ""
                         nimi0 = ""
+                        juoma.text = ""
                         olutId = 0
-                        //tahtiaRivi.visible = false
                         valitunEtiketti.source = "tuoppi.png"
                     }
                 }
 
             }
 
-            Row { //arvostelu
+            Item { //arvostelu
                 id: tahtiaRivi
+                width: parent.width - 2*x
                 visible: (olutId > 0) ? true : false
-                height: visible? implicitHeight : 0
+                height: visible? (valitunEtiketti.height > arvostelu1.height? valitunEtiketti.height : arvostelu1.height) : 0
                 x: Theme.horizontalPageMargin
-                spacing: (parent.width - 2*x - valitunEtiketti.width - 5*arvostelu1.width - 4*arvostelu15.width)/9
+                //spacing: vapaaTila/11
 
+                property int vapaaTila: width - valitunEtiketti.width - 5*arvostelu1.width - 4*arvostelu15.width
                 Image {
                     id: valitunEtiketti
                     source: "./tuoppi.png"
@@ -297,6 +281,10 @@ Dialog {
 
                 IconButton {
                     id: arvostelu1
+                    anchors {
+                        left: valitunEtiketti.right
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 1) ? true : false
                     icon.source: (tahtia >= 1) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
                     onClicked: {
@@ -308,6 +296,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu15
+                    anchors {
+                        left: arvostelu1.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 2) ? true : false
                     icon.source: "image://theme/icon-s-favorite"
                     onClicked: {
@@ -319,6 +312,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu2
+                    anchors {
+                        left: arvostelu15.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 3) ? true : false
                     icon.source: (tahtia >= 3) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
                     onClicked: {
@@ -331,6 +329,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu25
+                    anchors {
+                        left: arvostelu2.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 4) ? true : false
                     icon.source: "image://theme/icon-s-favorite"
                     onClicked: {
@@ -343,6 +346,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu3
+                    anchors {
+                        left: arvostelu25.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 5) ? true : false
                     icon.source: (tahtia >= 5) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
                     onClicked: {
@@ -355,6 +363,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu35
+                    anchors {
+                        left: arvostelu3.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 6) ? true : false
                     icon.source: "image://theme/icon-s-favorite"
                     onClicked: {
@@ -366,6 +379,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu4
+                    anchors {
+                        left: arvostelu35.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 7) ? true : false
                     icon.source: (tahtia >= 7) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
                     onClicked: {
@@ -378,6 +396,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu45
+                    anchors {
+                        left: arvostelu4.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia >= 8) ? true : false
                     icon.source: "image://theme/icon-s-favorite"
                     onClicked: {
@@ -390,6 +413,11 @@ Dialog {
                 }
                 IconButton {
                     id: arvostelu5
+                    anchors {
+                        left: arvostelu45.right
+                        leftMargin: tahtiaRivi.vapaaTila/8
+                        verticalCenter: valitunEtiketti.verticalCenter
+                    }
                     highlighted: (tahtia == 9) ? true : false
                     icon.source: (tahtia >= 9) ? "image://theme/icon-m-favorite-selected" : "image://theme/icon-m-favorite"
                     onClicked: {
@@ -400,7 +428,6 @@ Dialog {
 
                     }
                 }
-
             } //arvostelu
 
             Row { // time
@@ -416,14 +443,14 @@ Dialog {
                                     hourMode: DateTime.TwentyFourHours,
                                     hour: aika.getHours(),
                                     minute: aika.getMinutes()
-                        })
+                        });
 
                         dialog.accepted.connect(function() {
                                 aika = new Date(aika.getFullYear(),aika.getMonth(),aika.getDate(),dialog.hour,
-                                               dialog.minute,0,0)
-                                value = aika.toLocaleTimeString(Qt.locale(),"HH:mm")
+                                               dialog.minute,0,0);
+                                value = aika.toLocaleTimeString(Qt.locale(),"HH:mm");
                                 aika.setMinutes(dialog.minute)
-                        })
+                        });
                     }
 
 
@@ -442,14 +469,14 @@ Dialog {
                     function openDateDialog() {
                         var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
                                     date: aika
-                                 })
+                                 });
 
                         dialog.accepted.connect(function() {
-                            selectedDate = dialog.date
+                            selectedDate = dialog.date;
                             aika = new Date(selectedDate.getFullYear(),selectedDate.getMonth(),selectedDate.getDate(),
-                                           aika.getHours(), aika.getMinutes(), 0, 0)
-                            value = aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-                        })
+                                           aika.getHours(), aika.getMinutes(), 0, 0);
+                            value = aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat);
+                        });
                     }
 
                     //label: "Date"
@@ -716,32 +743,26 @@ Dialog {
 
     Component.onCompleted: {
         if (tilavuusMitta == 2) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
-            asetaYksikotUsOz()
-            yksikonValinta.currentIndex = tilavuusMitta - 1
+            asetaYksikotUsOz();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
         } else if (tilavuusMitta == 3) {
-            asetaYksikotImpOz()
-            yksikonValinta.currentIndex = tilavuusMitta - 1
+            asetaYksikotImpOz();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
         } else if (tilavuusMitta == 4) {
-            asetaYksikotImpPint()
-            yksikonValinta.currentIndex = tilavuusMitta - 1
+            asetaYksikotImpPint();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
         } else if (tilavuusMitta == 5) {
-            asetaYksikotUsPint()
-            yksikonValinta.currentIndex = tilavuusMitta - 1
+            asetaYksikotUsPint();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
         } else
-            asetaYksikotMl()
+            asetaYksikotMl();
 
-        //console.log("olutId + tahtia: " + olutId + " " + tahtia + " " + nimi)
+        nimi0 = nimi;
+        if (UnTpd.oluenEtiketti > "")
+            valitunEtiketti.source = UnTpd.oluenEtiketti;
 
-        //if (olutId > 0)
-        //    tahtiaRivi.visible = true
-
-        valitunEtiketti.source = UnTpd.oluenEtiketti
-        nimi0 = nimi
-
-        alkutoimet = false
-
-        console.log("oluen id " + olutId)
-
+        alkutoimet = false;
+        console.log("väli " + tahtiaRivi.vapaaTila + "leveys " + arvostelu1.width + "leveys2 " + arvostelu1.implicitWidth)
     }
 
     onDone: {
@@ -749,18 +770,16 @@ Dialog {
             nimi = juoma.text;
             juomanKuvaus = kuvaus.text;
             if (nimi0 != nimi){ // nimi0 = joko juodut-tietokantaan talletettu tai untappedista haettu
-                console.log("nimi muuttunut");
                 olutId = 0;
-                UnTpd.setBeer(olutId);
+                UnTpd.olutVaihtuu(olutId);
             }
 
             if (olutId > 0)
-                UnTpd.shout = kuvaus.text;
+                UnTpd.saateSanat = kuvaus.text;
             tilavuus = maara*yksikko;
 
             Tkanta.arvoTilavuusMitta = tilavuusMitta;
             Tkanta.paivitaAsetus(Tkanta.tunnusTilavuusMitta,Tkanta.arvoTilavuusMitta);
         }
     }
-
 }

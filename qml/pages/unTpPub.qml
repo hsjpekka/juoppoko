@@ -174,7 +174,7 @@ Page {
                         + "- " + bid + "- " + etiketti + "- " + olut + "; " + panimo + "; "
                         + maljoja + "; " + jutteluita + ", " + baari)// */
             //console.log("" + i + "= " + JSON.stringify(kirjatut[i]))
-            kirjausLista.lisaaListaan(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti,
+            kirjausLista.lisaa(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti,
                                       olut, panimo, baari, baariId, maljoja, omaMalja, huuto,
                                       puheita, puheLista, osallistunut)
 

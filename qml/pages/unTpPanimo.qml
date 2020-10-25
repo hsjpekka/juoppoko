@@ -19,7 +19,7 @@ Page {
 
         luokitus.text = vastaus.brewery_type
         if (vastaus.brewery_in_production === 0) {
-            luokitus.label = qsTr("brewing")
+            luokitus.label = "" //qsTr("brewing")
         } else {
             luokitus.label = qsTr("not producing")
             luokitus.color = Theme.secondaryHighlightColor

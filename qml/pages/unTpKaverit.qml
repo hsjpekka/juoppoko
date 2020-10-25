@@ -10,11 +10,12 @@ Page {
     property string ilmoitukset: ""
     property string tunnus: "" //username
     property bool   _pyynnot: false
+    property bool   _muuttunut: false
     //property int haku: 0
     //property int haettavia: 25
     //property bool hakuvirhe: false
 
-    signal sulkeutuu
+    signal sulkeutuu(bool muuttunut)
 
     /*
     function qqhaeKavereita() {
@@ -120,6 +121,7 @@ Page {
                             loydetytKaverit.lisaa(naama.source, tiedot.text, tiedot.label,
                                                   henkilo.ktunnus, henkilo.kId)
                             pyytajat.remove(tama)
+                            _muuttunut = true
                         } )
                     }
                 }
@@ -152,6 +154,7 @@ Page {
                         peru.execute(henkilo, qsTr("removing friendship"), function () {
                             uTYhteys.poistaKaveri(henkilo.kId)
                             loydetytKaverit.remove(tama)
+                            _muuttunut = true
                         } )
                     }
                 }
@@ -351,6 +354,6 @@ Page {
     }
 
     Component.onDestruction: {
-        sulkeutuu()
+        sulkeutuu(_muuttunut)
     }
 }

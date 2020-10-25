@@ -137,23 +137,23 @@
     <name>XhttpYhteys</name>
     <message>
         <source>request not initialized</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>server connection established</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>request received</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>processing request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>request finished</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>posting GET-query</source>
@@ -177,7 +177,7 @@
     </message>
     <message>
         <source>error: </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -508,10 +508,6 @@
         <translation>lähdevirhe</translation>
     </message>
     <message>
-        <source>check-in details</source>
-        <translation>kirjauksen yksityiskohdat</translation>
-    </message>
-    <message>
         <source>search settings</source>
         <translation>hakuasetukset</translation>
     </message>
@@ -538,14 +534,6 @@
     <message>
         <source>location determined %1 hours ago</source>
         <translation>sijainti määritetty %1 tuntia sitten</translation>
-    </message>
-    <message>
-        <source>shows location</source>
-        <translation>näyttää sijainnin</translation>
-    </message>
-    <message>
-        <source>hides location</source>
-        <translation>piilottaa sijainnin</translation>
     </message>
     <message>
         <source>location not determined</source>
@@ -578,6 +566,22 @@
     <message>
         <source>venue info</source>
         <translation>tarjoilupaikan tiedot</translation>
+    </message>
+    <message>
+        <source>venue activity</source>
+        <translation>kapakassa nautittuja</translation>
+    </message>
+    <message>
+        <source>Check-in location</source>
+        <translation>Sijainti</translation>
+    </message>
+    <message>
+        <source>shows co-ordinates</source>
+        <translation>näyttää koordinaatit</translation>
+    </message>
+    <message>
+        <source>hides place</source>
+        <translation>piilottaa paikan</translation>
     </message>
 </context>
 <context>
@@ -661,16 +665,20 @@
         <translation>poistaa</translation>
     </message>
     <message>
-        <source>post</source>
-        <translation>julkaise</translation>
-    </message>
-    <message>
         <source>Comments</source>
         <translation>Sanottuja</translation>
     </message>
     <message>
         <source>my comment</source>
         <translation>sanottavani</translation>
+    </message>
+    <message>
+        <source>posted</source>
+        <translation>lähetetty</translation>
+    </message>
+    <message>
+        <source>empty strings not posted</source>
+        <translation>tyhjiä ei lähetetä</translation>
     </message>
 </context>
 <context>
@@ -905,16 +913,28 @@
         <translation>käytä SilicaWebView&apos;tä</translation>
     </message>
     <message>
-        <source>To allow this app to use your unTappd-profile, use either an external browser (pull down menu) and follow the instructions below, or use the webview.</source>
-        <translation>Anna oikeudet unTappd-tiliisi joko käyttämällä ulkoista selainta (vetovalikosta) ja seuraamalla alla olevia ohjeita, tai selainikkunaa.</translation>
-    </message>
-    <message>
-        <source>After logging in, the browser will redirect you to a non-existing url %1. Copy the url, or just the CODE, to the text field below, and press enter.</source>
-        <translation>Kirjautumisen jälkeen selain yrittää avata sivun %1, jota ei ole. Kopioi osoite, tai vain parametri CODE, alla olevaan tekstikenttään, ja paina enteriä.</translation>
-    </message>
-    <message>
         <source>If you have problems with the default browser, paste the login url below to the address field of another browser.</source>
         <translation>Jos selaimen kanssa on ongelmia, kopioi alla oleva osoite johonkin muuhun selaimeen, ja yritä uudelleen.</translation>
+    </message>
+    <message>
+        <source>Sign in unTappd</source>
+        <translation>Kirjaudu unTappdiin</translation>
+    </message>
+    <message>
+        <source>After signing in</source>
+        <translation>Kirjautumisen jälkeen</translation>
+    </message>
+    <message>
+        <source>Problems with the browser?</source>
+        <translation>Selainongelmia?</translation>
+    </message>
+    <message>
+        <source>To use your unTappd-profile, sign in at %1 and follow the instructions below, or try the webview (pull down menu).</source>
+        <translation>Käyttääksesi unTappd-tiliäsi, kirjaudu osoitteessa %1 ja seuraa alla olevia ohjeita, tai yritä selainsivulla (vetovalikosta).</translation>
+    </message>
+    <message>
+        <source>After signing in, the browser will redirect you to a non-existing address %1. Copy the address, or just the CODE, to the text field below, and press enter.</source>
+        <translation>Kirjauduttuasi selain siirtyy olemassa olemattomalle sivulle %1. Kopioi osoite tai pelkkä CODE alla olevaan kenttään, ja paina enteriä. </translation>
     </message>
 </context>
 <context>
@@ -971,10 +991,6 @@
 <context>
     <name>unTpPanimo</name>
     <message>
-        <source>brewing</source>
-        <translation>panee</translation>
-    </message>
-    <message>
         <source>not producing</source>
         <translation>ei toiminnassa</translation>
     </message>
@@ -1012,7 +1028,7 @@
     </message>
     <message>
         <source>top beers</source>
-        <translation>parhaat oluet</translation>
+        <translation>juoduimmat</translation>
     </message>
     <message>
         <source>no brewery selected (brewery id &lt; 1)</source>
@@ -1146,7 +1162,7 @@
     </message>
     <message>
         <source>top beers</source>
-        <translation>parhaat oluet</translation>
+        <translation>juoduimmat</translation>
     </message>
 </context>
 <context>

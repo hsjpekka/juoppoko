@@ -1,10 +1,11 @@
 .pragma library
 
 var callbackURL = "", newBadges, newBadgesSet = false, notificationsRespond // JSON-objekti
-var oluetSuosionMukaan = true, oluenNimi = "", oluenEtiketti = "", oluenPanimo = ""
-var oluenTyyppi = "", oluenVahvuus = 0.0, oluenHappamuus = 0, oluenId = 0
+var oluetSuosionMukaan = true
+var oluenEtiketti = "", oluenHappamuus = -1, oluenId = -1, oluenNimi = "", oluenPanimo = ""
+var oluenTyyppi = "", oluenVahvuus = -1, saateSanat = ""
 var postFoursquare = false, postFacebook = false, postTwitter = false
-var programName = "", queryLimit = 25, shout = ""
+var programName = "", queryLimit = 25
 var kayttaja = ""
 var unTpdId = "" // ohjelman clientId
 var unTpOsoite = "https://api.untappd.com/v4" // url
@@ -12,17 +13,17 @@ var unTpdSecret = "" // ohjelman salasana
 var unTpToken = "" // käyttäjän valtuutus
 var yhteys = ""
 
-function setBeer(beerId){
+function olutVaihtuu(beerId){
     if (beerId != oluenId) {
+        oluenEtiketti = ""
+        oluenHappamuus = -1
         oluenId = beerId
         oluenNimi = ""
-        oluenEtiketti = ""
         oluenPanimo = ""
         oluenTyyppi = ""
-        oluenVahvuus = 0.0
-        shout = ""
+        oluenVahvuus = -1
+        saateSanat = ""
     }
-
     return
 }
 
@@ -187,16 +188,19 @@ function getBeerFeed(beerId, maxId, minId, limit) { //(address1, appReg, auth, b
         query +=  userAut();
 
     if (minId > 0) {
-        query += "&min_id=" + minId
-
-        if ((maxId > 0) && (maxId < minId)) maxId = minId
-    };
+        if ((maxId > 0) && (maxId < minId)){
+            var tmp = maxId;
+            maxId = minId;
+            minId = tmp;
+        }
+        query += "&min_id=" + minId;
+    }
     if (maxId > 0) {
         query += "&max_id=" + maxId
-    };
+    }
     if (limit > 0) {
         query += "&limit=" + limit
-    };
+    }
 
     return encodeURI(query);
 }
@@ -237,16 +241,18 @@ function getBreweryFeed(breweryId, maxId, minId, limit) { // (address1, appReg, 
         query +=  userAut();
 
     if (minId > 0) {
-        query += "&min_id=" + minId
-
-        if ((maxId > 0) && (maxId < minId))
-            maxId = minId
-    };
+        if ((maxId > 0) && (maxId < minId)){
+            var tmp = maxId;
+            maxId = minId;
+            minId = tmp;
+        }
+        query += "&min_id=" + minId;
+    }
     if (maxId > 0)
-        query += "&max_id=" + maxId
+        query += "&max_id=" + maxId;
 
     if (limit > 0)
-        query += "&limit=" + limit
+        query += "&limit=" + limit;
 
     return encodeURI(query);
 }
@@ -281,18 +287,21 @@ function getFriendsActivityFeed(maxId, minId, limit) { //(address1, auth, maxId,
     var query = unTpOsoite + endpoint + "?" + userAut(); // authentication required
 
     if (minId > 0) {
-        if ((maxId > 0) && (maxId < minId))
-            maxId = minId
-        query += "&min_id=" + minId
-    };
+        if ((maxId > 0) && (maxId < minId)){
+            var tmp = maxId;
+            maxId = minId;
+            minId = tmp;
+        }
+        query += "&min_id=" + minId;
+    }
 
     if (maxId > 0) {
-        query += "&max_id=" + maxId
-    };
+        query += "&max_id=" + maxId;
+    }
 
     if (limit > 0) {
-        query += "&limit=" + limit
-    };
+        query += "&limit=" + limit;
+    }
 
     return encodeURI(query);
 }
@@ -380,10 +389,13 @@ function getPubFeed(lat, lng, radius, unit, maxId, minId, limit) { //(address1, 
         query += "&dist_pref=" + unit;
 
     if (minId > 0) {
-        if ((maxId > 0) && (maxId < minId))
+        if ((maxId > 0) && (maxId < minId)){
+            var tmp = maxId;
             maxId = minId;
-        query += "&min_id=" + minId
-    };
+            minId = tmp;
+        }
+        query += "&min_id=" + minId;
+    }
 
     if (maxId > 0)
         query += "&max_id=" + maxId;
@@ -445,10 +457,13 @@ function getUserFeed(targetName, maxId, minId, limit) { //(address1, appReg, aut
         query +=  userAut();
 
     if (minId > 0) {
-        if ((maxId > 0) && (maxId < minId))
+        if ((maxId > 0) && (maxId < minId)) {
+            var tmp = maxId;
             maxId = minId;
-        query += "&min_id=" + minId
-    };
+            minId = tmp;
+        }
+        query += "&min_id=" + minId;
+    }
 
     if (maxId > 0)
         query += "&max_id=" + maxId;
@@ -493,11 +508,13 @@ function getVenueFeed(venueId, maxId, minId, limit) { //(address1, appReg, auth,
         query +=  userAut();
 
     if (minId > 0) {
+        if ((maxId > 0) && (maxId < minId)){
+            var tmp = maxId;
+            maxId = minId;
+            minId = tmp;
+        }
         query += "&min_id=" + minId;
-
-        if ((maxId > 0) && (maxId < minId))
-            maxId = minId
-    };
+    }
 
     if (maxId > 0)
         query += "&max_id=" + maxId;
@@ -651,108 +668,3 @@ function toast(checkInId) { //(address1, auth, targetId)
 
     return encodeURI(query);
 }
-
-/*
-function qqxHttpUnTpd(getVaiPost, kysely, postOsoite, viestit, kunValmista, josVirhe) {
-    // getVaiPost - 1 = GET, 0 = Post; kunValmista(vastaus), josVirhe(vastaus)
-    var xhttp = new XMLHttpRequest()
-    var async = false, sync = true
-
-    xhttp.onreadystatechange = function () {
-        var vastaus = ""
-        //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
-        if (xhttp.readyState === 0)
-            viestit = qsTr("request not initialized") + ", " + xhttp.statusText
-        else if (xhttp.readyState === 1)
-            viestit = qsTr("server connection established") + ", " + xhttp.statusText
-        else if (xhttp.readyState === 2)
-            viestit = qsTr("request received") + ", " + xhttp.statusText
-        else if (xhttp.readyState === 3)
-            viestit = qsTr("processing request") + ", " + xhttp.statusText
-        else if (xhttp.readyState === 4){
-            //console.log(xhttp.responseText)
-            viestit = qsTr("request finished") + ", " + xhttp.statusText
-
-            if (xhttp.status === 200 ) {
-                vastaus = JSON.parse(xhttp.responseText);
-                kunValmista(vastaus)
-            } else {
-                console.log(xhttp.responseText)
-                try {
-                    vastaus = JSON.parse(xhttp.responseText);
-                    if ("developer_friendly" in vastaus.meta) {
-                        viestit = vastaus.meta.developer_friendly
-                    } else {
-                        viestit = "error: " + vastaus.meta.code + " - " + vastaus.meta.error_detail
-                    }
-                } catch (err) {
-                    viestit = "error: " + xhttp.responseText
-                    vastaus = xhttp.responseText
-                }
-
-                if ( typeof josVirhe === typeof function (){} )
-                    josVirhe(vastaus)
-            }
-        } else {
-            viestit = "error: " + xhttp.readyState + ", " + xhttp.statusText
-            console.log(viestit)
-            if ( typeof josVirhe === typeof function (){} )
-                josVirhe(vastaus)
-        }
-
-    }
-
-    if (getVaiPost > 0.5) {
-        viestit = qsTr("posting GET-query");
-        xhttp.open("GET", kysely, async);
-        xhttp.send();
-    } else {
-        viestit = qsTr("posting POST-query");
-        xhttp.open("POST", postOsoite, sync);
-        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhttp.send(kysely);
-    }
-
-    return;
-}
-// */
-/*
-// viestit - string, jota päivitetään, kunValmista(vastaus), josVirhe()
-function qqunTpdPost(osoite, kysely, viestit, kunValmista, josVirhe) {
-    var xhttp = new XMLHttpRequest()
-    var async = false, sync = true
-
-    xhttp.onreadystatechange = function () {
-        var vastaus = ""
-        //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
-        if (xhttp.readyState == 0)
-            viestit = qsTr("request not initialized") + ", " + xhttp.statusText
-        else if (xhttp.readyState == 1)
-            viestit = qsTr("server connection established") + ", " + xhttp.statusText
-        else if (xhttp.readyState == 2)
-            viestit = qsTr("request received") + ", " + xhttp.statusText
-        else if (xhttp.readyState == 3)
-            viestit = qsTr("processing request") + ", " + xhttp.statusText
-        else if (xhttp.readyState == 4){
-            //console.log(xhttp.responseText)
-            viestit = qsTr("request finished") + ", " + xhttp.statusText
-
-            vastaus = JSON.parse(xhttp.responseText);
-
-            kunValmista(vastaus)
-
-        } else {
-            console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
-            viestit = xhttp.readyState + ", " + xhttp.statusText
-            josVirhe()
-        }
-
-    }
-
-    viestit = qsTr("posting POST-query");
-    xhttp.open("POST", osoite, sync);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhttp.send(kysely);
-
-    return;
-} // */

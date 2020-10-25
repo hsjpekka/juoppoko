@@ -104,22 +104,65 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
-        pullDownMenu: valikko
+        //pullDownMenu: valikko
         visible: !webView.visible
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("sign out")
+                visible: (UnTpd.unTpToken != "") ? true : false
+                onClicked: {
+                    vaihdaTunnus("")
+                    pageContainer.pop()
+                }
+            }
+            MenuItem {
+                text: qsTr("cancel")
+                onClicked: {
+                    muuttunut = false
+                    pageContainer.pop()
+                }
+            }
+            /*
+            MenuItem {
+                text: qsTr("open in external browser")
+                onClicked: {
+                    Qt.openUrlExternally(unTappdLoginUrl)
+                    webView.visible = !webView.visible
+                }
+            } // */
+            MenuItem {
+                text: qsTr("use SilicaWebView")
+                visible: !webView.visible
+                onClicked: {
+                    webView.visible = !webView.visible
+                }
+            }
+        }
 
         Column {
             id: column
+            width: parent.width
             spacing: Theme.paddingMedium
 
-            Label {
+            PageHeader{
+                title: qsTr("Sign in unTappd")
+            }
+
+            LinkedLabel {
                 color: Theme.highlightColor
+                shortenUrl: true
                 width: parent.width - 2*x
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 x: Theme.horizontalPageMargin
 
-                text: qsTr("To allow this app to use your unTappd-profile, use either " +
-                           "an external browser (pull down menu) and follow the instructions " +
-                           "below, or use the webview.")
+                plainText: qsTr("To use your unTappd-profile, sign in at %1 and " +
+                                "follow the instructions below, " +
+                                "or try the webview (pull down menu).").arg(unTappdLoginUrl)
+            }
+
+            SectionHeader {
+                text: qsTr("After signing in")
             }
 
             Label {
@@ -129,10 +172,10 @@ Page {
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 x: Theme.horizontalPageMargin
 
-                text: qsTr("After logging in, the browser will redirect you to a non-existing " +
-                           "url %1. Copy the url, or just the CODE, to the text field below, " +
-                           "and press enter.").arg(cbu)
-                property string cbu: ".../juoppoko.untpd.tunnistus?code=CODE"
+                text: qsTr("After signing in, the browser will redirect you to a non-existing " +
+                           "address %1. Copy the address, or just the CODE, to the text field " +
+                           "below, and press enter.").arg(cbu)
+                property string cbu: "untappd.com/.../juoppoko.untpd.tunnistus?code=CODE"
             }
 
             TextField {
@@ -156,6 +199,10 @@ Page {
 
             }
 
+            SectionHeader {
+                text: qsTr("Problems with the browser?")
+            }
+
             Label {
                 id: lisaOhje
                 color: Theme.highlightColor
@@ -174,7 +221,6 @@ Page {
                     Clipboard.text = text
                     focus = false
                 }
-
                 label: qsTr("unTappd login url")
                 text: unTappdLoginUrl
             }

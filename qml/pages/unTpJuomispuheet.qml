@@ -279,15 +279,6 @@ Page {
 
         VerticalScrollDecorator{}
 
-        PushUpMenu {
-            MenuItem {
-                text: qsTr("post")
-                enabled: (juttuni.text != "") ? true : false
-                onClicked: uTYhteys.kommentoi()
-            }
-
-        }
-
         XhttpYhteys {
             id: uTYhteys
             anchors.top: parent.top
@@ -308,7 +299,10 @@ Page {
 
                         keskustelu = jsonVastaus.response.comments
                         kirjoitaSanotut(jsonVastaus.response.comments.items[vika])
-                        juttuni.text = ""
+                        if (jsonVastaus.response.result === "success") {
+                            juttuni.label = qsTr("posted")
+                            juttuni.text = ""
+                        }
                     }
                 } catch (err) {
                     console.log("" + err)
@@ -380,6 +374,7 @@ Page {
             Row {// kuka ja missä
                 id: juojaRivi
                 spacing: Theme.paddingMedium
+                height:
 
                 Image {
                     id: naama
@@ -407,9 +402,7 @@ Page {
                         width: henkilo.width
                         color: Theme.secondaryHighlightColor
                     }
-
                 }
-
             }
 
             Row { // tuopin tiedot
@@ -485,14 +478,15 @@ Page {
                 id: juttuni
                 width: sivu.width
                 placeholderText: qsTr("my comment")
-                EnterKey.iconSource: "image://theme/icon-m-enter-close"
-                EnterKey.onClicked: juttuni.focus = false
+                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                EnterKey.onClicked: {
+                    if (text > "") uTYhteys.kommentoi()
+                    juttuni.focus = false
+                }
                 text: ""
-                label: qsTr("my comment")
+                label: (text > "") ? qsTr("my comment") : qsTr("empty strings not posted")
             }
-
         }
-
     }
 
     Component.onCompleted: {

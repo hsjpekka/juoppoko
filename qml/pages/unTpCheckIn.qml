@@ -8,8 +8,9 @@ import "../scripts/foursqr.js" as FourSqr
 
 Dialog {
     id: sivu
-    anchors.leftMargin: Theme.paddingLarge
-    anchors.rightMargin: Theme.paddingLarge
+
+    //anchors.leftMargin: Theme.paddingLarge
+    //anchors.rightMargin: Theme.paddingLarge
 
     property string baari: ""
     property string baarinTunnus: ""
@@ -99,12 +100,11 @@ Dialog {
     // */
 
     function haunAloitus(hakuteksti) {
-        tyhjennaLista()
-        hakunro = 0
-        haettu = true
-        kuvaBaari.source = ""
-
-        return fsYhteys.haeBaareja(hakuteksti)
+        loydetytBaarit.clear();
+        hakunro = 0;
+        haettu = true;
+        kuvaBaari.source = "";
+        return fsYhteys.haeBaareja(hakuteksti);
     }
 
     function kopioiBaari(nro) {
@@ -116,7 +116,7 @@ Dialog {
         baarinTunnus = loydetytBaarit.get(nro).baariId
         pituuspiiri.text = loydetytBaarit.get(nro).baarinPituusPiiri
         leveyspiiri.text = loydetytBaarit.get(nro).baarinLeveysPiiri
-
+        asemanTalletus.checked = true
         return
     }
 
@@ -159,14 +159,6 @@ Dialog {
     }
     // */
 
-    function lisaaListaan(id, nimi, osoite, tyyppi, kuvake, levpii, pitpii) {
-        return loydetytBaarit.append({"baariId": id, "nimi": nimi, "osoite": osoite,
-                                         "tyyppi": tyyppi, "kuvake": kuvake,
-                                         "baarinPituusPiiri": pitpii,
-                                         "baarinLeveysPiiri": levpii
-                                     });
-    }
-
     function onkoTietoa(tietue, kentta){
         var kentat = Object.keys(tietue)
         var i = 0, n = kentat.length
@@ -184,7 +176,7 @@ Dialog {
     function naytaKapakanTiedot(jsonVastaus) {
         var kapakkaId, mj="", i=0
         try {
-            pubiId = jsonVastaus.response.venue.items[0].venue_id
+            kapakkaId = jsonVastaus.response.venue.items[0].venue_id
             if (jsonVastaus.response.venue.count > 1) {
                 while (i<jsonVastaus.response.venue.count) {
                     mj += jsonVastaus.response.venue.items[i].venue_name + ", "
@@ -194,6 +186,26 @@ Dialog {
             }
             pageContainer.push(Qt.resolvedUrl("../pages/unTpTarjoaja.qml"),
                                {"tunniste": kapakkaId })
+        } catch (err) {
+            console.log("error: " + err)
+        }
+
+        return
+    }
+
+    function naytaKapakanKirjaukset(jsonVastaus) {
+        var kapakkaId, mj="", i=0
+        try {
+            kapakkaId = jsonVastaus.response.venue.items[0].venue_id
+            if (jsonVastaus.response.venue.count > 1) {
+                while (i<jsonVastaus.response.venue.count) {
+                    mj += jsonVastaus.response.venue.items[i].venue_name + ", "
+                    i++
+                }
+                console.log("löydettyjä " + i + ": " + mj)
+            }
+            pageContainer.push(Qt.resolvedUrl("unTpPub.qml"), {"tunniste": kapakkaId,
+                                   "kaljarinki": "kuppila" })
         } catch (err) {
             console.log("error: " + err)
         }
@@ -251,7 +263,7 @@ Dialog {
             } else
                 pitpii = pituuspiiri.text
 
-            lisaaListaan(haetut[i].id, nimi, osoite, tyyppi, encodeURI(kuvake), levpii, pitpii)
+            loydetytBaarit.lisaa(haetut[i].id, nimi, osoite, tyyppi, encodeURI(kuvake), levpii, pitpii)
             i++
         }
 
@@ -274,17 +286,6 @@ Dialog {
         else if (method === PositionSource.AllPositioningMethods)
             return qsTr("Multiple")
         return qsTr("source error");
-    }
-
-    function tyhjennaLista() {
-        //var i=0, n=loydetytBaarit.count//baariLista.count
-        //while (i<n) {
-        //    loydetytBaarit.remove(0)
-        //    i++
-        //}
-        loydetytBaarit.clear();
-
-        return
     }
 
     Timer {
@@ -318,16 +319,33 @@ Dialog {
         ListItem {
             id: baarinTiedot
             //height: Theme.fontSizeMedium*3
-            height: baarinNimi.height
+            contentHeight: baarinNimi.height
             width: sivu.width
             //highlightedColor: Theme.highlightColor
+            menu: ContextMenu {
+                MenuItem {
+                    text: qsTr("venue info")
+                    visible: baarinTiedot.frsqId > ""
+                    onClicked: {
+                        fsYhteys.haeUnTpdId(baarinTiedot.frsqId, "tiedot")
+                    }
+                }
+                MenuItem {
+                    text: qsTr("venue activity")
+                    visible: baarinTiedot.frsqId > ""
+                    onClicked: {
+                        fsYhteys.haeUnTpdId(baarinTiedot.frsqId, "toiminta")
+                    }
+                }
+            }
+
             onClicked: {
                 var kuppilaNr = baariLista.indexAt(mouseX,y+mouseY)
                 //valittuBaariNr = baariLista.indexAt(mouseX,y+mouseY)
                 kopioiBaari(kuppilaNr)
             }
 
-            //property string baarinId: baariId
+            property string frsqId: baariId
             //property string katuosoite: osoite
             //property string pipi: baarinPituusPiiri
             //property string lepi: baarinLeveysPiiri
@@ -369,37 +387,15 @@ Dialog {
                         //valittuBaariNr = baariLista.indexAt(mouseX,baarinTiedot.y+0.5*height)
                         kopioiBaari(kuppilaNr)
                     }
-                    //z: -1
+                    onPressAndHold: {
+                        baarinTiedot.openMenu()
+                    }
+                        //z: -1
                 }
-
-                /*
-                Label {
-                    id: baarinId
-                    text: baariId
-                    visible: false
-                }
-
-                Text {
-                    text: osoite
-                    visible: false
-                    //width: sivu.width - 0.5*x - Theme.paddingLarge
-                }
-
-                Text {
-                    text: baarinPituusPiiri
-                    visible: false
-                }
-
-                Text {
-                    text: baarinLeveysPiiri
-                    visible: false
-                }
-                // */
-
             } // row
         }
 
-    } // oluidenTiedot
+    }
 
     SilicaFlickable {
         id: ruutu
@@ -412,7 +408,7 @@ Dialog {
 
         XhttpYhteys {
             id: fsYhteys
-            anchors.top: parent.top
+            y: sivu.isPortrait ? Theme.itemSizeLarge : Theme.itemSizeSmall //DialogHeader.qml
             z: 1
             onValmis: {
                 var jsonVastaus
@@ -420,8 +416,10 @@ Dialog {
                     jsonVastaus = JSON.parse(httpVastaus)
                     if (toiminto === "baareja")
                         paivitaHaetut(jsonVastaus)
-                    else if (toiminto === "untpdInfo")
+                    else if (toiminto === "tiedot")
                         naytaKapakanTiedot(jsonVastaus)
+                    else if (toiminto === "toiminta")
+                        naytaKapakanKirjaukset(jsonVastaus)
                 } catch (err) {
                     console.log("error: " + err)
                 }
@@ -457,12 +455,11 @@ Dialog {
                 return
             }
 
-            function haeUnTpdId(frSqrId) {
+            function haeUnTpdId(frSqrId, toiminto) {
                 var kysely = UnTpd.lookupFoursquare(frSqrId)
-                xHttpGet(kysely, "untpdInfo")
+                xHttpGet(kysely, toiminto)
                 return
             }
-
         }
 
         Column {
@@ -470,7 +467,7 @@ Dialog {
             width: sivu.width
 
             DialogHeader {
-                title: qsTr("check-in details")
+                title: qsTr("Check-in location")
             }
 
             IconTextSwitch {
@@ -478,12 +475,15 @@ Dialog {
                 icon.source: "image://theme/icon-m-location"
                 checked: true
                 //highlighted: !sijaintiTuore
-                text: checked ? qsTr("shows location") : qsTr("hides location")
+                text: checked ? qsTr("shows co-ordinates") : qsTr("hides place")
                 onCheckedChanged: {
                     if (checked == false) {
                         asetuksetNakyvat = false
                     }
                     naytaSijainti = checked
+                    baarinTunnus = ""
+                    kuvaBaari.source = ""
+                    txtBaari.text = ""
                 }
             }
 
@@ -559,7 +559,7 @@ Dialog {
                             text: "???"
                             label: qsTr("lng")
                             //wrapMode: Text.WordWrap
-                            color: readOnly ? Theme.highlightColor : Theme.primaryColor
+                            color: readOnly ? (sijaintiTuore? Theme.highlightColor : Theme.secondaryHighlightColor) : Theme.primaryColor
                             readOnly: !syotaKoordinaatit.highlighted
                             width: (sivu.width - 2*asetuksetRivi.x - 2*asemaRivi.spacing - syotaKoordinaatit.width )/2
                             //x: Theme.paddingLarge
@@ -572,7 +572,7 @@ Dialog {
                             text: "???"
                             label: qsTr("lat")
                             //wrapMode: Text.WordWrap
-                            color: readOnly ? Theme.highlightColor : Theme.primaryColor
+                            color: readOnly ? (sijaintiTuore? Theme.highlightColor : Theme.secondaryHighlightColor) : Theme.primaryColor
                             readOnly: !syotaKoordinaatit.highlighted
                             width: pituuspiiri.width
                             inputMethodHints: Qt.ImhFormattedNumbersOnly
@@ -580,14 +580,6 @@ Dialog {
                             //visible: asetuksetNakyvat
                             //x: Theme.paddingLarge
                         }
-
-                        //IconButton {
-                            //id: lueAsema
-                            //icon.source: "image://theme/icon-m-refresh"
-                            //onClicked: koordinaatit()
-                            //highlighted: asemanTalletus.checked
-                        //}
-
                     }
 
                     ComboBox {
@@ -609,7 +601,7 @@ Dialog {
                             MenuItem { text: qsTr("not limited") }
                         }
 
-                        currentIndex: 0
+                        currentIndex: sijaintiTuore ? 1 : 3
 
                         onCurrentIndexChanged: {
                             switch (currentIndex) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
@@ -647,24 +639,36 @@ Dialog {
                 contentHeight: kuvaBaari.height > txtBaari.height ? kuvaBaari.height : txtBaari.height
                 x: Theme.paddingMedium
                 menu: ContextMenu {
-                    visible: valittuKuppila.kuppilaId > 0
                     MenuItem {
                         text: qsTr("venue info")
+                        visible: baarinTunnus > ""
+                        onClicked: {
+                            fsYhteys.haeUnTpdId(baarinTunnus, "tiedot")
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("venue activity")
+                        visible: baarinTunnus > ""
+                        onClicked: {
+                            fsYhteys.haeUnTpdId(baarinTunnus, "toiminta")
+                        }
                     }
                 }
 
-                property int kuppilaId: -1
-
                 Image {
                     id: kuvaBaari
+                    width: Theme.iconSizeMedium
+                    height: width
                 }
 
                 TextField {
                     id: txtBaari
-                    width: parent.width - kuvaBaari.width
+                    anchors.left: kuvaBaari.right
                     color: asemanTalletus.checked ? Theme.highlightColor : Theme.highlightDimmerColor
-                    readOnly: true
                     label: qsTr("check-in location")
+                    readOnly: true
+                    width: parent.width - kuvaBaari.width
+                    onPressAndHold: valittuKuppila.openMenu()
                     //x: Theme.paddingLarge
                 }
             }
@@ -741,6 +745,13 @@ Dialog {
 
                 model: ListModel {
                     id: loydetytBaarit
+                    function lisaa(id, nimi, osoite, tyyppi, kuvake, levpii, pitpii) {
+                        return append({"baariId": id, "nimi": nimi, "osoite": osoite,
+                                          "tyyppi": tyyppi, "kuvake": kuvake,
+                                          "baarinPituusPiiri": pitpii,
+                                          "baarinLeveysPiiri": levpii
+                                      });
+                    }
                 }
 
                 delegate: baarienTiedot
@@ -766,6 +777,7 @@ Dialog {
         UnTpd.postFacebook = face //facebook.checked
         UnTpd.postTwitter = tweet //twitter.checked
         UnTpd.postFoursquare = foursq //foursquare.checked
+
         console.log("valittu baari " + baarinTunnus + " , " + baari)
     }
 

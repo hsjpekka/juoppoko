@@ -204,15 +204,12 @@ Item {
         return
     }
 
-    function paivita(aika) { // jos aikaa ei määritetä, lasketaan nykyinen tila, muuten ajanhetki = aika
-        var ms, nyt = new Date().getTime()
+    function paivita(aika) { // jos aikaa ei määritetä, lasketaan nykyinen tila
 
         if (aika === undefined)
-            ms = nyt
-        else
-            ms = aika
+            aika = new Date().getTime()
 
-        alkoholia = mlKehossa(ms)
+        alkoholia = mlKehossa(aika)
         promilleja = alkoholia*tiheys/(paino*vetta)
         //msRajalle = msPromilleRajalle(alkoholia, promilleRaja)
         //msSelvaksi = msPromilleRajalle(alkoholia, 0)

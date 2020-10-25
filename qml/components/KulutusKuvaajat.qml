@@ -360,11 +360,13 @@ Item {
     BarChart {
         id: pylvaikko
         anchors.fill: parent
+        currentIndex: alustus? undefined : model.count - 1
+        highlightFollowsCurrentItem: true
         orientation: ListView.Horizontal
         model: alustus? undefined : ( (tyyppi === 0) ? vkoKulutus : pvKulutus )
         scale: tyyppi === 0 ? height/skaalaVko : height/skaalaPv
-        visible: !alustus
-        highlightFollowsCurrentItem: !alustus
+        //visible: !alustus
+        //highlightFollowsCurrentItem: !alustus
         onBarSelected: { //(int barNr, real barValue, string barLabel)
             pylvasValittu(barNr, barValue, barLabel)
             console.log("pylvään " + barNr + " korkeus " + barValue + " skaala " + scale)
@@ -373,5 +375,4 @@ Item {
             pitkaPainanta(barNr, barValue, barLabel)
         }
     }
-
 }
