@@ -30,7 +30,6 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
 import QtPositioning 5.2
-//import org.freedesktop.contextkit 1.0
 import Nemo.Notifications 1.0
 
 import "../scripts/unTap.js" as UnTpd
@@ -114,7 +113,6 @@ Page {
     }
 
     function kysyAsetukset() {
-        console.log("kysely " + juoja.paino + ", " + juoja.vetta)
         var dialog = pageContainer.push(Qt.resolvedUrl("asetukset.qml"), {
                                         "massa0": juoja.paino, "vetta0": juoja.vetta,
                                         "kunto0": juoja.maksa,
@@ -155,19 +153,12 @@ Page {
             Tkanta.paivitaAsetus(Tkanta.tunnusVsRaja2, Tkanta.vsRaja2)
 
             juoja.promilleRaja = Tkanta.promilleRaja1
-            //console.log("kohta1 ")
-            //paivitaAsetukset()
-            //console.log("kohta2 ")
-
-            //paivitaAsetus2(Tkanta.tunnusUnTappdToken, UnTpd.unTpToken)
 
             tarkistaUnTpd()
             if (unTpdKaytossa) {
                 uTYhteys.unTpdKayttaja()
                 uTYhteys.unTpdOnkoUutisia()
             }
-            //paivitaAsetus2(Tkanta.tunnusUnTappdToken, UnTpd.unTpToken)
-            //}
             juoja.paivita()
         })
 
@@ -183,47 +174,35 @@ Page {
     }
 
     function lueAsetukset() {
-        var luettu = Tkanta.lueTkAsetukset()
+        var luettu = Tkanta.lueTkAsetukset();
 
-        UnTpd.unTpToken = Tkanta.arvoUnTpToken
-
-        kuvaaja.tyyppi = Tkanta.nakyvaKuvaaja
+        UnTpd.unTpToken = Tkanta.arvoUnTpToken;
+        kuvaaja.tyyppi = Tkanta.nakyvaKuvaaja;
+        kuvaaja.riskiPvAlempi = Tkanta.vrkRaja1;
+        kuvaaja.riskiPvYlempi = Tkanta.vrkRaja2;
+        kuvaaja.riskiVkoAlempi = Tkanta.vkoRaja1;
+        kuvaaja.riskiVkoYlempi = Tkanta.vkoRaja2;
+        kuvaaja.vrkVaihtuu = Tkanta.vrkVaihtuu;
+        juoja.promilleRaja = Tkanta.promilleRaja1;
 
         return luettu
     }
 
     function lueJuodut(kaikki, alkuAika, loppuAika) { //jos kaikki=true, alku- ja loppuajalla ei merkitystä
+        var taulukko = Tkanta.lueTkJuodut(kaikki, alkuAika, loppuAika).rows
+        var i = 0, maara, tmp
 
-        var taulukko = Tkanta.lueTkJuodut(kaikki, alkuAika, loppuAika)
-        var i = 0, maara
+        console.log(qsTr("%1 drinks, latest %2").arg(taulukko.length).arg(taulukko[taulukko.length-1].juoma))
 
-        //console.log("juomia " + taulukko.rows.length + ", viimeisin " + taulukko.rows[taulukko.rows.length-1].juoma)
-        console.log(qsTr("%1 drinks, latest %2").arg(taulukko.rows.length).arg(taulukko.rows[taulukko.rows.length-1].juoma))
-        //console.log("rivi " + typeof taulukko.rows[i].id + ", " + typeof taulukko.rows[i].aika
-        //            + ", " + typeof taulukko.rows[i].tilavuus + ", "
-        //            + typeof taulukko.rows[i].prosenttia + ", " + typeof taulukko.rows[i].juoma
-        //             + ", " + typeof taulukko.rows[i].kuvaus + ", " + typeof taulukko.rows[i].oluenId)
-
-        maara = new Date()
-        console.log("juodut listaan " + maara.getHours() + ":" +  maara.getMinutes() + ":" +  maara.getSeconds() + "." +  maara.getMilliseconds())
-        while (i < taulukko.rows.length) {
-            juoja.juo(taulukko.rows[i].id, taulukko.rows[i].aika, //taulukko.rows[i].veressa,
-                      taulukko.rows[i].tilavuus, taulukko.rows[i].prosenttia,
-                      taulukko.rows[i].juoma, taulukko.rows[i].kuvaus, taulukko.rows[i].oluenId);
+        tmp = new Date()
+        while (i < taulukko.length) {
+            juoja.juo(taulukko[i].id, taulukko[i].aika,
+                      taulukko[i].tilavuus, taulukko[i].prosenttia,
+                      taulukko[i].juoma, taulukko[i].kuvaus, taulukko[i].oluenId);
             i++
         }
 
-        maara = new Date()
-        console.log("juodut kuvaajaan " + maara.getHours() + ":" +  maara.getMinutes() + ":" +  maara.getSeconds() + "." +  maara.getMilliseconds())
-        i=0
-        while (i < taulukko.rows.length) {
-            maara = taulukko.rows[i].tilavuus*taulukko.rows[i].prosenttia/100
-            kuvaaja.lisaa(taulukko.rows[i].aika, maara)
-            i++
-        }
-
-        maara = new Date()
-        console.log("valmista " + maara.getHours() + ":" +  maara.getMinutes() + ":" +  maara.getSeconds() + "." +  maara.getMilliseconds())
+        tmp = new Date()
         return;
     }
 
@@ -239,8 +218,6 @@ Page {
             unTpdKaytossa = true
         else
             unTpdKaytossa = false
-
-        console.log("untappd " + unTpdKaytossa)
 
         keho = Tkanta.lueTkJuomari()
 
@@ -266,7 +243,6 @@ Page {
         lueJuodut(true, pvm.getTime() - 365*vrk, pvm.getTime()) // true = kaikki, false = aikarajojen välissä olevat
 
         if (juoja.annoksia > 0) {
-            console.log("annoksia " + juoja.annoksia)
             txtJuoma.text = juoja.juodunNimi(juoja.annoksia-1) //lueJuomanNimi(juomat.count-1)
             txtMaara.text = juoja.juodunTilavuus(juoja.annoksia-1)//lueJuomanMaara(juomat.count-1)
             voltit.text = juoja.juodunVahvuus(juoja.annoksia-1)//lueJuomanVahvuus(juomat.count-1)
@@ -339,52 +315,21 @@ Page {
             unTpdKaytossa = true
         else
             unTpdKaytossa = false
-        //console.log(" - " + luettuUnTpToken)
 
         return unTpdKaytossa
     } // */
 
     function uusiJuoma(tkId, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId) {
-        //var lisayskohta = etsiPaikka(hetki, juomat.count -1) // mihin kohtaan uusi juoma kuuluu juomien historiassa?
-
-        //lisaaListoihin(xid, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId);
         Tkanta.lisaaTkJuodut(tkId, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId);
 
         juoja.juo(tkId, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId)
 
         kuvaaja.lisaa(hetki, tilavuus*vahvuus/100)
 
-        //paivitaMlVeressa(hetki);
-
-        //paivitaPromillet();
-
         paivitaAjatRajoille();
-
-        //kansi.update();
-
-        //console.log("uusiJuoma: oluenId " + oluenId)
 
         return;
     }
-
-    /*
-    Notification {
-        id: ilmoitus
-        onClicked: {
-            if (avattava === "unTpIlmoitukset.qml") {
-                pageContainer.push(Qt.resolvedUrl("unTpIlmoitukset.qml"),
-                                                  {"ilmoitukset": uTYhteys.ilmoitukset
-                                                  })
-            } else if (avattava > "") {
-                pageContainer.push(Qt.resolvedUrl(avattava))
-            }
-
-            avattava = ""
-        }
-
-        property string avattava: ""
-    }
-    // */
 
     Timer {
         id: paivitys
@@ -393,7 +338,6 @@ Page {
         repeat: true
         onTriggered: {
             paivitaAika()
-            //paivitaPromillet()
             i0++
             if (i0 >= iN) {
                 juoja.paivita()
@@ -419,17 +363,41 @@ Page {
     }
 
     Timer {
-        id: asetustenKysely
+        id: aloitus
         interval: 200
         running: false
-        repeat: false
+        repeat: true
         onTriggered: {
-            alkutoimet()
-            //if (!juoja.luettu)
-                //kysyAsetukset()
-            //else if (unTpdKaytossa)
-                //uTYhteys.unTpdOnkoUutisia()
+            var jakso = kuvaaja.vkMs, t1, i0;
+            if (eka) {
+                alkutoimet();
+                kuvaaja.iJuoma = juoja.annoksia-1;
+                t1 = new Date().getTime();
+                kuvaaja.lisaa(juoja.juodunAika(0),0);
+                kuvaaja.lisaa(t1,0);
+                kuvaaja.pylvasKuvaaja.positionViewAtEnd();
+                jakso = kuvaaja.viikkoja*kuvaaja.vkMs;
+                eka = false;
+            } else {
+                if (kuvaaja.iJuoma > 0)
+                    t1 = juoja.juodunAika(kuvaaja.iJuoma);
+            }
+
+            if (kuvaaja.iJuoma > 0) {
+                i0 = kuvaaja.iJuoma;
+                kuvaaja.lisaaJakso(t1 - jakso, t1);
+                if (i0 === kuvaaja.iJuoma){
+                    kuvaaja.lisaaJakso(juomari.juodunAika(i0-1)-1, t1)
+                }
+            } else {
+                repeat = false;
+                running = false;
+            }
+            j++;
         }
+        property bool eka: true
+        property int j:0
+        //property int kerralla: 100
     }
 
     PositionSource {
@@ -445,7 +413,6 @@ Page {
         z: 1
         onValmis: {
             var jsonVastaus;
-            //console.log("yhteydenotto valmis: " + httpVastaus.length)
             try {
                 jsonVastaus = JSON.parse(httpVastaus);
                 if (toiminto === "checkIn") {
@@ -453,7 +420,6 @@ Page {
                 } else if (toiminto === "uutiset") {
                     unTpdIlmoitaUutisista(jsonVastaus)
                 } else if (toiminto === "kayttaja") {
-                    //console.log(" --- " + httpVastaus)
                     if ("user" in jsonVastaus.response)
                         UnTpd.kayttaja = jsonVastaus.response.user.user_name
                 }
@@ -471,12 +437,6 @@ Page {
         function unTpdCheckIn() {
             var barId = "", naytaSijainti = false, leveys, pituus, huuto, tahtia;
             var osoite, kysely, face = "", twit = "", fsqr = "", vyohyketunnus;
-            //var xhttp = new XMLHttpRequest()
-            //var aika, m0, m1;// ;
-
-            //console.log("tiedot: " + olutId + ", " + baariId + ", " + juomanKuvaus + ", "
-            //            + arvostelu)
-            //toiminto = "checkIn";
 
             if (!unTpdKaytossa)
                 return
@@ -488,9 +448,6 @@ Page {
                 return
 
             vyohyketunnus = Apuja.vyohyke(pvm.toLocaleTimeString());
-            //console.log("vyöhyketunnus " + vyohyketunnus)
-
-            //hetkinen.running = true
 
             if (Tkanta.arvoTalletaSijainti > 0.5) {
                 naytaSijainti = true;
@@ -506,55 +463,16 @@ Page {
             else
                 tahtia = 0;
 
-            if (Tkanta.arvoJulkaiseFacebook)
+            if (kirjausAsetukset.facebook)
                 face = "on";
-            if (Tkanta.arvoJulkaiseFsqr)
+            if (kirjausAsetukset.foursqr)
                 fsqr = "on";
-            if (Tkanta.arvoJulkaiseTwitter)
+            if (kirjausAsetukset.twitter)
                 twit = "on";
 
-            // checkIn(beerId, tzone, venueId, position, lat, lng, shout, rating, fbook, twitter, fsquare)
-            //osoite = UnTpd.checkInAddress()
-            //kysely = UnTpd.checkInData(olutId, vyohyketunnus, barId, naytaSijainti, leveys,
-            //                            pituus, huuto, tahtia, face, twit, fsqr)
-            //UnTpd.xHttpUnTpd(UnTpd.POST, kysely, osoite, unTpdViestit.text,
-            //                 unTpdKirjausTehty, viestinNaytto.start)
-            //haku = ;
             osoite = UnTpd.checkInAddress();
             kysely = UnTpd.checkInData(olutId, vyohyketunnus, barId, naytaSijainti,
                                               leveys, pituus, huuto, tahtia, face, twit, fsqr);
-            /*
-            xhttp.onreadystatechange = function () {
-                //console.log("checkIN - " + xhttp.readyState + " - " + xhttp.status)
-                if (xhttp.readyState == 0)
-                    unTpdViestit.text = qsTr("request not initialized") + ", " + xhttp.statusText
-                else if (xhttp.readyState == 1)
-                    unTpdViestit.text = qsTr("server connection established") + ", " + xhttp.statusText
-                else if (xhttp.readyState == 2)
-                    unTpdViestit.text = qsTr("request received") + ", " + xhttp.statusText
-                else if (xhttp.readyState == 3)
-                    unTpdViestit.text = qsTr("processing request") + ", " + xhttp.statusText
-                else if (xhttp.readyState == 4){
-                    //console.log(xhttp.responseText)
-                    unTpdViestit.text = qsTr("request finished") + ", " + xhttp.statusText
-
-                    var vastaus = JSON.parse(xhttp.responseText);
-
-                    unTpdKirjausTehty(vastaus)
-
-                } else {
-                    console.log("tuntematon " + xhttp.readyState + ", " + xhttp.statusText)
-                    unTpdViestit.text = xhttp.readyState + ", " + xhttp.statusText
-                    viestinNaytto.start()
-                }
-
-            }
-
-            unTpdViestit.text = qsTr("posting query")
-            xhttp.open("POST", osoite, false)
-            xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-            xhttp.send(kysely);
-            // */
 
             xHttpPost(kysely, osoite, "checkIn");
 
@@ -600,18 +518,19 @@ Page {
         function unTpdIlmoitaUutisista(jsonVastaus) {
             var maara
             //console.log(JSON.stringify(jsonVastaus))
-            console.log(" ilmoita uutisista !!")
+            //console.log(" ilmoita uutisista !!")
             ilmoitukset = JSON.stringify(jsonVastaus)
             if ("notifications" in jsonVastaus && "unread_count" in jsonVastaus.notifications) {
                 maara = jsonVastaus.notifications.unread_count.friends
                 if (maara > 0) {
-                    nayta(qsTr("new friend requests: %1").arg(maara))
-                    //ilmoitus.previewSummary = qsTr("new notifications : %1").arg(maara)
-                    //ilmoitus.avattava = "unTpIlmoitukset.qml"
-                    //ilmoitus.publish()
+                    uTvalinta.pyyntoja = maara*1
+                    utValikko.busy = true
                 }
-
-                console.log(jsonVastaus.response.news.count + " notes" )
+                maara = jsonVastaus.notifications.unread_count.news
+                if (maara > 0) {
+                    uTvalinta.uutisia = maara*1
+                }
+                //console.log(jsonVastaus.response.news.count + " notes" )
             }
             return
         }
@@ -619,7 +538,7 @@ Page {
         function unTpdOnkoUutisia() {
             var kysely;
             //toiminto = "uutiset";
-            console.log("onko uutisia " + unTpdKaytossa)
+            //console.log("onko uutisia " + unTpdKaytossa)
             if (!unTpdKaytossa)
                 return;
 
@@ -653,12 +572,11 @@ Page {
             }
 
             MenuItem {
-                text: qsTr("demo")
+                text: qsTr("foreteller")
                 onClicked:
                     pageContainer.push(Qt.resolvedUrl("demolaskuri.qml"), {
                                    "promilleRaja1": Tkanta.promilleRaja1,
-                                   //"promilleja": laskePromillet(new Date().getTime()),
-                                   "promilleja": juoja.promillejaHetkella(new Date().getTime()),
+                                   "lahtoTaso": juoja.promillejaHetkella(new Date().getTime()),
                                    "vetta": juoja.vetta, "paino": juoja.paino
                                    })
             }
@@ -666,18 +584,24 @@ Page {
         }
 
         PushUpMenu {
+            id: utValikko
             visible: unTpdKaytossa
+            onActiveChanged: {
+                busy = false
+            }
+
             MenuItem {
-                text: qsTr("unTappd")
+                id: uTvalinta
+                text: qsTr("unTappd %1").arg(_ilmoitus)                
                 onClicked: {
-                    //if (tarkistaVerkko()) {
                     var s = pageContainer.push(Qt.resolvedUrl("unTpKayttaja.qml"),
                                                {"ilmoitukset": uTYhteys.ilmoitukset})
                     s.sulkeutuu.connect(function() {
                         tarkistaUnTpd() })
-                    //}
                 }
-
+                property string _ilmoitus: uutisia + pyyntoja === 0 ? "" : "("+ pyyntoja + " - " + uutisia + ")"
+                property int uutisia: 0
+                property int pyyntoja: 0
             }
             MenuItem {
                 text: qsTr("Pints nearby")
@@ -695,18 +619,6 @@ Page {
                     s.aloitaHaku()
                 }
             }
-            /*
-            MenuItem {
-                text: qsTr("Notifications")
-                onClicked: {
-                    console.log("pitäisi välittyä " + uTYhteys.ilmoitukset.length + " merkkiä")
-                    console.log(uTYhteys.ilmoitukset.substring(0, 40))
-                    pageContainer.push(Qt.resolvedUrl("unTpIlmoitukset.qml"),
-                                       {"ilmoitukset": uTYhteys.ilmoitukset}
-                                       )
-                }
-            }
-            // */
         }
 
         Column {
@@ -724,29 +636,65 @@ Page {
                 width: parent.width - 2*x
                 height: sivu.height/8
                 alustus: alustusKaynnissa
-                tyyppi: Tkanta.nakyvaKuvaaja
-                riskiPvAlempi: Tkanta.vrkRaja1
-                riskiPvYlempi: Tkanta.vrkRaja2
-                riskiVkoAlempi: Tkanta.vkoRaja1
-                riskiVkoYlempi: Tkanta.vkoRaja2
-                vrkVaihtuu: Tkanta.vrkVaihtuu
                 pylvasKuvaaja.barWidth: Theme.fontSizeExtraSmall
                 pylvasKuvaaja.labelWidth: pylvasKuvaaja.barWidth + 0.5*Theme.paddingSmall
                 x: Theme.horizontalPageMargin
-                onAlustusChanged: {
-                    if (!alustus) {
-                        //nykyinen = pylvasKuvaaja.count - 1
-                        //pylvasKuvaaja.positionViewAtEnd()
-                    }
-                }
                 onPitkaPainanta: {
                     tilastojenTarkastelu()
+                }
+                onAlussa: {
+                    var ti
+                    if (iJuoma >= 0) {
+                        ti = juomari.juodunAika(iJuoma)
+                        if (kertojaAlussa === 1) {
+                            lisaaJakso(juomari.juodunAika(0), ti)
+                        } else {
+                            lisaaJakso(ti - viikkoja*vkMs, ti)
+                        }
+                        kertojaAlussa++
+                    }
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     z: -2
                     onPressAndHold: kuvaaja.tilastojenTarkastelu()
+                }
+
+                BusyIndicator {
+                    id: kesken
+                    size: BusyIndicatorSize.Medium
+                    anchors.centerIn: parent
+                    running: false
+                }
+
+                property int iJuoma: -1
+                property int kertojaAlussa: 0
+                property int vkMs: 7*24*60*60*1000
+                property int viikkoja: 20
+
+                function lisaaJakso(alkuAika, loppuAika) {
+                    var maara, vp, pv, pp, hh, mm, ss, ms;
+
+                    if (alkuAika === undefined)
+                        alkuAika = juoja.juodunAika(0)
+
+                    if (loppuAika === undefined)
+                        loppuAika = juoja.juodunAika(juoja.annoksia-1)
+
+                    kesken.running = true;
+                    //kuvaaja.lisaa(alkuAika, 0);
+                    //kuvaaja.lisaa(loppuAika, 0);
+                    while (iJuoma > -1 && juoja.juodunAika(iJuoma) > loppuAika) {
+                        iJuoma--;
+                    }
+                    while (iJuoma > -1 && juoja.juodunAika(iJuoma) >= alkuAika) {
+                        maara = juoja.juodunTilavuus(iJuoma)*juoja.juodunVahvuus(iJuoma)/100;
+                        kuvaaja.lisaa(juoja.juodunAika(iJuoma), maara, iJuoma);
+                        iJuoma--;
+                    }
+                    kesken.running = false;
+                    return;
                 }
 
                 function tilastojenTarkastelu(){
@@ -758,33 +706,27 @@ Page {
                         i++
                     }
 
-                    console.log("vika " + juodut[i-1].ms)
                     dialog = pageContainer.push(Qt.resolvedUrl("tilastot.qml"), {
                                                     "valittuKuvaaja": tyyppi,
                                                     "ryyppyVrk": vrkVaihtuu,
                                                     "juodut": juodut })
 
                     dialog.accepted.connect(function() {
-                        uusiTaulukko = dialog.valittuKuvaaja
-                        uusiRyyppyVrk = dialog.ryyppyVrk
-                        //console.log("kohta2 ")
+                        uusiTaulukko = dialog.valittuKuvaaja;
+                        uusiRyyppyVrk = dialog.ryyppyVrk;
 
-                        if ( (tyyppi != uusiTaulukko) || (vrkVaihtuu != uusiRyyppyVrk) ) {
-                            tyyppi = uusiTaulukko
-                            vrkVaihtuu = uusiRyyppyVrk
-                            //nakyvaKuvaaja = uusiTaulukko
-                            //vrkVaihtuu = uusiRyyppyTkanta.paivitaAsetus
-                            console.log("kohta a " + tyyppi + ", " + vrkVaihtuu)
-                            //paivitaKuvaaja()
-                            //kuvaaja.paivita()
-                            //console.log("kohtab ")
-                            Tkanta.paivitaAsetus(Tkanta.tunnusKuvaaja, uusiTaulukko)
-                            //console.log("kohtac ")
-                            Tkanta.paivitaAsetus(Tkanta.tunnusVrkVaihdos, uusiRyyppyVrk)
+                        if (tyyppi !== uusiTaulukko) {
+                            tyyppi = uusiTaulukko;
+                            Tkanta.nakyvaKuvaaja = uusiTaulukko;
+                            Tkanta.paivitaAsetus(Tkanta.tunnusKuvaaja, uusiTaulukko);
+                            kuvaaja.pylvasKuvaaja.positionViewAtEnd();
                         }
-
+                        if (vrkVaihtuu !== uusiRyyppyVrk ) {
+                            vrkVaihtuu = uusiRyyppyVrk;
+                            Tkanta.vrkVaihtuu = uusiRyyppyVrk;
+                            Tkanta.paivitaAsetus(Tkanta.tunnusVrkVaihdos, uusiRyyppyVrk);
+                        }
                     })
-                    //console.log("kohtaL ")
 
                     return
                 }
@@ -841,21 +783,19 @@ Page {
                                         hourMode: DateTime.TwentyFourHours,
                                         hour: pvm.getHours(),
                                         minute: pvm.getMinutes()
-                                     })
+                                     });
 
                         dialog.accepted.connect(function() {
-                            valittuTunti = dialog.hour
-                            valittuMinuutti = dialog.minute
-                            pvm = new Date(pvm.getFullYear(), pvm.getMonth(), pvm.getDate(), valittuTunti, valittuMinuutti, 0, 0)
-                            value = pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
+                            valittuTunti = dialog.hour;
+                            valittuMinuutti = dialog.minute;
+                            pvm = new Date(pvm.getFullYear(), pvm.getMonth(), pvm.getDate(), valittuTunti, valittuMinuutti, 0, 0);
+                            value = pvm.toLocaleTimeString(Qt.locale(), kelloMuoto);
 
-                            kello.kay = false
-                            keskeytaAika.running = true
-                            muutaAjanKirjasin()
+                            kello.kay = false;
+                            keskeytaAika.running = true;
+                            muutaAjanKirjasin();
 
-                            juoja.paivita(pvm.getTime())
-
-                            //paivitaPromillet()
+                            juoja.paivita(pvm.getTime());
                         })
                     }
 
@@ -884,20 +824,19 @@ Page {
                     function avaaPaivanValinta() {
                         var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
                                         date: pvm
-                                     })
+                                     });
 
                         dialog.accepted.connect(function() {
-                            valittuPaiva = dialog.date
+                            valittuPaiva = dialog.date;
                             pvm = new Date(valittuPaiva.getFullYear(), valittuPaiva.getMonth(), valittuPaiva.getDate(),
-                                           pvm.getHours(), pvm.getMinutes(), 0, 0)
-                            value = pvm.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
+                                           pvm.getHours(), pvm.getMinutes(), 0, 0);
+                            value = pvm.toLocaleDateString(Qt.locale(),Locale.ShortFormat);
 
-                            paivays.kay = false
-                            keskeytaAika.running = true
-                            muutaAjanKirjasin()
+                            paivays.kay = false;
+                            keskeytaAika.running = true;
+                            muutaAjanKirjasin();
 
-                            juoja.paivita(pvm.getTime())
-                            //paivitaPromillet()
+                            juoja.paivita(pvm.getTime());
                         })
                     }
 
@@ -925,8 +864,8 @@ Page {
                 //spacing: (sivu.width - txtJuoma.width - txtMaara.width - voltit.width - Theme.paddingMedium)/2
 
                 function muutaUusi() {
-                    var pv0 = pvm.getDate(), kk0 = pvm.getMonth(), vs0 = pvm.getFullYear()
-                    var h0 = pvm.getHours(), m0 = pvm.getMinutes()
+                    var pv0 = pvm.getDate(), kk0 = pvm.getMonth(), vs0 = pvm.getFullYear();
+                    var h0 = pvm.getHours(), m0 = pvm.getMinutes();
 
                     var dialog = pageContainer.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
                                     "aika": pvm,
@@ -937,67 +876,58 @@ Page {
                                     "tilavuusMitta": Tkanta.arvoTilavuusMitta,
                                     "olutId": olutId,
                                     "tahtia": tuoppi.arvostelu
-                                 })
+                                 });
 
                     dialog.rejected.connect(function() {
-                        return tarkistaUnTpd()
+                        return tarkistaUnTpd();
                     })
 
                     dialog.accepted.connect(function() {
-                        pvm = dialog.aika
+                        pvm = dialog.aika;
 
                         if ( (pvm.getDate() != pv0) || (pvm.getMonth() != kk0) || (pvm.getFullYear() != vs0)) {
-                            paivays.value = dialog.aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-                            paivays.kay = false
-                            keskeytaAika.running = true
-                            muutaAjanKirjasin()
+                            paivays.value = dialog.aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat);
+                            paivays.kay = false;
+                            keskeytaAika.running = true;
+                            muutaAjanKirjasin();
                         }
 
                         if ((pvm.getHours() != h0) || (pvm.getMinutes() != m0)) {
-                            kello.value = dialog.aika.toLocaleTimeString(Qt.locale(),kelloMuoto)
-                            kello.kay = false
-                            keskeytaAika.running = true
-                            muutaAjanKirjasin()
+                            kello.value = dialog.aika.toLocaleTimeString(Qt.locale(),kelloMuoto);
+                            kello.kay = false;
+                            keskeytaAika.running = true;
+                            muutaAjanKirjasin();
                         }
 
-                        txtJuoma.text = dialog.nimi
-                        txtMaara.text = dialog.tilavuus
-                        voltit.text = (dialog.vahvuus).toFixed(1)
-                        tuoppi.kuvaus = dialog.juomanKuvaus
+                        txtJuoma.text = dialog.nimi;
+                        txtMaara.text = dialog.tilavuus;
+                        voltit.text = (dialog.vahvuus).toFixed(1);
+                        tuoppi.kuvaus = dialog.juomanKuvaus;
 
-                        //if (dialog.tilavuusMitta != Tkanta.arvoTilavuusMitta) {
-                        //    Tkanta.arvoTilavuusMitta = dialog.tilavuusMitta
-                        //    Tkanta.paivitaAsetus(Tkanta.tunnusTilavuusMitta,Tkanta.arvoTilavuusMitta)
-                        //}
+                        tarkistaUnTpd();
 
-                        tarkistaUnTpd()
-
-                        olutId = dialog.olutId
+                        olutId = dialog.olutId;
                         if (olutId <= 0){
-                            kirjaus.kirjaaUnTp = false
+                            kirjaus.kirjaaUnTp = false;
                         }
 
-                        tuoppi.arvostelu = dialog.tahtia
+                        tuoppi.arvostelu = dialog.tahtia;
 
-                        //console.log("" + juomanKuvaus + ", " + arvostelu)
-
-                        return
+                        return;
                     })
 
-                    return
+                    return;
                 }
 
                 TextField {
                     id: txtJuoma
                     width: sivu.width - txtMaara.width - voltit.width
-                    //width: Theme.fontSizeMedium*5.8 //Theme.fontSizeExtraSmall*8
                     readOnly: true
                     color: Theme.primaryColor
                     text: qsTr("beer")
                     label: tuoppi.arvostelu > 0 ? "" + (tuoppi.arvostelu/2+0.5).toFixed(1) + "/5" : " "
                     onClicked: {
                         tuoppi.muutaUusi()
-                        //console.log("-- " + juomanKuvaus)
                     }
 
                 }
@@ -1005,7 +935,6 @@ Page {
                 TextField {
                     id: txtMaara
                     label: "ml"
-                    //width: Theme.fontSizeMedium*4 //Theme.fontSizeExtraSmall*4
                     readOnly: true
                     color: Theme.primaryColor
                     text: "500"
@@ -1031,54 +960,50 @@ Page {
             Row { // lisäys
                 id: kirjaus
                 x: unTpdKaytossa? Theme.paddingSmall : 0.5*(sivu.width - kulautus.width)
-                //spacing: (column.width - checkinUnTappd.width - kulautus.width - Theme.paddingMedium)
-                //spacing: (column.width - 2*x - txtBaari.width - kirjataankoUnTpd.width - kirjausAsetukset.width)/2
                 spacing: (column.width - 2*x - txtBaari.width - kulautus.width - kirjausAsetukset.width)/2
-                //spacing: 0
 
                 property bool kirjaaUnTp: true
-                //property int arvoTalletaSijainti: 0 // 0 - älä, 1 - pelkät koordinaatit riittää, 2 - vain, jos baari valittu
 
-                //*
                 IconButton {
                     id: kirjausAsetukset
-                    //icon.source: "image://theme/icon-s-setting"
                     icon.source: "image://theme/icon-m-whereami"
-                    //visible: unTpdKaytossa
-                    //enabled: olutId > 0 ? true : false
                     onClicked: {
-                        var dialog = pageContainer.push(Qt.resolvedUrl("unTpCheckIn.qml"))
+                        var dialog = pageContainer.push(Qt.resolvedUrl("unTpCheckIn.qml"), {
+                                                            "face": facebook,
+                                                            "foursq": foursqr,
+                                                            "tweet": twitter
+                                                        })
 
                         dialog.accepted.connect(function() {
-                            baariNimi = dialog.baari
-                            baariNr = dialog.baarinTunnus
+                            baariNimi = dialog.baari;
+                            baariNr = dialog.baarinTunnus;
                             if (baariNr != "")
-                                Tkanta.arvoTalletaSijainti = 2
+                                Tkanta.arvoTalletaSijainti = 2;
                             if (dialog.naytaSijainti){
                                 FourSqr.lastLat = dialog.lpiiri
                                 FourSqr.lastLong = dialog.ppiiri
                                 if (Tkanta.arvoTalletaSijainti == 0)
                                     Tkanta.arvoTalletaSijainti = 1
                             } else
-                                Tkanta.arvoTalletaSijainti = 0
-
+                                Tkanta.arvoTalletaSijainti = 0;
+                            if (facebook !== dialog.face)
+                                Tkanta.paivitaAsetus(Tkanta.tunnusJulkaiseFacebook, dialog.face);
+                            facebook = dialog.face;
+                            if (foursqr !== dialog.foursq)
+                                Tkanta.paivitaAsetus(Tkanta.tunnusJulkaiseFsqr, dialog.foursq);
+                            foursqr = dialog.foursq;
+                            if (twitter !== dialog.tweet)
+                                Tkanta.paivitaAsetus(Tkanta.tunnusJulkaiseTwitter, dialog.tweet);
+                            twitter = dialog.tweet;
                         })
                     }
 
                     property string baariNr: "-1"
                     property string baariNimi: ""
-
+                    property bool   foursqr: false
+                    property bool   facebook: false
+                    property bool   twitter: false
                 } // button
-                // */
-
-                /*
-                IconButton {
-                    id: kirjataankoUnTpd
-                    icon.source: kirjaaUnTp? "image://theme/icon-m-certificates" : "image://theme/icon-m-tabs"
-                    highlighted: kirjaaUnTp? true : false
-                    onClicked:
-                        kirjaaUnTp = !kirjaaUnTp
-                } // */
 
                 TextField {
                     id: txtBaari
@@ -1097,16 +1022,12 @@ Page {
 
                 Button { //add
                     id: kulautus
-                    //width: Theme.fontSizeMedium*4 //sivu.width - txtJuoma.width - txtMaara.width - voltit.width - 8 //100
-                    //anchors.horizontalCenter: parent.horizontalCenter
                     y: txtBaari.y + 0.5*(txtBaari.height - height)
                     text: qsTr("cheers!")
                     onClicked: {
                         var nyt = new Date().getTime(), juomaAika = pvm.getTime();
                         uusiJuoma(nyt, juomaAika, parseInt(txtMaara.text),
                                  parseFloat(voltit.text), txtJuoma.text, tuoppi.kuvaus, olutId);
-
-                        //lisaaKuvaajaan(juomaAika, parseInt(txtMaara.text), parseFloat(voltit.text))
                         paivays.kay = true;
                         kello.kay = true;
                         muutaAjanKirjasin();
@@ -1114,7 +1035,6 @@ Page {
                         uTYhteys.unTpdCheckIn();
                         tuoppi.kuvaus = ""
                     }
-
                 }
 
             } // untappd
@@ -1130,10 +1050,8 @@ Page {
                 height: (sivu.height - y > oletusKorkeus) ? sivu.height - y : oletusKorkeus
                 width: parent.width
                 alustus: alustusKaynnissa
-                promilleRaja: Tkanta.promilleRaja1
                 onJuomaPoistettu: { // signaali (string tkTunnus, int paivia, int kello, real holia)
                     Tkanta.poistaTkJuodut(tkTunnus);
-                    console.log("aika " + paivia*msPaivassa + kello + ", ml " + holia)
                     kuvaaja.lisaa(paivia*msPaivassa + kello, -holia);
                 }
                 onLuettuChanged: { // ensimmäisellä kerralla ohjelma kysyy käyttäjän tiedot, uutisten kysely sotkee tätä
@@ -1157,7 +1075,6 @@ Page {
 
                     dialog.accepted.connect(function() {
                         var ms = dialog.aika.getTime();
-                        //var i = etsiSeuraava(ms) - 1;
                         var vanhaHetki = juodunAika(iMuutettava)
                         var vanhanAlkoholi = juodunTilavuus(iMuutettava)*juodunVahvuus(iMuutettava)/100
                         muutaJuoma(iMuutettava, ms, dialog.tilavuus, dialog.vahvuus, dialog.nimi,
@@ -1166,11 +1083,7 @@ Page {
                                              dialog.vahvuus, dialog.nimi, dialog.juomanKuvaus,
                                              dialog.olutId); //, juodunPohjilla(iMuutettava)
                         paivita();
-                        //tuoppi.kuvaus = dialog.juomanKuvaus
-                        //paivitaMlVeressa(i);
-                        //paivitaPromillet();
                         paivitaAjatRajoille();
-                        //paivitaKuvaaja();
                         kuvaaja.lisaa(vanhaHetki, -vanhanAlkoholi);
                         kuvaaja.lisaa(ms, dialog.tilavuus*dialog.vahvuus/100);
                         tarkistaUnTpd();
@@ -1192,73 +1105,38 @@ Page {
 
                 property bool luettu: false
 
-                /*
-                function qqmuutaJuoma(id, ms, maara, vahvuus, juoma, kuvaus, juomaId){
-                    //             int, int, float,      int,   float,    string,     string
-                    //var qqpaiva = new Date(ms).toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-                    //var qqkello = new Date(ms).toLocaleTimeString(Qt.locale(), kelloMuoto)
-                    var mlAlkoholia = juoja.juodunPohjilla(id)
-                    //var i = Apuja.monesko(lueJuomanTunnus(id))
-                    //var i = Apuja.monesko(id)
-
-
-                    //Apuja.asetaJuomanArvot(i, lueJuomanTunnus(id), ms, mlAlkoholia, juoma, maara, vahvuus,
-                    //                       kuvaus, juomaId)
-
-                    //juomat.set(id, {"section": paiva,"juomaaika": kello,
-                    //                  "juomanimi": juoma, "juomamaara": maara,
-                    //                  "juomapros": vahvuus.toFixed(1)});
-
-
-                    //juomat.set(id, {"section": paiva,"juomaaika": kello, "aikaMs": ms,
-                    //                  "mlVeressa": mlAlkoholia, "juomanimi": juomanNimi, "juomamaara": maara,
-                    //                  "juomapros": vahvuus.toFixed(1), "kuvaus": juomanKuvaus});
-
-
-                    juoja.muutaJuoma(id, ms, mlAlkoholia, maara, vahvuus, juoma, kuvaus, juomaId)
-
-                    Tkanta.muutaTkJuodut(juoja.juodunTunnus(id), ms, maara, vahvuus,
-                                         juoma, kuvaus, juomaId); // , mlAlkoholia
-
-                    return
-                }
-                // */
-
                 function muutaPromillet() {
-                    var nytMs = pvm.getTime()
-                    var prml = juoja.promilleja
-
-                    //prml = laskePromillet(nytMs)
-                    //prml = juoja.promillejaHetkella(nytMs)
+                    var nytMs = pvm.getTime();
+                    var prml = juoja.promilleja;
 
                     if (prml < 3.0){
-                        txtPromilleja.text = "" + prml.toFixed(2) + " ‰"
+                        txtPromilleja.text = "" + prml.toFixed(2) + " ‰";
                     } else {
-                        txtPromilleja.text = "> 3.0 ‰"
+                        txtPromilleja.text = "> 3.0 ‰";
                     }
 
                     // huomion keräys, jos promilleRajat ylittyvät
                     if ( prml < Tkanta.promilleRaja1 ) {
                         //txtPromilleja.color = Theme.highlightDimmerColor
-                        txtPromilleja.font.pixelSize = Theme.fontSizeMedium
-                        txtPromilleja.font.bold = false
+                        txtPromilleja.font.pixelSize = Theme.fontSizeMedium;
+                        txtPromilleja.font.bold = false;
                     } else if( prml < Tkanta.promilleRaja2 ) {
                         //txtPromilleja.color = Theme.highlightColor
-                        txtPromilleja.font.pixelSize = Theme.fontSizeMedium
-                        txtPromilleja.font.bold = true
+                        txtPromilleja.font.pixelSize = Theme.fontSizeMedium;
+                        txtPromilleja.font.bold = true;
                     } else {
                         //txtPromilleja.color = Theme.highlightColor
-                        txtPromilleja.font.pixelSize = Theme.fontSizeLarge
-                        txtPromilleja.font.bold = true
+                        txtPromilleja.font.pixelSize = Theme.fontSizeLarge;
+                        txtPromilleja.font.bold = true;
                     }
 
                     if (nytMs > juoja.rajalla.getTime()) // msKunnossa.getTime() // verrataan hetkeä nytMs listan viimeisen juoman jälkeiseen hetkeen
-                        txtAjokunnossa.text = " -"
+                        txtAjokunnossa.text = " -";
 
                     if (nytMs > juoja.selvana.getTime()) // msSelvana.getTime()
-                        txtSelvana.text = " -"
+                        txtSelvana.text = " -";
 
-                    return
+                    return;
                 }
 
             }
@@ -1269,15 +1147,15 @@ Page {
 
     Component.onCompleted: {
         lueTiedostot()
-        // --> pois
+        // --> virtualbox
         if (kone === "i486")
             juoja.luettu = true
-        // <-- pois
+        // <--
         alustusKaynnissa = false
-        asetustenKysely.start()
+        aloitus.start()
+        juoja.paivita()
         paivitaAjatRajoille()
 
-        console.log("alkutoimet ohi, juoja.luettu=" + juoja.luettu )
     }
 
 }

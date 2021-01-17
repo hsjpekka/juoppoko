@@ -51,14 +51,14 @@ ApplicationWindow{
     Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta        
         var args = Qt.application.arguments.length
         UnTpd.programName = Qt.application.arguments[0]
-        kone = Qt.application.arguments[args-8]
+        UnTpd.unTpdId = Qt.application.arguments[args-1]
+        UnTpd.unTpdSecret = Qt.application.arguments[args-2]
+        UnTpd.callbackURL = Qt.application.arguments[args-3]
+        FourSqr.appId = Qt.application.arguments[args-4]
+        FourSqr.appSecret = Qt.application.arguments[args-5]
+        FourSqr.fsqrVersion = Qt.application.arguments[args-6]
         versioNro = Qt.application.arguments[args-7]
-        UnTpd.unTpdId = Qt.application.arguments[args-6]
-        UnTpd.unTpdSecret = Qt.application.arguments[args-5]
-        UnTpd.callbackURL = Qt.application.arguments[args-4]
-        FourSqr.appId = Qt.application.arguments[args-3]
-        FourSqr.appSecret = Qt.application.arguments[args-2]
-        FourSqr.fsqrVersion = Qt.application.arguments[args-1]
-        console.log("==> " + args + ", " + UnTpd.callbackURL + ", " + versioNro + " .. " + kone)
+        kone = Qt.application.arguments[args-8]
+        console.log("Juoppoko " + versioNro + " .. " + kone)
     }
 }

@@ -60,12 +60,12 @@ DISTFILES += \
 DEFINES += \
      "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"" \
      "UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\"" \
-     "CB_URL=\"\\\"$${_CB_URL}\\\"\"" \
      "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
      "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
-     "FSQ_VERSION=\"\\\"$${_FSQ_VERSION}\\\"\""\
      "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
-     "JUOPPOKO_VERSIO=\"\\\"3.0.1\\\"\""
+     "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
+     "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
+     "JUOPPOKO_VERSIO=\"\\\"2.4.1\\\"\""
 
 QT += positioning
 

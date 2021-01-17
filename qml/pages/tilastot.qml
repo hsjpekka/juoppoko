@@ -4,14 +4,63 @@ import "../scripts/scripts.js" as Apuja
 
 Dialog {
     id: sivu
-    property int paiva: 24*60*60*1000 // ms
-    property real tanaan: mlAikana(paiva) // paaikkuna.mlAikana(paiva)
-    property real mlViikossa: mlAikana(7*paiva)
-    property real mlKuussa: mlAikana(30*paiva) // paaikkuna.mlAikana(30*paiva)
-    property real mlVuodessa: vuodessa()
-    property int valittuKuvaaja // 0 - viikkokulutus, 1 - paivakulutus, oli 2 - paivaruudukko
-    property int ryyppyVrk
-    property var juodut
+    property var    juodut
+    property real   mlKuussa
+    property real   mlViikossa
+    property real   mlVuodessa
+    property int    paiva: 24*60*60*1000 // ms
+    property int    ryyppyVrk
+    property real   tanaan
+    property int    valittuKuvaaja // 0 - viikkokulutus, 1 - paivakulutus, oli 2 - paivaruudukko
+
+    function kellonAika(hh, mm) {
+        var mj;
+
+        if (hh < 10)
+            mj = "0" + hh + ":"
+        else
+            mj = "" + hh + ":";
+
+        if (mm < 10)
+            mj = mj + "0" + mm
+        else
+            mj = mj + mm;
+
+        return mj;
+    }
+
+    function korostukset() {
+
+        if (tanaan > paaikkuna.vrkRaja1) {
+            txtPaivassa.color = Theme.highlightColor;
+            if( tanaan > paaikkuna.vrkRaja2 ) {
+                txtPaivassa.font.bold = true;
+            }
+        }
+
+        if (mlViikossa > paaikkuna.vkoRaja1) {
+            txtViikossa.color = Theme.highlightColor;
+            if( mlViikossa > paaikkuna.vkoRaja2 ) {
+                txtViikossa.font.bold = true;
+            }
+        }
+
+        if (mlKuussa > paaikkuna.vkoRaja1/7*30 ) {
+            txtKuussa.color = Theme.highlightColor;
+            if( mlKuussa > paaikkuna.vkoRaja2/7*30 ) {
+                txtKuussa.font.bold = true;
+            }
+        }
+
+        if (mlVuodessa > paaikkuna.vsRaja1/7*30 ) {
+            txtVuodessa.color = Theme.highlightColor;
+            if( mlVuodessa > paaikkuna.vsRaja2/7*30 ) {
+                txtVuodessa.font.bold = true;
+            }
+        }
+
+        return;
+    }
 
     function mlAikana(kesto, loppu) { // jakso = ms nykyhetkestä (tai tulevasta juoman hetkestä)
         //var nyt = new Date().getTime()
@@ -26,10 +75,10 @@ Dialog {
             i--;
         while (i >= 0 && juodut[i].ms >= t0) {
             ml += juodut[i].ml;
-            i--
+            i--;
         }
 
-        console.log(" zzz " + juodut[juodut.length-1].ms + ", " + juodut[juodut.length-1].ml)
+        //console.log(" zzz " + juodut[juodut.length-1].ms + ", " + juodut[juodut.length-1].ml)
         //if ( Apuja.juomanAika(i) > nyt)
         //    nyt = Apuja.juomanAika(i)
 
@@ -38,7 +87,7 @@ Dialog {
         //    i--
         //}
 
-        return ml
+        return ml;
     }
 
     function vuodessa() {
@@ -52,62 +101,12 @@ Dialog {
             suhde = (nyt-juodut[0].ms)/(365*paiva);
             if (suhde < 1/52)
                 suhde = 1/52;
-            txtVuodessa.font.italic = !txtVuodessa.font.italic
+            txtVuodessa.font.italic = !txtVuodessa.font.italic;
         }
 
-        console.log("oo  " + suhde);
+        //console.log("oo  " + suhde);
 
-        return mlAikana(365*paiva)/suhde
-    }
-
-    function kellonAika(hh,mm) {
-        var mj
-
-        if (hh < 10)
-            mj = "0" + hh + ":"
-        else
-            mj = "" + hh + ":"
-
-        if (mm <10 )
-            mj = mj + "0" + mm
-        else
-            mj = mj + mm
-
-        return mj
-    }
-
-    //
-    function korostukset() {
-
-        if (tanaan > paaikkuna.vrkRaja1) {
-            txtPaivassa.color = Theme.highlightColor
-            if( tanaan > paaikkuna.vrkRaja2 ) {
-                txtPaivassa.font.bold = true
-            }
-        }
-
-        if (mlViikossa > paaikkuna.vkoRaja1) {
-            txtViikossa.color = Theme.highlightColor
-            if( mlViikossa > paaikkuna.vkoRaja2 ) {
-                txtViikossa.font.bold = true
-            }
-        }
-
-        if (mlKuussa > paaikkuna.vkoRaja1/7*30 ) {
-            txtKuussa.color = Theme.highlightColor
-            if( mlKuussa > paaikkuna.vkoRaja2/7*30 ) {
-                txtKuussa.font.bold = true
-            }
-        }
-
-        if (mlVuodessa > paaikkuna.vsRaja1/7*30 ) {
-            txtVuodessa.color = Theme.highlightColor
-            if( mlVuodessa > paaikkuna.vsRaja2/7*30 ) {
-                txtVuodessa.font.bold = true
-            }
-        }
-
-        return
+        return mlAikana(365*paiva)/suhde;
     }
 
     SilicaFlickable {
@@ -121,10 +120,6 @@ Dialog {
 
             DialogHeader {
                 title: qsTr("Statistics")
-            }
-
-            SectionHeader {
-                text: qsTr("chart")
             }
 
             ComboBox {
@@ -169,7 +164,6 @@ Dialog {
                 }
 
             } // päivässä
-
 
             SectionHeader {
                 text: qsTr("last week")
@@ -268,13 +262,13 @@ Dialog {
                     dialog.accepted.connect(function() {
                         valittuTunti = dialog.hour
                         valittuMinuutti = dialog.minute
-                        value = kellonAika(valittuTunti,valittuMinuutti)
+                        value = kellonAika(valittuTunti, valittuMinuutti)
                         ryyppyVrk = valittuTunti*60 + valittuMinuutti
                     })
                 }
 
                 width: Theme.fontSizeExtraSmall*8
-                value: kellonAika(valittuTunti,valittuMinuutti)
+                value: kellonAika(valittuTunti, valittuMinuutti)
                 onClicked: {
                         valitseAika()
                 }
@@ -285,6 +279,11 @@ Dialog {
     }
 
     Component.onCompleted: {
+        //console.log("vrk vaihtuu " + ryyppyVrk + " - " + kello.valittuTunti + ", " + kello.valittuMinuutti)
+        tanaan = mlAikana(paiva)
+        mlViikossa = mlAikana(7*paiva)
+        mlKuussa = mlAikana(30*paiva)
+        mlVuodessa = vuodessa()
         korostukset()
     }
 

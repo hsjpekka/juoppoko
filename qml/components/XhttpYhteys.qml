@@ -50,7 +50,9 @@ Item {
 
     property string httpVastaus: ""
     property bool   keskeyta: false
+    property alias  kesto: viestinNaytto.muuKesto // jos muuKesto > 0, sitä käytetään
     property int    kokoKorkeus: hetkinen.height + viestit.height + 3*Theme.paddingMedium
+    property bool   naytaVainVirheet: true
     property alias  naytaViesti: viestinNaytto.running
     property bool   onnistui: true
     property alias  peita: tausta.visible
@@ -143,33 +145,35 @@ Item {
         var async = true, sync = false;
         var yhteysNro // funktion kutsuhetkellä
 
-        yhteys.nakyville(); //yhteys.state = "nakyvilla";
+        if (!naytaVainVirheet)
+            yhteys.nakyville(); //yhteys.state = "nakyvilla";
         if (unohdaVanhat && kutsu === undefined)
-            viimeisinYhteys++
-        yhteysNro = viimeisinYhteys
+            viimeisinYhteys++;
+        yhteysNro = viimeisinYhteys;
 
         if (tarkistaVerkko() !== "connected") {
-            yhteydet.lisaa(toiminto, haku, kysely, postOsoite, yhteysNro, unohdaVanhat)
-            console.log("lisätty listaan " + kysely + " " + yhteysNro)
+            yhteydet.lisaa(toiminto, haku, kysely, postOsoite, yhteysNro, unohdaVanhat);
+            console.log("lisätty listaan " + kysely + " " + yhteysNro);
             if (!yhteydenOtto.running)
-                yhteydenOtto.start()
+                yhteydenOtto.start();
             return;
         }
 
         xhttp.onreadystatechange = function () {
-            var vst=toiminto, tilaNro, tila;
+            var vst=toiminto, tilaNro="", tila="";
             naytaKeskeytys.restart();
-            yhteys.nakyville(); //yhteys.state = "nakyvilla";
+            if (!naytaVainVirheet)
+                yhteys.nakyville(); //yhteys.state = "nakyvilla";
             if (yhteys.keskeyta) {
                 xhttp.abort();
                 yhteys.piiloon();
                 console.log("query aborted by user")
             }
             if ("readyState" in xhttp)
-                tilaNro = xhttp.readyState
+                tilaNro = "" + xhttp.readyState
             if ("status" in xhttp)
-                tila = xhttp.status
-            console.log(vst + " - " + tilaNro + " - " + tila)
+                tila = "" + xhttp.status
+            //console.log(vst + " - " + tilaNro + " - " + tila);
             if (xhttp.readyState === 0)
                 viestit.text = qsTr("request not initialized")
             else if (xhttp.readyState === 1)
@@ -182,54 +186,58 @@ Item {
                 //console.log(xhttp.responseText)
                 viestit.text = qsTr("request finished");
                 vst = xhttp.responseText;
+                /*
                 if (vst.length > 20)
                     console.log("vastaus " + vst.substring(0,20))
                 else
                     console.log("vastaus " + vst)
+                // */
 
                 if (xhttp.status === 200 ) {
-                    kunValmis(toiminto, vst, yhteysNro)
+                    kunValmis(toiminto, vst, yhteysNro);
                 } else {
+                    yhteys.nakyville();
                     try {
                         var vastausJson = JSON.parse(xhttp.responseText);
                         if ("developer_friendly" in vastausJson.meta &&
                                 vastausJson.meta.developer_friendly > "") {
-                            viestit.text = vastausJson.meta.developer_friendly
+                            viestit.text = vastausJson.meta.developer_friendly;
                         } else if ("error_detail" in vastausJson.meta &&
                                    vastausJson.meta.error_detail > "") {
-                            viestit.text = vastausJson.meta.error_detail
+                            viestit.text = vastausJson.meta.error_detail;
                         } else {
-                            viestit.text = "error: " + xhttp.responseText
+                            viestit.text = "error: " + xhttp.responseText;
                         }
-                        onnistui = false
-                        console.log(viestit.text)
+                        onnistui = false;
+                        console.log(viestit.text);
                     } catch (err) {
-                        viestit.text = "error: " + xhttp.status + ", " + xhttp.responseText
-                        onnistui = false
-                        console.log(err)
-                        vst = err
+                        viestit.text = "error: " + xhttp.status + ", " + xhttp.responseText;
+                        onnistui = false;
+                        console.log(err);
+                        vst = err;
                     }
-                    kunVirhe(toiminto, xhttp.statusText, vst, yhteysNro)
+                    kunVirhe(toiminto, xhttp.statusText, vst, yhteysNro);
                 }
             } else {
+                yhteys.nakyville();
                 viestit.text = "error: " + xhttp.readyState + ", " + xhttp.statusText;
                 console.log(viestit.text);
-                onnistui = false
-                kunVirhe(toiminto, xhttp.statusText, viestit.text, yhteysNro)
+                onnistui = false;
+                kunVirhe(toiminto, xhttp.statusText, viestit.text, yhteysNro);
             }
         }
 
         naytaKeskeytys.restart();
 
         if (haku === _get) {
-            viestit.text = qsTr("posting GET-query");
+            //viestit.text = qsTr("posting GET-query");
             xhttp.open("GET", kysely, async);
-            xhttp.send()
+            xhttp.send();
         } else if (haku === _post) {
-            viestit.text = qsTr("posting POST-query");
+            //viestit.text = qsTr("posting POST-query");
             xhttp.open("POST", postOsoite, sync);
             xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            xhttp.send(kysely)
+            xhttp.send(kysely);
         }
 
         //console.log(">>> " + kysely)
@@ -245,12 +253,17 @@ Item {
 
     Timer {
         id: viestinNaytto
-        interval: onnistui? 100 : 4*1000 // virheviestejä näytetään kauemmin
+        interval: kesto
         running: false
         repeat: false
         onTriggered: {
             piiloon()
         }
+
+        property int kesto: muuKesto > 0 ? muuKesto : (onnistui? kestoOnnistui : kestoVirhe)
+        property int kestoOnnistui: 100
+        property int kestoVirhe: 4*1000 // virheviestejä näytetään kauemmin
+        property int muuKesto: 0
     }
 
     Timer {

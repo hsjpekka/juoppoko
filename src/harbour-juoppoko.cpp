@@ -37,13 +37,13 @@
 int main(int argc, char *argv[])
 {
     char *strings[argc+8]; // + s1-s8
-    char *s1 = JUOPPOKO_VERSIO;
-    char *s2 = UTPD_ID;
-    char *s3 = UTPD_SECRET;
-    char *s4 = CB_URL;
-    char *s5 = FSQ_ID;
-    char *s6 = FSQ_SECRET;
-    char *s7 = FSQ_VERSION;
+    char *s1 = UTPD_ID;
+    char *s2 = UTPD_SECRET;
+    char *s3 = CB_URL;
+    char *s4 = FSQ_ID;
+    char *s5 = FSQ_SECRET;
+    char *s6 = FSQ_VERSIO;
+    char *s7 = JUOPPOKO_VERSIO;
     char *s8 = CC_KOHDE;
     int i=0;
 
@@ -51,21 +51,21 @@ int main(int argc, char *argv[])
         strings[i] = argv[i];
     }
 
-    strings[argc] = s8; // onko käännös pc:lle (i486) vai puhelimeen ("")
+    strings[argc] = s8; // onko käännös pc:lle (i486) vai puhelimeen (armv7hl)
     argc++;
-    strings[argc] = s1; // ohjelman versio
+    strings[argc] = s7; // ohjelman versio
     argc++;
-    strings[argc] = s2; // unTappd appId
+    strings[argc] = s6; // 4square versio (version päivämäärä)
     argc++;
-    strings[argc] = s3; // unTappd salasana
+    strings[argc] = s5; // 4square salasana
     argc++;
-    strings[argc] = s4; // redirect url
+    strings[argc] = s4; // 4square appId
     argc++;
-    strings[argc] = s5; // 4square appId
+    strings[argc] = s3; // redirect url
     argc++;
-    strings[argc] = s6; // 4square salasana
+    strings[argc] = s2; // unTappd salasana
     argc++;
-    strings[argc] = s7; // 4square versio (päivämäärä)
+    strings[argc] = s1; // unTappd appId
     argc++;
 
     return SailfishApp::main(argc, strings);

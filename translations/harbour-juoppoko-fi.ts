@@ -42,16 +42,8 @@
         <translation>tietoja</translation>
     </message>
     <message>
-        <source>unTappd</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>settings</source>
         <translation>asetukset</translation>
-    </message>
-    <message>
-        <source>demo</source>
-        <translation>demo</translation>
     </message>
     <message>
         <source>Drunkard?</source>
@@ -110,8 +102,12 @@
         <translation>virhe tiedon siirrossa</translation>
     </message>
     <message>
-        <source>new friend requests: %1</source>
-        <translation>uusia kaveripyyntöjä: %1</translation>
+        <source>unTappd %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>foreteller</source>
+        <translation>ennustin</translation>
     </message>
 </context>
 <context>
@@ -154,14 +150,6 @@
     <message>
         <source>request finished</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>posting GET-query</source>
-        <translation>lähettää GET-kyselyä</translation>
-    </message>
-    <message>
-        <source>posting POST-query</source>
-        <translation>lähettää POST-kyselyä</translation>
     </message>
     <message>
         <source>press &apos;x&apos; to interrupt</source>
@@ -282,16 +270,20 @@
 <context>
     <name>demolaskuri</name>
     <message>
-        <source>Demo</source>
-        <translation>Demo</translation>
+        <source>drinker</source>
+        <translation>juoja</translation>
     </message>
     <message>
-        <source>weight</source>
-        <translation>paino</translation>
+        <source>starting point</source>
+        <translation>lähtötilanne</translation>
     </message>
     <message>
-        <source>limit</source>
-        <translation>raja</translation>
+        <source>at</source>
+        <translation>klo</translation>
+    </message>
+    <message>
+        <source>state at %1</source>
+        <translation>tilanne %1</translation>
     </message>
     <message>
         <source>BAC</source>
@@ -314,24 +306,24 @@
         <translation>skåål!</translation>
     </message>
     <message>
-        <source>water</source>
-        <translation>vettä</translation>
+        <source>water %1</source>
+        <translation>vettä %1</translation>
     </message>
     <message>
-        <source>at</source>
-        <translation>klo</translation>
+        <source>weight %1</source>
+        <translation>paino %1</translation>
     </message>
     <message>
-        <source>drinker</source>
-        <translation>juomari</translation>
+        <source>limit %1</source>
+        <translation>raja %1</translation>
     </message>
     <message>
-        <source>starting point</source>
-        <translation>pohjia</translation>
+        <source>Foreteller</source>
+        <translation>Ennustin</translation>
     </message>
     <message>
-        <source>current state at </source>
-        <translation>humalatila klo </translation>
+        <source>recalculate</source>
+        <translation>laske uudelleen</translation>
     </message>
 </context>
 <context>

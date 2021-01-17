@@ -234,7 +234,7 @@ Dialog {
                 title: qsTr("Drink")
             } // */
 
-            Row {
+            Row { // juoma
                 TextField {
                     id: juoma
                     text: nimi0
@@ -245,6 +245,7 @@ Dialog {
                     onTextChanged: {
                         if (!alkutoimet) {
                             olutId = 0
+                            tahtia = 0
                         }
                     }
                     EnterKey.onClicked: focus = false
@@ -257,6 +258,7 @@ Dialog {
                         nimi0 = ""
                         juoma.text = ""
                         olutId = 0
+                        tahtia = 0
                         valitunEtiketti.source = "tuoppi.png"
                     }
                 }
@@ -762,7 +764,6 @@ Dialog {
             valitunEtiketti.source = UnTpd.oluenEtiketti;
 
         alkutoimet = false;
-        console.log("väli " + tahtiaRivi.vapaaTila + "leveys " + arvostelu1.width + "leveys2 " + arvostelu1.implicitWidth)
     }
 
     onDone: {

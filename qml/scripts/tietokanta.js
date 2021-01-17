@@ -49,7 +49,7 @@ var luettuJulkaiseFsqr = false
 var tunnusKuvaaja = "kuvaaja"
 var nakyvaKuvaaja = 0 // 0 - viikkokulutus, 1 - paivakulutus, oli 2 - paivaruudukko
 var luettuNakyvaKuvaaja = false
-var tunnusVrkVaihdos = "ryypaysVrk"
+var tunnusVrkVaihdos = "ryyppaysVrk"
 var vrkVaihtuu = 0*60 // minuuttia puolen yön jälkeen
 var luettuVrkVaihtuu = false
 //var juotu // juodut-taulukko luetaan tähän
@@ -105,7 +105,7 @@ function lisaaTkJuodut(xid, hetki, maara, vahvuus, juoma, kuvaus, olutId) {
 }
 
 function lueTkAsetukset() {
-    var luettu = 0
+    var luettu = 0, vanhaVaihdosTunnus = false;
 
     if(tkanta === null) return luettu;
 
@@ -150,9 +150,12 @@ function lueTkAsetukset() {
                     nakyvaKuvaaja = taulukko.rows[i].arvo;
                     luettuNakyvaKuvaaja = true;
                 }
-                else if (taulukko.rows[i].asia === tunnusVrkVaihdos ) {
+                else if (taulukko.rows[i].asia === tunnusVrkVaihdos ||
+                         taulukko.rows[i].asia === "ryypaysVrk") {
                     vrkVaihtuu = taulukko.rows[i].arvo;
                     luettuVrkVaihtuu = true;
+                    if (taulukko.rows[i].asia === "ryypaysVrk")
+                        vanhaVaihdosTunnus = true;
                 }
                 else if (taulukko.rows[i].asia === tunnusTilavuusMitta ) {
                     arvoTilavuusMitta = taulukko.rows[i].arvo;
@@ -248,6 +251,9 @@ function lueTkAsetukset() {
         uusiAsetus(tunnusJulkaiseTwitter, arvoJulkaiseTwitter)
     if (!luettuUnTpToken)
         uusiAsetus2(tunnusUnTappdToken, "")
+
+    if (vanhaVaihdosTunnus)
+        poistaAsetus("ryypaysVrk")
 
     return luettu
 }
@@ -502,14 +508,21 @@ function onkoSarake(taulukko, tunnus) {
 }
 
 function paivitaAsetus(tunnus, arvo) {
+    var mj;
     // tunnus string, arvo numeric
+    if (arvo === true)
+        arvo = 1
+    else if (arvo === false)
+        arvo = 0;
+
     if(tkanta === null) return;
-    //console.log("kohta1 ")
+
+    mj = "UPDATE asetukset SET arvo = " + arvo + "  WHERE asia = '" + tunnus + "'";
+    console.log("" + mj);
 
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("UPDATE asetukset SET arvo = " + arvo +
-                          "  WHERE asia = '" + tunnus + "'");
+            tx.executeSql(mj);
         });
     } catch (err) {
         console.log("Error modifying asetukset-table in database: " + err);
@@ -540,6 +553,25 @@ function paivitaAsetus2(tunnus, arvo) {
     } catch (err) {
         console.log("Error modifying asetukset2-table in database: " + err);
         virheet = virheet + "Error modifying asetukset2-table in database: " + err +" <br> "
+    };
+
+    //console.log("paivitaAsetus2: " + mj)
+    return
+}
+
+function poistaAsetus(tunnus) {
+    var mj = "DELETE FROM asetukset WHERE asia = '" + tunnus + "'";
+    // tunnus string, arvo string
+    if(tkanta === null) return;
+
+    console.log(mj);
+    try {
+        tkanta.transaction(function(tx){
+            tx.executeSql(mj);
+        });
+    } catch (err) {
+        console.log("Error when deleting from asetukset-table in database: " + err);
+        virheet = virheet + "Error when deleting from asetukset-table in database: " + err +"\n"
     };
 
     //console.log("paivitaAsetus2: " + mj)

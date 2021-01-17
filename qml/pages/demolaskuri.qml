@@ -1,18 +1,25 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import "../components"
+import "../scripts/tietokanta.js" as Tkanta
 
 Page {
     id: sivu
     width: parent.width
 
-    property date alkuhetki: new Date()
     property string kelloMuoto: "HH:mm"
-    property alias paino: juoja.paino
-    property real promilleja // g alkoholia / g vettä
-    property alias promilleRaja1: juoja.promilleRaja
-    property date pvm: new Date()
-    property alias vetta: juoja.vetta
+    property real   lahtoTaso // g alkoholia / g vettä
+    property int    minMs: 60*1000
+    property alias  paino: juoja.paino
+    property alias  promilleRaja1: juoja.promilleRaja
+    property date   pvm//: new Date(new Date().getTime()+2*minMs)
+    property alias  vetta: juoja.vetta
+    onPvmChanged: {
+        kello.value = pvm.toLocaleTimeString(Qt.locale(), kelloMuoto);
+        paivays.value = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+        txtAjokunnossa.teksti(pvm.getTime())
+        txtSelvana.teksti(pvm.getTime())
+    }
 
     function muutaUusi() {
         var pv0 = pvm.getDate(), kk0 = pvm.getMonth(), vs0 = pvm.getFullYear()
@@ -47,97 +54,48 @@ Page {
         return
     }
 
-    function uusiJuoma(hetki, mlVeressa, maara, vahvuus, juomanNimi)     {
-        //var lisayskohta = etsiPaikka(hetki, juomat.count -1) // mihin kohtaan uusi juoma kuuluu juomien historiassa?
-        //var ml0
-        //var apu
-
-        // lasketaan paljonko veressä on alkoholia juomishetkellä
-        //mlVeressa = mlKehossa(lisayskohta-1, hetki)
-        juoja.juo(juoja.annoksia, hetki, mlVeressa, maara, vahvuus, juomanNimi)
-
+    function kokoaTiedot() {
+        var dt, ml, msTunti = 60*60*1000;
+        juoja.paino = massa.text*1;
+        juoja.vetta = vesimaara.text/100;
+        if (juoja.annoksia > 0) {
+            if (alkutilanne.aika.getTime() > juoja.juodunAika(0)) {
+                alkutilanne.aika = new Date(juoja.juodunAika(0));
+                paivays0.value = alkutilanne.aika.toLocaleDateString(Qt.locale(),
+                                                                     Locale.ShortFormat);
+                kello0.value = alkutilanne.aika.toLocaleTimeString(Qt.locale(),
+                                                                   kelloMuoto);
+            }
+            dt =  juoja.juodunAika(0) - alkutilanne.aika.getTime();
+        } else
+            dt = pvm.getTime() - alkutilanne.aika.getTime();
+        //console.log("dt " + dt + ", annoksia " + juoja.annoksia + " " + pvm.getTime() + " " + alkutilanne.aika.getTime());
+        if (dt < 0) dt = 0;
+        ml = Number.fromLocaleString(Qt.locale(), pohjat.text)*paino*vetta/juoja.tiheys - juoja.palamisNopeus()*dt/msTunti;
+        //console.log("ml " + ml );
+        if (ml < 0) ml = 0;
+        juoja.promilleja = ml*juoja.tiheys/(paino*vetta);
+        juoja.pohjat = ml;
         return;
     }
 
-    /*
-    Component {
-        id: rivityyppi
-        ListItem {
-            id: juotuJuoma
-            propagateComposedEvents: true
-            onClicked: {
-                valittu = juomaLista.indexAt(mouseX,y+mouseY)
-                kopioiJuoma(valittu)
-                mouse.accepted = false
-            }
+    function laskeUudelleen() {
+        kokoaTiedot();
+        if (juoja.annoksia > 0 && pvm.getTime() >= juoja.juodunAika(0)) {
+            juoja.laskeUudelleen(juoja.juodunAika(0)-1);
+            juoja.paivita(pvm.getTime()+1);
+        }
+        txtSelvana.teksti(pvm.getTime()+1);
+        txtAjokunnossa.teksti(pvm.getTime()+1);
+        return;
+    }
 
-            onPressAndHold: {
-                valittu = juomaLista.indexAt(mouseX,y+mouseY)
-                juomaLista.currentIndex = valittu
-                mouse.accepted = false
-            }
-
-            // contextmenu erillisenä komponenttina on ongelma remorseActionin kanssa
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("delete")
-                    onClicked: {
-                        juomaLista.currentItem.remorseAction(qsTr("deleting"), function () {
-                            juomat.remove(valittu)
-                            paivitaMlVeressa(lueJuomanAika(valittu)-1, valittu); //-1 varmistaa, että usean samaan aikaan juodun juoman kohdalla päivitys toimii
-                            paivitaPromillet();
-                            paivitaAjatRajoille();
-                        })
-
-                    }
-                }
-
-                MenuItem {
-                    text: qsTr("modify")
-                    onClicked: {
-                        muutaValittu(valittu);
-
-                        //paivitaMlVeressa(lueJuomanAika(valittu)-1, valittu);
-                        paivitaPromillet();
-                        paivitaAjatRajoille();
-
-                    }
-                }
-
-            }
-
-            // juodut-taulukko: id aika veri% tilavuus juoma% juoma kuvaus
-            Row {
-                width: sivu.width*0.9
-                x: sivu.width*0.05
-
-                Label {
-                    text: aikaMs
-                    visible: false
-                    width: 0
-                }
-                Label {
-                    text: juomaaika
-                    width: (Theme.fontSizeMedium*3.5).toFixed(0)
-                }
-                Label {
-                    text: juomatyyppi
-                    width: Theme.fontSizeMedium*7
-                }
-                Label {
-                    text: juomamaara
-                    width: (Theme.fontSizeMedium*2.5).toFixed(0)
-                }
-                Label {
-                    text: juomapros
-                    width: (Theme.fontSizeMedium*2.5).toFixed(0)
-                }
-
-            } //row
-
-
-        } //listitem
-    } //rivityyppi //*/
+    function uusiJuoma(hetki, maara, vahvuus, juomanNimi) {
+        juoja.juo(juoja.annoksia, hetki, maara, vahvuus, juomanNimi);
+        juoja.paivita(hetki+1);
+        pvm = new Date(pvm.getTime() + minMs);
+        return;
+    }
 
     SilicaFlickable {
         id: ylaosa
@@ -145,86 +103,109 @@ Page {
         width: parent.width
         contentHeight: column.height
 
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("recalculate")
+                onClicked: {
+                    laskeUudelleen()
+                }
+            }
+
+            MenuItem {
+                text: qsTr("cheers!")
+                onClicked: {
+                    uusiJuoma(pvm.getTime(), parseInt(txtMaara.text),
+                             parseFloat(voltit.text), txtJuoma.text)
+                }
+            }
+        }
+
         Column {
             id: column
 
             width: sivu.width
-            spacing: 2 //Theme.paddingSmall
+            //spacing: 2 //Theme.paddingSmall
 
             PageHeader {
-                title: qsTr("Demo")
+                title: qsTr("Foreteller")
             }
 
-            /*
             SectionHeader {
-                text: qsTr("values not saved, clock not running")
-            } // */
-
-            SectionHeader {
-                text: qsTr("drinker") + " & " + qsTr("starting point")
+                text: qsTr("drinker")
             }
 
             // sukupuoli ja paino
             Row {
 
                 TextField {
+                    id: vesimaara
                     text: (vetta*100).toFixed(0)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 0; top: 100}
                     EnterKey.iconSource: "image://theme/icon-m-play"
                     EnterKey.onClicked: {
-                        vetta = text/100
-                        juoja.laskeUudelleen()
-                        juoja.paivita(pvm.getDate())
+                        laskeUudelleen()
+                        focus = false
                     }
-                    label: qsTr("water") + " [%]"
+                    label: qsTr("water %1").arg("[%]")
                     width: Theme.fontSizeExtraSmall*7
                 }
 
                 TextField {
+                    id: massa
                     text: paino
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: IntValidator {bottom: 1; top: 1000}
                     EnterKey.iconSource: "image://theme/icon-m-play"
                     EnterKey.onClicked: {
-                        paino = text*1
-                        juoja.laskeUudelleen()
-                        juoja.paivita(pvm.getDate())
+                        laskeUudelleen()
+                        focus = false
                     }
 
-                    label: qsTr("weight") + " [kg]"
-                    width: Theme.fontSizeExtraSmall*7
+                    label: qsTr("weight %1").arg("[kg]")
+                    width: Theme.fontSizeExtraSmall*8
                 }
 
                 TextField {
+                    id: raja
                     text: Number(promilleRaja1).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
                     EnterKey.iconSource: "image://theme/icon-m-play"
                     EnterKey.onClicked: {
-                        promilleRaja1 = Number.fromLocaleString(Qt.locale(),text)
-                        juoja.paivita(pvm.getDate())
+                        promilleRaja1 = Number.fromLocaleString(Qt.locale(), text)
+                        txtAjokunnossa.teksti(pvm.getTime())
+                        focus = false
                     }
-                    label: qsTr("limit") + " [‰]"
+                    label: qsTr("limit %1").arg("[‰]")
                     width: Theme.fontSizeExtraSmall*7
                 }
 
             }            
 
+            SectionHeader {
+                text: qsTr("starting point")
+            }
+
             // pohjat
             Row {
+                id: alkutilanne
+                width: parent.width
+                property date aika
 
                 TextField {
                     id: pohjat
-                    text: Number(promilleja).toLocaleString(Qt.locale())
+                    text: Number(lahtoTaso).toLocaleString(Qt.locale())
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
                     EnterKey.iconSource: "image://theme/icon-m-play"
+                    onTextChanged: {
+                        lahtoTaso = Number.fromLocaleString(Qt.locale(), text)
+                        juoja.pohjat = juoja.prom2ml(lahtoTaso)
+                    }
                     EnterKey.onClicked: {
-                        promilleja = Number.fromLocaleString(Qt.locale(), text)
-                        juoja.pohjat = juoja.prom2ml(promilleja)
-                        juoja.laskeUudelleen()
-                        juoja.paivita(pvm.getDate())
+                        laskeUudelleen()
+                        focus = false
                     }
                     label: "[‰]"
                     width: (Theme.fontSizeMedium*3.5).toFixed(0) //Theme.fontSizeExtraSmall*5
@@ -238,64 +219,67 @@ Page {
 
                 ValueButton {
                     id: kello0
-                    property int valittuTunti0: alkuhetki.getHours()
-                    property int valittuMinuutti0: alkuhetki.getMinutes()
+                    width: Theme.fontSizeMedium*5
+                    value: alkutilanne.aika.toLocaleTimeString(Qt.locale(), kelloMuoto)
+                    valueColor: Theme.primaryColor
+                    onClicked: {
+                            openTimeDialog0()
+                    }
+                    property int valittuTunti0
+                    property int valittuMinuutti0
 
                     function openTimeDialog0() {
                         var dialog = pageContainer.push("Sailfish.Silica.TimePickerDialog", {
                                         hourMode: DateTime.TwentyFourHours,
-                                        hour: alkuhetki.getHours(),
-                                        minute: alkuhetki.getMinutes()
+                                        hour: alkutilanne.aika.getHours(),
+                                        minute: alkutilanne.aika.getMinutes()
                                      })
 
                         dialog.accepted.connect(function() {
-                            valittuTunti0 = dialog.hour
-                            valittuMinuutti0 = dialog.minute
-                            alkuhetki = new Date(alkuhetki.getFullYear(), alkuhetki.getMonth(), alkuhetki.getDate(), valittuTunti0, valittuMinuutti0, 0, 0)
-                            kello0.value = alkuhetki.toLocaleTimeString(Qt.locale(), kelloMuoto)
-                            juoja.laskeUudelleen()
-                            juoja.paivita(pvm.getDate())
+                            valittuTunti0 = dialog.hour;
+                            valittuMinuutti0 = dialog.minute;
+                            alkutilanne.aika = new Date(alkutilanne.aika.getFullYear(),
+                                                        alkutilanne.aika.getMonth(),
+                                                        alkutilanne.aika.getDate(),
+                                                        valittuTunti0, valittuMinuutti0, 0, 0);
+                            kello0.value = alkutilanne.aika.toLocaleTimeString(Qt.locale(),
+                                                                               kelloMuoto);
+                            //laskeUudelleen()
                         })
                     }
 
-                    width: Theme.fontSizeMedium*5
-                    value: pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
-                    onClicked: {
-                            openTimeDialog0()
-                    }
                 }
 
                 ValueButton {
                     id: paivays0
-                    property date valittuPaiva0: alkuhetki
+                    value: alkutilanne.aika.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+                    valueColor: Theme.primaryColor
+                    width: Theme.fontSizeMedium*8 //sivu.width - kello.width - pohjat.width - Theme.fontSizeMedium*2 - 4*Theme.paddingSmall
+                    onClicked: {
+                        avaaPaivanValinta()
+                    }
 
                     function avaaPaivanValinta() {
                         var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
-                                        date: alkuhetki
+                                        date: alkutilanne.aika
                                      })
 
                         dialog.accepted.connect(function() {
-                            valittuPaiva0 = dialog.date
-                            alkuhetki = new Date(valittuPaiva0.getFullYear(), valittuPaiva0.getMonth(), valittuPaiva0.getDate(),
-                                           alkuhetki.getHours(), alkuhetki.getMinutes(), 0, 0)
-                            value = alkuhetki.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-
-                            juoja.laskeUudelleen()
-                            juoja.paivita(pvm.getDate())
+                            alkutilanne.aika = new Date(dialog.date.getFullYear(),
+                                                        dialog.date.getMonth(),
+                                                        dialog.date.getDate(),
+                                                        alkutilanne.aika.getHours(),
+                                                        alkutilanne.aika.getMinutes(), 0, 0);
+                            value = alkutilanne.aika.toLocaleDateString(Qt.locale(),
+                                                                        Locale.ShortFormat);
+                            //laskeUudelleen()
                         })
                     }
-
-                    value: alkuhetki.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-                    width: Theme.fontSizeMedium*8 //sivu.width - kello.width - pohjat.width - Theme.fontSizeMedium*2 - 4*Theme.paddingSmall
-                    onClicked: {
-                            avaaPaivanValinta()
-                    }
                 }
-
             }
 
             SectionHeader {
-                text: qsTr("current state at ") + " " + kello.value
+                text: qsTr("state at %1").arg(kello.value)
             }
 
             Row { // promillet
@@ -303,30 +287,53 @@ Page {
 
                 TextField {
                     id: txtPromilleja
-                    text: "X ‰"
+                    text: juoja.promilleja < 3.0 ? juoja.promilleja.toFixed(2) + " ‰" : "> 3.0 ‰"
                     label: qsTr("BAC")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.primaryColor
-                    width: Theme.fontSizeSmall*6
                     readOnly: true
+                    font.pixelSize: juoja.promilleja < promilleRaja1? Theme.fontSizeMedium : Theme.fontSizeLarge
+                    font.bold: juoja.promilleja < promilleRaja1? false : true
+                    color: Theme.highlightColor
+                    width: Theme.fontSizeSmall*6
                 }
 
                 TextField {
                     id: txtSelvana
                     text: "?"
                     label: qsTr("sober at")
+                    readOnly: true
+                    color: Theme.highlightColor
                     font.pixelSize: Theme.fontSizeSmall
                     width: Theme.fontSizeSmall*6
-                    readOnly: true
+
+                    function teksti(aika) {
+                        //console.log("selvänä " + juoja.selvana + ", " + juoja.selvana.valueOf());
+                        if (juoja.selvana.toLocaleTimeString(Qt.locale(), kelloMuoto) == "" ||
+                                aika > juoja.selvana.getTime())
+                            text = " -"
+                        else
+                            text = juoja.selvana.toLocaleTimeString(Qt.locale(), kelloMuoto);
+                        return;
+                    }
                 }
 
                 TextField {
                     id: txtAjokunnossa
                     text: "?"
                     label: promilleRaja1.toFixed(1) + " ‰"
+                    readOnly: true
+                    color: Theme.highlightColor
                     font.pixelSize: Theme.fontSizeSmall
                     width: Theme.fontSizeSmall*8
-                    readOnly: true
+
+                    function teksti(aika) {
+                        console.log("rajalla " + juoja.rajalla.getTime() + ", nyt " + aika);
+                        if (juoja.rajalla.toLocaleTimeString(Qt.locale(), kelloMuoto) == "" ||
+                                aika > juoja.rajalla.getTime())
+                            text = " -"
+                        else
+                            text = juoja.rajalla.toLocaleTimeString(Qt.locale(), kelloMuoto);
+                        return;
+                    }
                 }
 
             }
@@ -334,11 +341,20 @@ Page {
             Row { // nykyinen aika
 
                 spacing: Theme.paddingSmall
+                x: (parent.width - kello.width - paivays.width - spacing)/2
 
                 ValueButton {
                     id: kello
-                    property int valittuTunti: pvm.getHours()
-                    property int valittuMinuutti: pvm.getMinutes()
+                    width: Theme.fontSizeSmall*6
+                    //value: pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
+                    valueColor: Theme.primaryColor
+                    onClicked: {
+                            openTimeDialog()
+                    }
+
+                    property int   valittuTunti: pvm.getHours()
+                    property int   valittuMinuutti: pvm.getMinutes()
+                    property color tausta
 
                     function openTimeDialog() {
                         var dialog = pageContainer.push("Sailfish.Silica.TimePickerDialog", {
@@ -348,57 +364,66 @@ Page {
                                      })
 
                         dialog.accepted.connect(function() {
-                            valittuTunti = dialog.hour
-                            valittuMinuutti = dialog.minute
-                            pvm = new Date(pvm.getFullYear(), pvm.getMonth(), pvm.getDate(), valittuTunti, valittuMinuutti, 0, 0)
-                            value = pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
-
-                            juoja.paivita(pvm.getDate())
+                            valittuTunti = dialog.hour;
+                            valittuMinuutti = dialog.minute;
+                            pvm = new Date(pvm.getFullYear(), pvm.getMonth(), pvm.getDate(), valittuTunti, valittuMinuutti, 0, 0);
+                            if (pvm.getTime() < alkutilanne.aika.getTime()) {
+                                kello._backgroundColor = Theme.highlightColor
+                                paivays._backgroundColor = Theme.highlightColor
+                            } else {
+                                kello._backgroundColor = kello.tausta
+                                paivays._backgroundColor = paivays.tausta
+                            }
+                            //value = pvm.toLocaleTimeString(Qt.locale(), kelloMuoto);
+                            juoja.paivita(pvm.getTime()+1);
+                            //console.log(valittuTunti + ":" + valittuMinuutti + " ")
                         })
                     }
 
-                    width: Theme.fontSizeSmall*6
-                    value: pvm.toLocaleTimeString(Qt.locale(), kelloMuoto)
-                    onClicked: {
-                            openTimeDialog()
-                    }
                 }
 
                 ValueButton {
                     id: paivays
-                    property date valittuPaiva: pvm
-
-                    function avaaPaivanValinta() {
-                        var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
-                                        date: pvm
-                                     })
-
-                        dialog.accepted.connect(function() {
-                            valittuPaiva = dialog.date
-                            pvm = new Date(valittuPaiva.getFullYear(), valittuPaiva.getMonth(), valittuPaiva.getDate(),
-                                           pvm.getHours(), pvm.getMinutes(), 0, 0)
-                            value = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-
-                            juoja.paivita(pvm.getDate())
-                        })
-                    }
-
-                    value: pvm.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
+                    //value: pvm.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
+                    valueColor: Theme.primaryColor
                     width: Theme.fontSizeSmall*8 //sivu.width - kello.width - 3*Theme.paddingSmall
                     onClicked: {
                             avaaPaivanValinta()
                     }
-                }
+                    property color tausta
 
+                    function avaaPaivanValinta() {
+                        var dialog = pageContainer.push("Sailfish.Silica.DatePickerDialog", {
+                                        "date": pvm
+                                     })
+
+                        dialog.accepted.connect(function() {
+                            pvm = new Date(dialog.date.getFullYear(), dialog.date.getMonth(), dialog.date.getDate(),
+                                           pvm.getHours(), pvm.getMinutes(), 0, 0)
+                            //value = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+                            if (pvm.getTime() < alkutilanne.aika.getTime()) {
+                                kello._backgroundColor = Theme.highlightColor
+                                paivays._backgroundColor = Theme.highlightColor
+                            } else {
+                                kello._backgroundColor = kello.tausta
+                                paivays._backgroundColor = paivays.tausta
+                            }
+                            juoja.paivita(pvm.getTime()+1);
+                            //laskeUudelleen();
+                        })
+                    }
+
+                }
             } // aika
 
             Row { //lisattava juoma
                 //id: drinkData
-                spacing: 2
+                width: parent.width
+                spacing: Theme.paddingMedium
 
                 TextField {
                     id: txtJuoma
-                    width: Theme.fontSizeMedium*6
+                    width: parent.width - 2*parent.spacing - txtMaara.width - voltit.width
                     readOnly: true
                     text: qsTr("beer")
                     onClicked: {
@@ -409,7 +434,7 @@ Page {
                 TextField {
                     id: txtMaara
                     label: "ml"
-                    width: Theme.fontSizeMedium*3
+                    width: Theme.fontSizeMedium*5
                     readOnly: true
                     text: "500"
                     onClicked: {
@@ -420,7 +445,7 @@ Page {
                 TextField {
                     id: voltit
                     label: qsTr("vol-%")
-                    width: (Theme.fontSizeMedium*3.5).toFixed(0)
+                    width: Theme.fontSizeMedium*4
                     readOnly: true
                     text: "4.7"
                     onClicked: {
@@ -428,18 +453,16 @@ Page {
                     }
                 }
 
+                /*
                 Button { //add
                     width: Theme.fontSizeMedium*4
 
                     text: qsTr("cheers!")
                     onClicked: {
-                        uusiJuoma(pvm.getTime(), 0.0, parseInt(txtMaara.text),
+                        uusiJuoma(pvm.getTime(), parseInt(txtMaara.text),
                                  parseFloat(voltit.text), txtJuoma.text)
-
-                        //console.log("cheers - " + pvm.getTime() )
-
                     }
-                }
+                } // */
             }
 
             Separator{
@@ -450,13 +473,10 @@ Page {
 
             Juomari {
                 id: juoja
-                pohjat: prom2ml(sivu.promilleja)
+                pohjat: prom2ml(lahtoTaso)
                 width: parent.width
                 height: (sivu.height - y) > oletusKorkeus? sivu.height - y : oletusKorkeus
                 promilleRaja: promilleRaja1
-                onJuomaPoistettu: {
-                    paivita()
-                }
                 onMuutaJuomanTiedot: {
                     var dialog = pageContainer.push(Qt.resolvedUrl("juomanMuokkaus.qml"), {
                                     "aika": new Date(juodunAika(iMuutettava)),
@@ -476,40 +496,17 @@ Page {
                         juoja.paivitaAjatRajoille();
                     })
                 }
-                onPromillejaChanged: {
-                    var nytMs = pvm.getTime()
-                    var prml = juoja.promilleja
-
-                    if (prml < 3.0){
-                        txtPromilleja.text = "" + prml.toFixed(2) + " ‰"
-                    } else {
-                        txtPromilleja.text = "> 3.0 ‰"
-                    }
-
-                    // huomion keräys, jos promilleRajat ylittyvät
-                    if ( prml < promilleRaja1 ) {
-                        //txtPromilleja.color = Theme.highlightDimmerColor
-                        txtPromilleja.font.pixelSize = Theme.fontSizeMedium
-                        txtPromilleja.font.bold = false
-                    } else {
-                        //txtPromilleja.color = Theme.highlightColor
-                        txtPromilleja.font.pixelSize = Theme.fontSizeLarge
-                        txtPromilleja.font.bold = true
-                    }
-
-                    if (nytMs > juoja.rajalla.getTime()) // msKunnossa.getTime() // verrataan hetkeä nytMs listan viimeisen juoman jälkeiseen hetkeen
-                        txtAjokunnossa.text = " -"
-
-                    if (nytMs > juoja.selvana.getTime()) // msSelvana.getTime()
-                        txtSelvana.text = " -"
-
+                onRajallaChanged: {
+                    txtAjokunnossa.teksti(pvm.getTime())
+                }
+                onSelvanaChanged: {
+                    txtSelvana.teksti(pvm.getTime())
                 }
                 onValittuJuomaChanged: {
                     txtJuoma.text = juodunNimi(valittuJuoma) //valitunNimi //Apuja.juomanNimi(i)
                     txtMaara.text = juodunTilavuus(valittuJuoma) //valitunTilavuus //lueJuomanMaara(qId)
                     voltit.text = juodunVahvuus(valittuJuoma) //valitunVahvuus //lueJuomanVahvuus(qId)
                 }
-
             }
 
             /*
@@ -563,7 +560,15 @@ Page {
         }
 
         Component.onCompleted: {
-            //juoja.paivita(pvm.getDate())
+            var nyt = new Date()
+            alkutilanne.aika = new Date(nyt.getFullYear(), nyt.getMonth(), nyt.getDate(), nyt.getHours(), nyt.getMinutes(), 0, 0)
+            pvm = new Date(alkutilanne.aika.getTime() + minMs)
+            kello0.valittuTunti0 = alkutilanne.aika.getHours()
+            kello0.valittuMinuutti0 = alkutilanne.aika.getMinutes()
+            juoja.paivita()
+            kello.tausta = kello._backgroundColor
+            paivays.tausta = paivays._backgroundColor
+            //console.log("promilleja " + lahtoTaso + " ‰")
         }
     }
 }

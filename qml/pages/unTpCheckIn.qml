@@ -26,9 +26,9 @@ Dialog {
     property alias  ppiiri: pituuspiiri.text
     property bool   sijaintiTuore: false
 
-    property bool   face: false
-    property bool   foursq: false
-    property bool   tweet: false
+    property alias  face: facebook.checked
+    property alias  foursq: foursquare.checked
+    property alias  tweet: twitter.checked
 
     property bool   asetuksetNakyvat: false
     property bool   julkaisutNakyvat: false
@@ -138,7 +138,7 @@ Dialog {
             aikaero = new Date().getTime() - pvm.getTime()
         }
 
-        console.log(" pvm " + pvm + " - " + pvm.getTime() )
+        //console.log(" pvm " + pvm + " - " + pvm.getTime() )
 
         //sijainninTila.text = new Date().getTime() + " " + paikkatieto.active + " - " + paikkatieto.valid + " - " + paikkatieto.position.timestamp + " - " + pvm.getTime()
 
@@ -310,7 +310,7 @@ Dialog {
         updateInterval: 5*60*1000 // 5 min
         onPositionChanged: {
             koordinaatit()
-            console.log("paikkatieto vaihtui")
+            //console.log("paikkatieto vaihtui")
         }
     }
 
@@ -402,7 +402,7 @@ Dialog {
         anchors.fill: sivu
         height: sivu.height
         contentHeight: column.height
-        width: sivu.width
+        //width: sivu.width
 
         VerticalScrollDecorator {}
 
@@ -468,6 +468,38 @@ Dialog {
 
             DialogHeader {
                 title: qsTr("Check-in location")
+            }
+
+            Row { // facebook, foursquare, twitter
+                property string hakemisto: "./"
+                width: parent.width
+                x: Theme.horizontalPageMargin
+                spacing: (width - 3*facebook.width - 2*x)/2
+                IconTextSwitch {
+                    id: facebook
+                    checked: false
+                    //width: icon.width + rightMargin + leftMargin + Theme.itemSizeExtraSmall + leftMargin - Theme.paddingLarge
+                    width: icon.width + Theme.itemSizeExtraSmall + Theme.paddingMedium
+                    icon.source: parent.hakemisto + "f_logo_RGB-Blue_58.png"
+                    icon.height: Theme.iconSizeMedium
+                    icon.width: height*0.8
+                }
+                IconTextSwitch {
+                    id: foursquare
+                    checked: false
+                    width: facebook.width
+                    icon.source: parent.hakemisto + "foursquare.svg"
+                    icon.height: Theme.iconSizeMedium
+                    icon.width: height*0.8
+                }
+                IconTextSwitch {
+                    id: twitter
+                    checked: false
+                    width: facebook.width
+                    icon.source: parent.hakemisto + "Twitter_Social_Icon_Circle_Color.svg"
+                    icon.height: Theme.iconSizeMedium
+                    icon.width: height*0.8
+                }
             }
 
             IconTextSwitch {
@@ -628,7 +660,7 @@ Dialog {
                         //visible: asetuksetNakyvat
                         checked: true
                         text: checked? qsTr("limits to Foursquare categories %1 and %2").arg("Food").arg("Nightlife Spot") :
-                                       qsTr("searches in all categories")
+                                       qsTr("searches in all categories")                        
                     } // */
                 }
             }
@@ -774,11 +806,12 @@ Dialog {
     }
 
     onAccepted: {
-        UnTpd.postFacebook = face //facebook.checked
-        UnTpd.postTwitter = tweet //twitter.checked
-        UnTpd.postFoursquare = foursq //foursquare.checked
+        UnTpd.postFacebook = face; //facebook.checked
+        UnTpd.postTwitter = tweet; //twitter.checked
+        UnTpd.postFoursquare = foursq; //foursquare.checked
 
-        console.log("valittu baari " + baarinTunnus + " , " + baari)
+        if (baarinTunnus > "")
+            console.log("valittu baari " + baarinTunnus + ", " + baari);
     }
 
     Component.onCompleted: {
