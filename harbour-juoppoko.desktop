@@ -11,4 +11,7 @@ Name=Juoppoko
 # a different app name in German locale (de).
 Name[en]=Drunkard?
 Name[fi]=Juoppoko
-
+[X-Sailjail]
+Permissions=Internet; Location
+OrganizationName=null.hsjpekka
+ApplicationName=harbour-juoppoko

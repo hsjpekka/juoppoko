@@ -96,6 +96,7 @@ Page {
 
         function haeToken() {
             var kysely = accTokenAddress + tunnus
+            //console.log("kysely = " + kysely)
             xHttpGet(kysely)
             return
         }

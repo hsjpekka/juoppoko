@@ -82,34 +82,37 @@ Page {
 
     function avaaDb() {
 
-        if(db == null)
+        if(db == null) {
             try {
                 db = LocalStorage.openDatabaseSync("juoppoko", "0.1", "juodun alkoholin paivyri", 10000);
             } catch (err) {
                 console.log("Error in opening the database: " + err);
                 virheet = virheet + "Error in opening the database: " + err +" <br> "
             };
+        }
 
         Tkanta.tkanta = db;
         Tkanta.luoTaulukot();
-        return
+        return;
     }
 
     function kellonaika(ms) {
         // kirjoittaa kellonajan halutussa muodossa
-        var tunnit = new Date(ms).getHours()
-        var minuutit = new Date(ms).getMinutes()
-        var teksti
-        if (tunnit < 10)
-            teksti = "0" + tunnit + ":"
-        else
-            teksti = "" + tunnit + ":"
-        if (minuutit < 10)
-            teksti = teksti + "0" + minuutit
-        else
-            teksti = teksti + minuutit
+        var tunnit = new Date(ms).getHours();
+        var minuutit = new Date(ms).getMinutes();
+        var teksti;
+        if (tunnit < 10) {
+            teksti = "0" + tunnit + ":";
+        } else {
+            teksti = "" + tunnit + ":";
+        }
+        if (minuutit < 10) {
+            teksti = teksti + "0" + minuutit;
+        } else {
+            teksti = teksti + minuutit;
+        }
 
-        return teksti
+        return teksti;
     }
 
     function kysyAsetukset() {
@@ -364,7 +367,7 @@ Page {
 
     Timer {
         id: aloitus
-        interval: 200
+        interval: 5*1000
         running: false
         repeat: true
         onTriggered: {
@@ -378,6 +381,7 @@ Page {
                 kuvaaja.pylvasKuvaaja.positionViewAtEnd();
                 jakso = kuvaaja.viikkoja*kuvaaja.vkMs;
                 eka = false;
+                interval = 200
             } else {
                 if (kuvaaja.iJuoma > 0)
                     t1 = juoja.juodunAika(kuvaaja.iJuoma);
@@ -924,7 +928,7 @@ Page {
                     width: sivu.width - txtMaara.width - voltit.width
                     readOnly: true
                     color: Theme.primaryColor
-                    text: qsTr("beer")
+                    placeholderText: qsTr("beer")
                     label: tuoppi.arvostelu > 0 ? "" + (tuoppi.arvostelu/2+0.5).toFixed(1) + "/5" : " "
                     onClicked: {
                         tuoppi.muutaUusi()
@@ -938,6 +942,7 @@ Page {
                     readOnly: true
                     color: Theme.primaryColor
                     text: "500"
+                    width: font.pixelSize*4
                     onClicked: {
                         tuoppi.muutaUusi()
                     }
@@ -949,7 +954,7 @@ Page {
                     readOnly: true
                     color: Theme.primaryColor
                     text: "4.7"
-                    width: Theme.fontSizeMedium*4
+                    width: font.pixelSize*4//Theme.fontSizeMedium*4
                     onClicked: {
                         tuoppi.muutaUusi()
                     }

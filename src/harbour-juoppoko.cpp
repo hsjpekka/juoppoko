@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     char *s6 = FSQ_VERSIO;
     char *s7 = JUOPPOKO_VERSIO;
     char *s8 = CC_KOHDE;
-    int i=0;
+    int i;
 
     for (i=0; i<argc; i++){
         strings[i] = argv[i];

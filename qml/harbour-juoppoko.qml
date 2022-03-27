@@ -57,8 +57,7 @@ ApplicationWindow{
         FourSqr.appId = Qt.application.arguments[args-4]
         FourSqr.appSecret = Qt.application.arguments[args-5]
         FourSqr.fsqrVersion = Qt.application.arguments[args-6]
-        versioNro = Qt.application.arguments[args-7]
+        versioNro = Qt.application.arguments[args-7] //Qt.application.version
         kone = Qt.application.arguments[args-8]
-        console.log("Juoppoko " + versioNro + " .. " + kone)
     }
 }
