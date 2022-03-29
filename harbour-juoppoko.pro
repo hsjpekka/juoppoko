@@ -20,7 +20,7 @@ SOURCES += \
 OTHER_FILES += \
     translations/*.ts
 
-SAILFISHAPP_ICONS = 86x86 108x108 128x128 256x256
+SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172 256x256
 
 DISTFILES += \
     qml/components/BarChart.qml \
@@ -65,7 +65,7 @@ DEFINES += \
      "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
      "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
      "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
-     "JUOPPOKO_VERSIO=\"\\\"2.4.1\\\"\""
+     "JUOPPOKO_VERSIO=\"\\\"2.4.2\\\"\""
 
 QT += positioning
 

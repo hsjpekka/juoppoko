@@ -12,6 +12,6 @@ Name=Juoppoko
 Name[en]=Drunkard?
 Name[fi]=Juoppoko
 [X-Sailjail]
-Permissions=Internet; Location
+Permissions=Internet;Location
 OrganizationName=null.hsjpekka
 ApplicationName=harbour-juoppoko
