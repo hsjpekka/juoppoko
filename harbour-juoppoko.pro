@@ -15,7 +15,9 @@ TARGET = harbour-juoppoko
 CONFIG += sailfishapp
 
 SOURCES += \
-    src/harbour-juoppoko.cpp
+    src/harbour-juoppoko.cpp \
+    src/juomari.cpp \
+    src/untpd.cpp
 
 OTHER_FILES += \
     translations/*.ts
@@ -80,3 +82,7 @@ CONFIG += sailfishapp_i18n
 
 TRANSLATIONS += translations/$${TARGET}-fi.ts \
     translations/$${TARGET}-C.ts
+
+HEADERS += \
+    src/juomari.h \
+    src/untpd.h
