@@ -33,7 +33,8 @@ PkgConfigBR:
 # Runtime dependencies which are not automatically detected
 Requires:
   - sailfishsilica-qt5 >= 0.10.9
-  - contextkit-declarative-qt5
+  - nemo-qml-plugin-contextkit
+#contextkit-declarative-qt5
 
 # All installed files
 Files:

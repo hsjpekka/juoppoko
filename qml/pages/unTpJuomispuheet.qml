@@ -374,7 +374,7 @@ Page {
             Row {// kuka ja missä
                 id: juojaRivi
                 spacing: Theme.paddingMedium
-                height:
+                //height:
 
                 Image {
                     id: naama
