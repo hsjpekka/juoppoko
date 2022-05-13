@@ -317,7 +317,7 @@ function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
 }
 
 function lueTkJuomari() {
-    var riveja = 0, massa = -1, vetta = -1, kunto = -1, keho = []
+    var riveja = 0, massa = -1, vetta = -1, kunto = -1, keho = [];
 
     try {
         tkanta.transaction(function(tx) {
@@ -325,20 +325,21 @@ function lueTkJuomari() {
             riveja = taulukko.rows.length
 
             if (riveja > 0) {
-                massa = taulukko.rows[riveja - 1].paino;
-                vetta = taulukko.rows[riveja - 1].neste;
-                kunto = taulukko.rows[riveja - 1].maksa;
+                //massa = taulukko.rows[riveja - 1].paino;
+                //vetta = taulukko.rows[riveja - 1].neste;
+                //kunto = taulukko.rows[riveja - 1].maksa;
+                keho = taulukko.rows;
             };
         });
     } catch (err) {
         console.log("lueJuomari: " + err);
     }
 
-    keho[0] = massa
-    keho[1] = vetta
-    keho[2] = kunto
+    //keho[0] = massa
+    //keho[1] = vetta
+    //keho[2] = kunto
 
-    return keho
+    return keho;
 }
 
 function luoTaulukot() {

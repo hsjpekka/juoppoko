@@ -34,7 +34,7 @@ import "scripts/foursqr.js" as FourSqr
 
 ApplicationWindow{
     id: juoppoko
-    property string versioNro: ""
+    //property string versioNro: ""
     property string kone: ""
 
     Paaikkuna {
@@ -51,13 +51,13 @@ ApplicationWindow{
     Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta        
         var args = Qt.application.arguments.length
         UnTpd.programName = Qt.application.arguments[0]
-        UnTpd.unTpdId = Qt.application.arguments[args-1]
-        UnTpd.unTpdSecret = Qt.application.arguments[args-2]
-        UnTpd.callbackURL = Qt.application.arguments[args-3]
-        FourSqr.appId = Qt.application.arguments[args-4]
-        FourSqr.appSecret = Qt.application.arguments[args-5]
-        FourSqr.fsqrVersion = Qt.application.arguments[args-6]
-        versioNro = Qt.application.arguments[args-7] //Qt.application.version
-        kone = Qt.application.arguments[args-8]
+        UnTpd.unTpdId = unTappdId //Qt.application.arguments[args-1]
+        UnTpd.unTpdSecret = unTappdSe //Qt.application.arguments[args-2]
+        UnTpd.callbackURL = unTappdCb //Qt.application.arguments[args-3]
+        FourSqr.appId = fsqId //Qt.application.arguments[args-4]
+        FourSqr.appSecret = fsqSec //Qt.application.arguments[args-5]
+        FourSqr.fsqrVersion = fsqVer //Qt.application.arguments[args-6]
+        //versioNro = Qt.application.arguments[args-7] //Qt.application.version
+        kone = ccKohde //Qt.application.arguments[args-8]
     }
 }

@@ -44,7 +44,7 @@ Page {
     property bool alustusKaynnissa: true
     property date pvm: new Date() // kello- ja päiväkohdissa oleva aika (sekunnit ja millisekunnit = 0.0, alustusta lukuunottamatta )
     property string kelloMuoto: "HH:mm"
-    property alias juomari: juoja
+    //property alias juomari: juoja
 
     property var db: null
     property string virheet: ""
@@ -117,25 +117,20 @@ Page {
 
     function kysyAsetukset() {
         var dialog = pageContainer.push(Qt.resolvedUrl("asetukset.qml"), {
-                                        "massa0": juoja.paino, "vetta0": juoja.vetta,
-                                        "kunto0": juoja.maksa,
+                                        "massa0": juomari.luePaino(), "vetta0": juomari.lueVesimaara(),
+                                        "kunto0": juomari.lueMaksa(),
                                         "prom10": Tkanta.promilleRaja1, "prom20": Tkanta.promilleRaja2,
                                         "paiva10": Tkanta.vrkRaja1, "paiva20": Tkanta.vrkRaja2,
                                         "viikko10": Tkanta.vkoRaja1, "viikko20": Tkanta.vkoRaja2,
                                         "vuosi10": Tkanta.vsRaja1, "vuosi20": Tkanta.vsRaja2,
-                                        "palonopeus": juoja.polttonopeusVakio
+                                        "palonopeus": juomari.polttonopeus(1.0,1.0)//juoja.polttonopeusVakio
                                     })
         dialog.accepted.connect(function() {
-            var muutos = 0
-            if (juoja.paino != dialog.massa || juoja.vetta != dialog.vetta ||
-                    juoja.maksa != dialog.kunto ){
-                muutos = 1
+            if (juomari.luePaino() != dialog.massa || juomari.lueVesiMaara() != dialog.vetta ||
+                    juomari.lueMaksa() != dialog.kunto ){
+                juomari.asetaKeho(dialog.massa, dialog.vetta, dialog.kunto, pvm.getTime() - Tkanta.vrkVaihtuu*60*1000)
+                // Tkanta.uusiJuomari(juoja.paino, juoja.vetta, juoja.maksa, pvm.getTime())
             }
-            juoja.paino = dialog.massa
-            juoja.vetta = dialog.vetta
-            juoja.maksa = dialog.kunto
-            if (muutos > 0.5)
-                Tkanta.uusiJuomari(juoja.paino, juoja.vetta, juoja.maksa, pvm.getTime())
             juoja.luettu = true
 
             Tkanta.promilleRaja1 = dialog.prom1
@@ -155,6 +150,7 @@ Page {
             Tkanta.vsRaja2 = dialog.vuosi2
             Tkanta.paivitaAsetus(Tkanta.tunnusVsRaja2, Tkanta.vsRaja2)
 
+            juomari.asetaPromilleraja(dialog.prom1)
             juoja.promilleRaja = Tkanta.promilleRaja1
 
             tarkistaUnTpd()
@@ -162,7 +158,7 @@ Page {
                 uTYhteys.unTpdKayttaja()
                 uTYhteys.unTpdOnkoUutisia()
             }
-            juoja.paivita()
+            //juoja.paivita()
         })
 
         dialog.rejected.connect(function() {
@@ -186,33 +182,36 @@ Page {
         kuvaaja.riskiVkoAlempi = Tkanta.vkoRaja1;
         kuvaaja.riskiVkoYlempi = Tkanta.vkoRaja2;
         kuvaaja.vrkVaihtuu = Tkanta.vrkVaihtuu;
+        juomari.asetaVrkVaihdos(Tkanta.vrkVaihtuu);
         juoja.promilleRaja = Tkanta.promilleRaja1;
+        juomari.asetaPromilleraja(Tkanta.promilleRaja1);
 
         return luettu
     }
 
     function lueJuodut(kaikki, alkuAika, loppuAika) { //jos kaikki=true, alku- ja loppuajalla ei merkitystä
-        var taulukko = Tkanta.lueTkJuodut(kaikki, alkuAika, loppuAika).rows
-        var i = 0, maara, tmp
+        var taulukko = Tkanta.lueTkJuodut(kaikki, alkuAika, loppuAika).rows;
+        var i = 0, maara, tmp;
 
         console.log(qsTr("%1 drinks, latest %2").arg(taulukko.length).arg(taulukko[taulukko.length-1].juoma))
 
-        tmp = new Date()
+        //tmp = new Date()
         while (i < taulukko.length) {
             juoja.juo(taulukko[i].id, taulukko[i].aika,
                       taulukko[i].tilavuus, taulukko[i].prosenttia,
                       taulukko[i].juoma, taulukko[i].kuvaus, taulukko[i].oluenId);
-            i++
+            juomari.juo(taulukko[i].id, taulukko[i].tilavuus,
+                        taulukko[i].prosenttia, taulukko[i].aika, false);
+            i++;
         }
 
-        tmp = new Date()
         return;
     }
 
     function lueTiedostot() {
-        var ehto = 0, nyt = new Date().getTime() //, vkoNyt
-        var keho = []
-        var vrk = 24*60*60*1000 // t0 = new Date(0).getTimezoneOffset()*minuutti,
+        var ehto = 0, i, nyt = new Date().getTime(); //, vkoNyt
+        var keho = [], paino, vetta, maksa;
+        var vrk = 24*60*60*1000; // t0 = new Date(0).getTimezoneOffset()*minuutti,
 
         avaaDb();
         lueAsetukset();
@@ -220,14 +219,43 @@ Page {
         if (UnTpd.unTpToken > "")
             unTpdKaytossa = true
         else
-            unTpdKaytossa = false
+            unTpdKaytossa = false;
 
-        keho = Tkanta.lueTkJuomari()
+        keho = Tkanta.lueTkJuomari();
+        if (keho.length > 0){
+            i = 0;
+        } else {
+            i = -1;
+        }
 
+        while (i < keho.length) {
+            paino = keho[i].paino;
+            vetta = keho[i].neste;
+            maksa = keho[i].maksa;
+            if (paino < 1) {
+                console.log("mass < 1 kg, changed to 75 kg");
+                paino = 75;
+            }
+            if (vetta < 0.01) {
+                console.log("body water content < 1 %, changed to 70%");
+                vetta = 0.7;
+            }
+            if (maksa < 0.01) {
+                console.log("lever condition < 1 %, changed to 100%");
+                maksa = 1.0;
+            }
+            juomari.asetaKeho(paino, vetta, maksa, keho[i].aika);
+            i++;
+        }
+        if (i >= 0) {
+            juoja.luettu = true;
+        }
+
+        /*
         if (keho[0] > 1 ){
-            juoja.paino = keho[0] //massa = keho[0];
-            juoja.vetta = keho[1]//vetta = keho[1];
-            juoja.maksa = keho[2]//kunto = keho[2];
+            juomari.asetaKeho(keho[0], keho[1], keho[2]); //juoja.paino = keho[0] //massa = keho[0];
+            juoja.vetta = keho[1]; //vetta = keho[1];
+            juoja.maksa = keho[2]; //kunto = keho[2];
             if (juoja.paino < 1) {
                 console.log("mass < 1 kg, changed to 75 kg")
                 juoja.paino = 75
@@ -241,18 +269,20 @@ Page {
                 juoja.maksa = 1.0
             }
             juoja.luettu = true;
-        }
+            juomari.asetaKeho(keho[0], keho[1], keho[2]);
 
-        lueJuodut(true, pvm.getTime() - 365*vrk, pvm.getTime()) // true = kaikki, false = aikarajojen välissä olevat
+        } // */
+
+        lueJuodut(true, pvm.getTime() - 365*vrk, pvm.getTime()); // true = kaikki, false = aikarajojen välissä olevat
 
         if (juoja.annoksia > 0) {
-            txtJuoma.text = juoja.juodunNimi(juoja.annoksia-1) //lueJuomanNimi(juomat.count-1)
-            txtMaara.text = juoja.juodunTilavuus(juoja.annoksia-1)//lueJuomanMaara(juomat.count-1)
-            voltit.text = juoja.juodunVahvuus(juoja.annoksia-1)//lueJuomanVahvuus(juomat.count-1)
-            olutId = juoja.juodunOlutId(juoja.annoksia-1) //lueOluenId(juomat.count-1)
+            txtJuoma.text = juoja.juodunNimi(juoja.annoksia-1); //lueJuomanNimi(juomat.count-1)
+            txtMaara.text = juoja.juodunTilavuus(juoja.annoksia-1); //lueJuomanMaara(juomat.count-1)
+            voltit.text = juoja.juodunVahvuus(juoja.annoksia-1); //lueJuomanVahvuus(juomat.count-1)
+            olutId = juoja.juodunOlutId(juoja.annoksia-1); //lueOluenId(juomat.count-1)
         }
 
-        return
+        return;
     }
 
     function muutaAjanKirjasin() {
@@ -325,7 +355,8 @@ Page {
     function uusiJuoma(tkId, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId) {
         Tkanta.lisaaTkJuodut(tkId, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId);
 
-        juoja.juo(tkId, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId)
+        juoja.juo(tkId, hetki, tilavuus, vahvuus, juomanNimi, juomanKuvaus, oluenId);
+        juomari.juo(tkId, tilavuus, vahvuus, hetki);
 
         kuvaaja.lisaa(hetki, tilavuus*vahvuus/100)
 
@@ -1087,7 +1118,7 @@ Page {
                         Tkanta.muutaTkJuodut(juodunTunnus(iMuutettava), ms, dialog.tilavuus,
                                              dialog.vahvuus, dialog.nimi, dialog.juomanKuvaus,
                                              dialog.olutId); //, juodunPohjilla(iMuutettava)
-                        paivita();
+                        //paivita();
                         paivitaAjatRajoille();
                         kuvaaja.lisaa(vanhaHetki, -vanhanAlkoholi);
                         kuvaaja.lisaa(ms, dialog.tilavuus*dialog.vahvuus/100);
@@ -1111,8 +1142,8 @@ Page {
                 property bool luettu: false
 
                 function muutaPromillet() {
-                    var nytMs = pvm.getTime();
-                    var prml = juoja.promilleja;
+                    //var nytMs = pvm.getTime();
+                    var prml = juomari.promilleja(); // juoja.promilleja;
 
                     if (prml < 3.0){
                         txtPromilleja.text = "" + prml.toFixed(2) + " ‰";
@@ -1135,10 +1166,10 @@ Page {
                         txtPromilleja.font.bold = true;
                     }
 
-                    if (nytMs > juoja.rajalla.getTime()) // msKunnossa.getTime() // verrataan hetkeä nytMs listan viimeisen juoman jälkeiseen hetkeen
+                    if (prml < Tkanta.promilleRaja1)//nytMs > juoja.rajalla.getTime()) // msKunnossa.getTime() // verrataan hetkeä nytMs listan viimeisen juoman jälkeiseen hetkeen
                         txtAjokunnossa.text = " -";
 
-                    if (nytMs > juoja.selvana.getTime()) // msSelvana.getTime()
+                    if (prml <= 0) // msSelvana.getTime()
                         txtSelvana.text = " -";
 
                     return;
@@ -1158,7 +1189,7 @@ Page {
         // <--
         alustusKaynnissa = false
         aloitus.start()
-        juoja.paivita()
+        //juoja.paivita()
         paivitaAjatRajoille()
 
     }

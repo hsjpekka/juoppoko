@@ -36,7 +36,7 @@ Item {
     readonly property int  oletusLeveys: Theme.itemSizeExtraLarge
     readonly property int  msPaivassa: 24*msTunnissa // ms
     readonly property int  msTunnissa: 60*60*1000 // ms
-    readonly property real polttonopeusVakio: 0.1267 // ml/kg/h -- 1 g/10 kg/h = 1.267 ml/10 kg/h
+    //readonly property real polttonopeusVakio: 0.1267 // ml/kg/h -- 1 g/10 kg/h = 1.267 ml/10 kg/h
     readonly property real tiheys: 0.7897 // alkoholin tiheys, g/ml
 
     // signal välittää kokonaisluvut qml:n 32 bittisinä, ei javascriptin 64 bittisinä
@@ -66,30 +66,31 @@ Item {
         // tkId - juoman tunnus, hetki - juontiaika [ms], mlVeressa - ml alkoholia veressä hetkellä hetki,
         // maara - juoman tilavuus, vahvuus- juoman prosentit, juomanNimi - nimi, juomanKuvaus - tekstiä, lisayskohta - kohta listassa
         // pitäisikö juoman kuvaus lisätä???
-        var veressa//, koskaSelvana, koskaRajalla
+        //var veressa;//, koskaSelvana, koskaRajalla
         //var paiva = new Date(hetki).toLocaleDateString(Qt.locale(),Locale.ShortFormat) // juomispäivä
         //var kello = new Date(hetki).toLocaleTimeString(Qt.locale(), kelloMuoto) // kellonaika
 
         // lasketaan paljonko veressä on alkoholia juomishetkellä
-        veressa = mlKehossa(hetki)
+        //veressa = mlKehossa(hetki);
 
         if (juomanKuvaus === undefined)
-            juomanKuvaus = ""
+            juomanKuvaus = "";
         if (oluenId === undefined)
-            oluenId = -1
+            oluenId = -1;
 
-        juomat.lisaa(tkId, hetki, veressa, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId)
+        //juomat.lisaa(tkId, hetki, veressa, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId);
+        juomat.lisaa(tkId, hetki, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId);
 
-        if (!alustus) {
-            selvana = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, 0) + hetki)
-            rajalla = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, promilleRaja) + hetki)
+        //if (!alustus) {
+            //selvana = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, 0) + hetki)
+            //rajalla = new Date(msPromilleRajalle(veressa + maara*vahvuus/100, promilleRaja) + hetki)
 
-            paivita(new Date().getTime())
+            //paivita(new Date().getTime())
 
-            juomaLista.positionViewAtEnd()
-        }
+            //juomaLista.positionViewAtEnd()
+        //}
 
-        return
+        return;
     }
 
     function juodunAika(xid) {
@@ -166,10 +167,10 @@ Item {
             i--;
         }
 
-        return ml
+        return ml;
     }
 
-    function mlKehossa(ms) {
+    function _mlKehossa(ms) {
         // laskee, paljonko alkoholia on veressä hetkellä ms
         // xid on edellisen juoman kohta
         var xid = etsiSeuraava(ms)-1;
@@ -183,26 +184,26 @@ Item {
                                         juodunTilavuus(xid), juodunVahvuus(xid), ms);
         }
         //console.log(xid + ", ml " + ml1 + ", pohjat " + pohjat)
-        return ml1
+        return ml1;
     }
 
     function muutaJuoma(id, hetki, maara, vahvuus, nimi, kuvaus, oId) {
-        var ms0 = juodunAika(id)
-        juomat.aseta(id, hetki, maara, vahvuus, nimi, kuvaus, oId)
+        var ms0 = juodunAika(id);
+        juomat.aseta(id, hetki, maara, vahvuus, nimi, kuvaus, oId);
         //juomat.set(id, { "msPvm": pv1970, "kelloMs": kloMs, "mlVeressa": veressa,
         //               "section": paiva, "juomanAika": kello,
         //               "juomanNimi": nimi, "juomanTilavuus": maara,
         //               "juomanPros": vahvuus, "oluenId": oId, "kuvaus": kuvaus })
 
-        if (hetki < ms0)
-            laskeUudelleen(hetki+1)
-        else
-            laskeUudelleen(ms0+1)
+        //if (hetki < ms0)
+        //    laskeUudelleen(hetki+1)
+        //else
+        //    laskeUudelleen(ms0+1)
 
-        return
+        return;
     }
 
-    function paivita(aika) { // jos aikaa ei määritetä, lasketaan nykyinen tila
+    function _paivita(aika) { // jos aikaa ei määritetä, lasketaan nykyinen tila
 
         if (aika === undefined)
             aika = new Date().getTime();
@@ -213,20 +214,20 @@ Item {
         return;
     }
 
-    function palamisNopeus() {     // ml/h
+    function _palamisNopeus() {     // ml/h
         return polttonopeusVakio*paino*maksa;
     }
 
-    function promillejaHetkella(aika) { // g alkoholia/kg keho
+    function _promillejaHetkella(aika) { // g alkoholia/kg keho
         return mlKehossa(aika)*tiheys/(paino*vetta);
     }
 
-    function prom2ml(pro) {
+    function _prom2ml(pro) {
         return pro*paino*vetta/tiheys;
     }
 
     //sisäiseen käyttöön
-    function alkoholiaVeressa(hetki0, ml0, mlJuoma, vahvuus, hetki1){
+    function _alkoholiaVeressa(hetki0, ml0, mlJuoma, vahvuus, hetki1){
         //  hetki0 - int [ms], hetki, jolloin edellinen juoma juotiin
         //  ml0 - float [ml], alkoholia veressä hetkellä hetki0
         //  mlJuoma - int [ml], juoman koko
@@ -249,7 +250,7 @@ Item {
         return ml1;
     }
 
-    function laskeUudelleen(aika) { // muuttaa ajan jälkeen juotujen juomien ml-arvot
+    function _laskeUudelleen(aika) { // muuttaa ajan jälkeen juotujen juomien ml-arvot
         var i, ml0, ml1, ms0, ms1;
 
         if (aika === undefined)
@@ -286,7 +287,7 @@ Item {
         return;
     }
 
-    function msPromilleRajalle(mlVeressa, raja){
+    function _msPromilleRajalle(mlVeressa, raja){
         // ml0 - alkoholia veressä ennen juotua juomaa koko0, vahvuus0
         var mlRajalle, hRajalle;
 
@@ -310,9 +311,9 @@ Item {
         var ms = juodunAika(i), tkTunnus = juodunTunnus(i), poistettavanML, ajat;
         poistettavanML = juodunTilavuus(i)*juodunVahvuus(i)/100;
         juomat.remove(i);
-        laskeUudelleen(ms-1);
-        paivita();
-        ajat = msPaiviksiJaTunneiksi(ms);
+        //laskeUudelleen(ms-1);
+        //paivita();
+        //ajat = msPaiviksiJaTunneiksi(ms);
         juomaPoistettu(tkTunnus, ajat.paivia, ajat.kello, poistettavanML); // signaali
         return;
     }
@@ -406,15 +407,15 @@ Item {
             var paiva = new Date(hetki).toLocaleDateString(Qt.locale(),Locale.ShortFormat); // juomispäivä
             var kello = new Date(hetki).toLocaleTimeString(Qt.locale(), kelloMuoto); // kellonaika
             var ajat, kloMs, pv1970, tkId = juodunTunnus(id);
-            var veressa = 0;
-            if (id > 0)
-                veressa = alkoholiaVeressa(juodunAika(id-1), juodunPohjilla(id-1),
-                                           juodunTilavuus(id-1), juodunVahvuus(id-1), hetki) //mlKehossa(hetki-1);
+            //var veressa = 0;
+            //if (id > 0)
+            //    veressa = alkoholiaVeressa(juodunAika(id-1), juodunPohjilla(id-1),
+            //                               juodunTilavuus(id-1), juodunVahvuus(id-1), hetki) //mlKehossa(hetki-1);
             ajat = msPaiviksiJaTunneiksi(hetki);
             kloMs = ajat.kello;//hetki%msPaivassa
             pv1970 = ajat.paivia;//(hetki-kloMs)/msPaivassa
 
-            juomat.set(id, { "tunnus": tkId, "msPvm": pv1970, "kelloMs": kloMs, "mlVeressa": veressa,
+            juomat.set(id, { "tunnus": tkId, "msPvm": pv1970, "kelloMs": kloMs, //"mlVeressa": veressa,
                            "section": paiva, "juomanAika": kello,
                            "juomanNimi": nimi, "juomanTilavuus": maara,
                            "juomanPros": vahvuus, "oluenId": oId, "kuvaus": kuvaus});
@@ -422,31 +423,33 @@ Item {
         }
 
         //             int,  int,   real,    real,  real,    str,        str,         int
-        function lisaa(tkId, hetki, veressa, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId) {
-            var paiva = new Date(hetki).toLocaleDateString(Qt.locale(),Locale.ShortFormat) // juomispäivä
-            var kello = new Date(hetki).toLocaleTimeString(Qt.locale(), kelloMuoto) // kellonaika
-            var ind = etsiSeuraava(hetki)
-            var ajat, kloMs, pv1970// = hetki%msPaivassa // ms vuorokauden vaihtumisesta
+        //function lisaa(tkId, hetki, veressa, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId) {
+        //             int,  int,    real,  real,    str,        str,         int
+        function lisaa(tkId, hetki, maara, vahvuus, juomanNimi, juomanKuvaus, oluenId) {
+            var paiva = new Date(hetki).toLocaleDateString(Qt.locale(),Locale.ShortFormat); // juomispäivä
+            var kello = new Date(hetki).toLocaleTimeString(Qt.locale(), kelloMuoto); // kellonaika
+            var ind = etsiSeuraava(hetki);
+            var ajat, kloMs, pv1970;// = hetki%msPaivassa // ms vuorokauden vaihtumisesta
             //var pv1970 = (hetki - kloMs)/msPaivassa
-            ajat = msPaiviksiJaTunneiksi(hetki)
-            kloMs = ajat.kello
-            pv1970 = ajat.paivia
+            ajat = msPaiviksiJaTunneiksi(hetki);
+            kloMs = ajat.kello;
+            pv1970 = ajat.paivia;
 
             if (ind < juomat.count) {
-                juomat.insert(ind, { "tunnus": tkId, "msPvm": pv1970, "kelloMs": kloMs,
-                                  "mlVeressa": veressa, "section": paiva, "juomanAika": kello,
+                juomat.insert(ind, { "tunnus": tkId, "msPvm": pv1970, "kelloMs": kloMs, //"mlVeressa": veressa,
+                                  "section": paiva, "juomanAika": kello,
                                   "juomanNimi": juomanNimi, "juomanTilavuus": maara,
                                   "juomanPros": vahvuus, "oluenId": oluenId,
                                   "kuvaus": juomanKuvaus });
             } else {
-                juomat.append({ "tunnus": tkId, "msPvm": pv1970, "kelloMs": kloMs,
-                                  "mlVeressa": veressa, "section": paiva, "juomanAika": kello,
+                juomat.append({ "tunnus": tkId, "msPvm": pv1970, "kelloMs": kloMs, //"mlVeressa": veressa,
+                                  "section": paiva, "juomanAika": kello,
                                   "juomanNimi": juomanNimi, "juomanTilavuus": maara,
                                   "juomanPros": vahvuus, "oluenId": oluenId,
                                   "kuvaus": juomanKuvaus });
             }
 
-            return
+            return;
         }
 
     }

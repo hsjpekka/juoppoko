@@ -33,19 +33,39 @@
 #endif
 
 #include <sailfishapp.h>
+#include <QScopedPointer>
+#include "juomari.h"
 
 int main(int argc, char *argv[])
 {
-    char *strings[argc+8]; // + s1-s8
-    char *s1 = UTPD_ID;
-    char *s2 = UTPD_SECRET;
-    char *s3 = CB_URL;
-    char *s4 = FSQ_ID;
-    char *s5 = FSQ_SECRET;
-    char *s6 = FSQ_VERSIO;
-    char *s7 = JUOPPOKO_VERSIO;
-    char *s8 = CC_KOHDE;
-    int i;
+    QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    QScopedPointer<QQuickView> view(SailfishApp::createView());
+    juomari juoja;
+    view->engine()->rootContext()->setContextProperty("juomari", &juoja);
+    app->setApplicationVersion(JUOPPOKO_VERSIO);
+    view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
+    view->engine()->rootContext()->setContextProperty("unTappdSe", UTPD_SECRET);
+    view->engine()->rootContext()->setContextProperty("unTappdCb", CB_URL);
+    view->engine()->rootContext()->setContextProperty("fsqId", FSQ_ID);
+    view->engine()->rootContext()->setContextProperty("fsqSec", FSQ_SECRET);
+    view->engine()->rootContext()->setContextProperty("fsqVer", FSQ_VERSIO);
+    view->engine()->rootContext()->setContextProperty("ccKohde", CC_KOHDE);
+
+    view->setSource(SailfishApp::pathToMainQml());
+    view->show();
+    return app->exec();
+
+    /*
+    //char *strings[argc+8]; // + s1-s8
+    //char *s1 = UTPD_ID;
+    //char *s2 = UTPD_SECRET;
+    //char *s3 = CB_URL;
+    //char *s4 = FSQ_ID;
+    //char *s5 = FSQ_SECRET;
+    //char *s6 = FSQ_VERSIO;
+    //char *s7 = JUOPPOKO_VERSIO;
+    //char *s8 = CC_KOHDE;
+    //int i;
 
     for (i=0; i<argc; i++){
         strings[i] = argv[i];
@@ -68,5 +88,5 @@ int main(int argc, char *argv[])
     strings[argc] = s1; // unTappd appId
     argc++;
 
-    return SailfishApp::main(argc, strings);
+    return SailfishApp::main(argc, strings);// */
 }
