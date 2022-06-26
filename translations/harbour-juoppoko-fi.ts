@@ -36,6 +36,37 @@
     </message>
 </context>
 <context>
+    <name>KulutusKuvaajat</name>
+    <message>
+        <source>Sun</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fri</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sat</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Paaikkuna</name>
     <message>
         <source>info</source>
@@ -56,10 +87,6 @@
     <message>
         <source>sober at</source>
         <translation>selvänä</translation>
-    </message>
-    <message>
-        <source> ‰ at</source>
-        <translation> ‰ klo</translation>
     </message>
     <message>
         <source>beer</source>
@@ -94,10 +121,6 @@
         <translation>kavereiden kirjaukset</translation>
     </message>
     <message>
-        <source>%1 drinks, latest %2</source>
-        <translation>juomia %1, viimeisin %2</translation>
-    </message>
-    <message>
         <source>some error in transmission</source>
         <translation>virhe tiedon siirrossa</translation>
     </message>
@@ -108,6 +131,10 @@
     <message>
         <source>foreteller</source>
         <translation>ennustin</translation>
+    </message>
+    <message>
+        <source>%1 ‰ at</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -282,14 +309,6 @@
         <translation>klo</translation>
     </message>
     <message>
-        <source>state at %1</source>
-        <translation>tilanne %1</translation>
-    </message>
-    <message>
-        <source>BAC</source>
-        <translation>veressä</translation>
-    </message>
-    <message>
         <source>sober at</source>
         <translation>selvänä</translation>
     </message>
@@ -322,8 +341,28 @@
         <translation>Ennustin</translation>
     </message>
     <message>
-        <source>recalculate</source>
-        <translation>laske uudelleen</translation>
+        <source>body water content</source>
+        <translation type="unfinished">kehon neste-%</translation>
+    </message>
+    <message>
+        <source>weight of the drinker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lever condition %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>blood alcohol content limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>juodut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BAC</source>
+        <translation type="unfinished">veressä</translation>
     </message>
 </context>
 <context>
@@ -339,6 +378,13 @@
     <message>
         <source>Do you want to try to search UnTappd anyway?</source>
         <translation>Haluatko silti yrittää etsi UnTappdistä?</translation>
+    </message>
+</context>
+<context>
+    <name>harbour-juoppoko</name>
+    <message>
+        <source>%1 drinks, latest %2</source>
+        <translation type="unfinished">juomia %1, viimeisin %2</translation>
     </message>
 </context>
 <context>

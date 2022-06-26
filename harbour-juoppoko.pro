@@ -28,6 +28,7 @@ DISTFILES += \
     qml/components/BarChart.qml \
     qml/components/Juomari.qml \
     qml/components/KulutusKuvaajat.qml \
+    qml/components/ModExpandingSection.qml \
     qml/components/XhttpYhteys.qml \
     qml/pages/asetukset.qml \
     qml/pages/demolaskuri.qml \
@@ -67,7 +68,7 @@ DEFINES += \
      "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
      "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
      "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
-     "JUOPPOKO_VERSIO=\"\\\"2.4.2\\\"\""
+     "JUOPPOKO_VERSIO=\"\\\"2.5.0\\\"\""
 
 QT += positioning
 

@@ -117,7 +117,7 @@ Item {
     function tarkistaVerkko() {
         var tulos = verkko.value//"connected"
         //console.log("tarkistetaan")
-        if (kone === "i486") {
+        if (ccKohde === "i486") {
             tulos = "connected"
         } else if (tulos !== "connected") {
             console.log(qsTr("not connected") + ": " + tulos + ", " + verkko.status)

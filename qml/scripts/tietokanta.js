@@ -54,10 +54,12 @@ var vrkVaihtuu = 0*60 // minuuttia puolen yön jälkeen
 var luettuVrkVaihtuu = false
 //var juotu // juodut-taulukko luetaan tähän
 
-var virheet = ""
+var virheet = ["havaitut virheet:"]
 
 function lisaaSarake(taulukko, sarake) {
     var mj = "ALTER TABLE '" + taulukko + "' ADD COLUMN '" + sarake + "' " + "INTEGER"
+
+    if(tkanta === null) return;
 
     try {
         tkanta.transaction(function(tx) {
@@ -65,6 +67,7 @@ function lisaaSarake(taulukko, sarake) {
         });
     } catch (err) {
         console.log("Error tietokanta.js: " + err);
+        virheet.push(err + " >> " + mj + " <<")
     }
 
     //console.log(mj)
@@ -94,24 +97,25 @@ function lisaaTkJuodut(xid, hetki, maara, vahvuus, juoma, kuvaus, olutId) {
     try {
         tkanta.transaction(function(tx){
             tx.executeSql(komento);
-
         });
     } catch (err) {
         console.log("Error adding to juodut-table in database: " + err);
-        virheet = virheet + "Error adding to juodut-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + komento + " <<");
+        //virheet = virheet + "Error adding to juodut-table in database: " + err +" <br> "
     };
 
     return
 }
 
 function lueTkAsetukset() {
-    var luettu = 0, vanhaVaihdosTunnus = false;
+    var luettu = 0, vanhaVaihdosTunnus = false, mj;
+    mj = "SELECT asia, arvo FROM asetukset";
 
     if(tkanta === null) return luettu;
 
     try {
         tkanta.transaction(function(tx) {
-            var taulukko  = tx.executeSql("SELECT asia, arvo FROM asetukset");
+            var taulukko  = tx.executeSql(mj);
 
             for (var i = 0; i < taulukko.rows.length; i++ ) {
                 if (taulukko.rows[i].asia === tunnusProm1 ){
@@ -179,19 +183,19 @@ function lueTkAsetukset() {
                 }
             }
 
-            luettu = i
+            luettu = i;
          });
-
-    } catch (err) {
-        console.log("Error reading asetukset-table in database: " + err);
-        virheet = virheet + "Error reading asetukset-table in database: " + err +" <br> "
-
+    } catch (err1) {
+        console.log("Error reading asetukset-table in database: " + err1);
+        //virheet = virheet + "Error reading asetukset-table in database: " + err +" <br> "
+        virheet.push(err1 + " >[ " + mj + " ]<");
     }
 
+    mj = "SELECT asia, arvo FROM asetukset2";
     try {
         tkanta.transaction(function(tx) {
-            var taulukko2  = tx.executeSql("SELECT asia, arvo FROM asetukset2");
-            var luettu2 = 0
+            var taulukko2  = tx.executeSql(mj);
+            var luettu2 = 0;
 
             //console.log("lueAsetukset2: rivejä " + taulukko2.rows.length)
             while (luettu2 < taulukko2.rows.length) {
@@ -199,7 +203,7 @@ function lueTkAsetukset() {
                 if (taulukko2.rows[luettu2].asia === tunnusUnTappdToken ){
                     arvoUnTpToken = taulukko2.rows[luettu2].arvo;
                     if (arvoUnTpToken === null || arvoUnTpToken === undefined)
-                        arvoUnTpToken = ""
+                        arvoUnTpToken = "";
                     if (arvoUnTpToken !== "")
                         luettuUnTpToken = true;
                 }
@@ -211,57 +215,56 @@ function lueTkAsetukset() {
             //console.log("lueAsetukset2 - " + tunnusUnTappdToken + ": " + arvoUnTpToken)
 
         });
-
     } catch (err) {
         console.log("Error reading asetukset2-table in database: " + err);
-        virheet = virheet + "Error reading asetukset2-table in database: " + err +" <br> "
-
+        //virheet = virheet + "Error reading asetukset2-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     }
 
     //varmistetaan, että kaikki asetukset ovat tietokannassa
     if (!luettuPromilleRaja1)
-        uusiAsetus(tunnusProm1, promilleRaja1)
+        uusiAsetus(tunnusProm1, promilleRaja1);
     if (!luettuPromilleRaja2)
-        uusiAsetus(tunnusProm2, promilleRaja2)
+        uusiAsetus(tunnusProm2, promilleRaja2);
     if (!luettuVrkRaja1)
-        uusiAsetus(tunnusVrkRaja1, vrkRaja1)
+        uusiAsetus(tunnusVrkRaja1, vrkRaja1);
     if (!luettuVrkRaja2)
-        uusiAsetus(tunnusVrkRaja2, vrkRaja2)
+        uusiAsetus(tunnusVrkRaja2, vrkRaja2);
     if (!luettuVkoRaja1)
-        uusiAsetus(tunnusVkoRaja1, vkoRaja1)
+        uusiAsetus(tunnusVkoRaja1, vkoRaja1);
     if (!luettuVkoRaja2)
-        uusiAsetus(tunnusVkoRaja2, vkoRaja2)
+        uusiAsetus(tunnusVkoRaja2, vkoRaja2);
     if (!luettuVsRaja1)
-        uusiAsetus(tunnusVsRaja1, vsRaja1)
+        uusiAsetus(tunnusVsRaja1, vsRaja1);
     if (!luettuVsRaja2)
-        uusiAsetus(tunnusVsRaja2, vsRaja2)
+        uusiAsetus(tunnusVsRaja2, vsRaja2);
     if (!luettuNakyvaKuvaaja)
-        uusiAsetus(tunnusKuvaaja, nakyvaKuvaaja)
+        uusiAsetus(tunnusKuvaaja, nakyvaKuvaaja);
     if (!luettuVrkVaihtuu)
-        uusiAsetus(tunnusVrkVaihdos, vrkVaihtuu)
+        uusiAsetus(tunnusVrkVaihdos, vrkVaihtuu);
     if (!luettuYksikko)
-        uusiAsetus(tunnusTilavuusMitta, arvoTilavuusMitta)
+        uusiAsetus(tunnusTilavuusMitta, arvoTilavuusMitta);
     if (!luettuTalletaSijainti)
-        uusiAsetus(tunnusTalletaSijainti, arvoTalletaSijainti)
+        uusiAsetus(tunnusTalletaSijainti, arvoTalletaSijainti);
     if (!luettuJulkaiseFacebook)
-        uusiAsetus(tunnusJulkaiseFacebook, arvoJulkaiseFacebook)
+        uusiAsetus(tunnusJulkaiseFacebook, arvoJulkaiseFacebook);
     if (!luettuJulkaiseFsqr)
-        uusiAsetus(tunnusJulkaiseFsqr, arvoJulkaiseFsqr)
+        uusiAsetus(tunnusJulkaiseFsqr, arvoJulkaiseFsqr);
     if (!luettuJulkaiseTwitter)
-        uusiAsetus(tunnusJulkaiseTwitter, arvoJulkaiseTwitter)
+        uusiAsetus(tunnusJulkaiseTwitter, arvoJulkaiseTwitter);
     if (!luettuUnTpToken)
-        uusiAsetus2(tunnusUnTappdToken, "")
+        uusiAsetus2(tunnusUnTappdToken, "");
 
     if (vanhaVaihdosTunnus)
-        poistaAsetus("ryypaysVrk")
+        poistaAsetus("ryypaysVrk");
 
-    return luettu
+    return luettu;
 }
 
 function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
-    var taulukko
-    var i = 0
-    var hakuteksti = "SELECT * FROM juodut"
+    var taulukko;
+    var i = 0;
+    var hakuteksti = "SELECT * FROM juodut";
 
     if (tkanta === null)
         return;
@@ -286,9 +289,9 @@ function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
     // */
 
     if (!kaikkiko)
-        hakuteksti += " WHERE aika >= " + alkuAika + " AND aika <= " + loppuAika
+        hakuteksti += " WHERE aika >= " + alkuAika + " AND aika <= " + loppuAika;
 
-    hakuteksti += " ORDER BY aika ASC"
+    hakuteksti += " ORDER BY aika ASC";
     //console.log(hakuteksti)
 
     try {
@@ -301,7 +304,7 @@ function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
                 for (i = 0; i < taulukko.rows.length; i++){
                     //console.log("lueTkJuodut: " + taulukko.rows[i].aika + " " + taulukko.rows[i].juoma)
                     if (taulukko.rows[i].oluenId === null)
-                        taulukko.rows[i].oluenId = 0
+                        taulukko.rows[i].oluenId = 0;
                 }
             } else {
                 //for (i = 0; i < taulukko.rows.length; i++){
@@ -310,29 +313,33 @@ function lueTkJuodut(kaikkiko, alkuAika, loppuAika) {
             }
         }
     } catch (err) {
-        console.log("lueJuodut: " + err);
+        console.log("lueJuodut: " + err + " //// " + hakuteksti);
+        virheet.push(err + " >> " + hakuteksti + " << ");
     }
 
     return taulukko;
 }
 
 function lueTkJuomari() {
-    var riveja = 0, massa = -1, vetta = -1, kunto = -1, keho = [];
+    var riveja = 0, massa = -1, vetta = -1, kunto = -1, keho = [], mj;
 
+    mj = "SELECT * FROM juomari ORDER BY aika ASC";
     try {
         tkanta.transaction(function(tx) {
-            var taulukko  = tx.executeSql("SELECT * FROM juomari ORDER BY aika ASC");
-            riveja = taulukko.rows.length
+            var taulukko  = tx.executeSql(mj);
+            riveja = taulukko.rows.length;
 
             if (riveja > 0) {
                 //massa = taulukko.rows[riveja - 1].paino;
                 //vetta = taulukko.rows[riveja - 1].neste;
                 //kunto = taulukko.rows[riveja - 1].maksa;
                 keho = taulukko.rows;
+                console.log("riveja juomarissa " + riveja)
             };
         });
     } catch (err) {
         console.log("lueJuomari: " + err);
+        virheet.push(err + " >> " + mj + " <<");
     }
 
     //keho[0] = massa
@@ -352,45 +359,49 @@ function luoTaulukot() {
         lisaaSarake("juodut", "oluenId")
     //luoTkSuosikit();
 
-    return
+    return;
 }
 
 function luoTkAsetukset() {
     // asetukset-tietokanta
     // asia,    arvo
     // string,  numeric
+    var mj;
 
     if(tkanta === null) return;
 
+    mj = "CREATE TABLE IF NOT EXISTS asetukset (asia TEXT, arvo NUMERIC)";
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("CREATE TABLE IF NOT EXISTS asetukset (asia TEXT, arvo NUMERIC)");
+            tx.executeSql(mj);
         });
     } catch (err) {
         console.log("Error creating asetukset-table in database: " + err);
-        virheet = virheet + "Error creating asetukset-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     };
 
-    return
+    return;
 }
 
 function luoTkAsetukset2() {
     // asetukset2-tietokanta
     // asia,    arvo
     // string,  string
+    var mj;
 
     if(tkanta === null) return;
 
+    mj = "CREATE TABLE IF NOT EXISTS asetukset2 (asia TEXT, arvo TEXT)";
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("CREATE TABLE IF NOT EXISTS asetukset2 (asia TEXT, arvo TEXT)");
+            tx.executeSql(mj);
         });
     } catch (err) {
         console.log("Error creating asetukset2-table in database: " + err);
-        virheet = virheet + "Error creating asetukset2-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     };
 
-    return
+    return;
 }
 
 function luoTkJuodut() {
@@ -398,60 +409,69 @@ function luoTkJuodut() {
     // id,  aika,     tilavuus, prosenttia, juoma,                kuvaus, oluenId
     // int, int [ms], int [ml], float,      string - juoman nimi, string, int - unTappd-id
     // poistettu veressa -- float [ml] - alkoholia veressä juomahetkellä
+    var mj;
 
     if(tkanta === null) return;
 
+    mj = "CREATE TABLE IF NOT EXISTS juodut (id INTEGER, aika INTEGER, " +
+            "tilavuus INTEGER, prosenttia REAL, juoma TEXT, kuvaus TEXT, " +
+            "oluenId INTEGER)";
     try { // veressa REAL, poistettu
         tkanta.transaction(function(tx){
-            tx.executeSql("CREATE TABLE IF NOT EXISTS juodut (id INTEGER, aika INTEGER, " +
-                    "tilavuus INTEGER, prosenttia REAL, juoma TEXT, kuvaus TEXT, oluenId INTEGER)");
+            tx.executeSql(mj);
         });
     } catch (err) {
         console.log("Error creating juodut-table in database: " + err);
-        virheet = virheet + "Error creating asetukset-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + err + " <<");
     };
 
-    return
+    return;
 }
 
 function luoTkJuomari() {
     //juomari-taulukko
     // aika,     paino,      neste,                          maksa
     // int [ms], int [kg],   float - kehon nesteprosentti,   float - maksan tehokkuuskerroin
+    var mj;
 
     if(tkanta === null) return;
 
+    mj = "CREATE TABLE IF NOT EXISTS juomari (aika INTEGER, paino INTEGER, " +
+            "neste REAL, maksa REAL)";
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("CREATE TABLE IF NOT EXISTS juomari (aika INTEGER, paino INTEGER, neste REAL, maksa REAL)");
+            tx.executeSql(mj);
         });
 
     } catch (err) {
         console.log("Error creating juomari-table in database: " + err);
-        virheet = virheet + "Error creating asetukset-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     };
 
-    return
+    return;
 }
 
 function luoTkSuosikit() {
     //suosikit-taulukko
     //id  juoma (nimi)  suosio kuvaus tilavuus prosentti
     //int string        int    string int      float
+    var mj;
 
     if(tkanta === null) return;
 
+    mj = "CREATE TABLE IF NOT EXISTS suosikit (id INTEGER, juoma TEXT, " +
+            "suosio INTEGER, kuvaus TEXT, tilavuus INTEGER, prosentti REAL, " +
+            "oluenId INTEGER)"
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("CREATE TABLE IF NOT EXISTS suosikit (id INTEGER, juoma TEXT, suosio INTEGER," +
-                    "kuvaus TEXT, tilavuus INTEGER, prosentti REAL, oluenId INTEGER)");
+            tx.executeSql(mj);
         });
     } catch (err) {
         console.log("Error creating suosikit-table in database: " + err);
-        virheet = virheet + "Error creating asetukset-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     };
 
-    return
+    return;
 }
 
 // poistettu , mlVeressa
@@ -459,10 +479,10 @@ function muutaTkJuodut(xid, hetki, maara, vahvuus, nimi, kuvaus, olutId) {
     //juomanNimi = vaihdaHipsut(juomanNimi)
     //juomanKuvaus = vaihdaHipsut(juomanKuvaus)
 
-    var komento = "UPDATE juodut SET aika = " + hetki //+ ", veressa = " + mlVeressa
-            + ", tilavuus = " + maara + ", prosenttia = " + vahvuus +", juoma = '"
-            + vaihdaHipsut(nimi) + "', kuvaus = '" + vaihdaHipsut(kuvaus) + "', oluenId = "
-            + olutId + "  WHERE id = " + xid
+    var komento = "UPDATE juodut SET aika = " + hetki + //+ ", veressa = " + mlVeressa
+            ", tilavuus = " + maara + ", prosenttia = " + vahvuus +", juoma = '" +
+            vaihdaHipsut(nimi) + "', kuvaus = '" + vaihdaHipsut(kuvaus) +
+            "', oluenId = " + olutId + "  WHERE id = " + xid
     if(tkanta === null) return;
 
     try {
@@ -471,10 +491,10 @@ function muutaTkJuodut(xid, hetki, maara, vahvuus, nimi, kuvaus, olutId) {
         });
     } catch (err) {
         console.log("Error modifying juodut-table in database: " + err);
-        virheet = virheet + "Error modifying juodut-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + komento + " <<");
     };
 
-    return
+    return;
 }
 
 function onkoSarake(taulukko, tunnus) {
@@ -496,6 +516,7 @@ function onkoSarake(taulukko, tunnus) {
 
     } catch (err) {
         console.log("Error tietokanta.js: " + err);
+        virheet.push(err + " >> " + mj3 + " <<");
     }
 
     /*
@@ -505,7 +526,7 @@ function onkoSarake(taulukko, tunnus) {
         console.log("taulukossa " + taulukko + " on sarake " + tunnus)
     // */
 
-    return onko
+    return onko;
 }
 
 function paivitaAsetus(tunnus, arvo) {
@@ -519,7 +540,7 @@ function paivitaAsetus(tunnus, arvo) {
     if(tkanta === null) return;
 
     mj = "UPDATE asetukset SET arvo = " + arvo + "  WHERE asia = '" + tunnus + "'";
-    console.log("" + mj);
+    //console.log("" + mj);
 
     try {
         tkanta.transaction(function(tx){
@@ -527,11 +548,11 @@ function paivitaAsetus(tunnus, arvo) {
         });
     } catch (err) {
         console.log("Error modifying asetukset-table in database: " + err);
-        virheet = virheet + "Error modifying asetukset-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     };
     //console.log("kohta1 ")
 
-    return
+    return;
 }
 
 function paivitaAsetus2(tunnus, arvo) {
@@ -543,7 +564,7 @@ function paivitaAsetus2(tunnus, arvo) {
         if (arvo === null || arvo === "" || arvo === undefined)
             luettuUnTpToken = false
         else
-            luettuUnTpToken = true
+            luettuUnTpToken = true;
     }
 
     //console.log(mj)
@@ -553,11 +574,11 @@ function paivitaAsetus2(tunnus, arvo) {
         });
     } catch (err) {
         console.log("Error modifying asetukset2-table in database: " + err);
-        virheet = virheet + "Error modifying asetukset2-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     };
 
     //console.log("paivitaAsetus2: " + mj)
-    return
+    return;
 }
 
 function poistaAsetus(tunnus) {
@@ -572,36 +593,40 @@ function poistaAsetus(tunnus) {
         });
     } catch (err) {
         console.log("Error when deleting from asetukset-table in database: " + err);
-        virheet = virheet + "Error when deleting from asetukset-table in database: " + err +"\n"
+        virheet.push(err + " >> " + mj + " <<");
     };
 
     //console.log("paivitaAsetus2: " + mj)
-    return
+    return;
 }
 
 function poistaTkJuodut(xid){
+    var mj = "DELETE FROM juodut WHERE id = ?";
     if(tkanta === null) return;
 
     try {
         tkanta.transaction(function(tx) {
-            tx.executeSql("DELETE FROM juodut WHERE id = ?", [xid]);
+            tx.executeSql(mj, [xid]);
         });
     } catch (err) {
         console.log("poistaTkJuodut: " + err);
+        virheet.push(err + " >> " + mj + " [" + xid + "] <<");
     }
 
     return;
 }
 
 function tyhjennaTaulukko(taulukko){
+    var mj = "DELETE FROM " + taulukko;
     if(tkanta === null || taulukko == "") return;
 
     try {
         tkanta.transaction(function(tx) {
-            tx.executeSql("DELETE FROM " + taulukko);
+            tx.executeSql(mj);
         });
     } catch (err) {
         console.log("tyhjennaTaulukko: " + err);
+        virheet.push(err + " >> " + mj + " <<");
     }
 
     return;
@@ -609,22 +634,25 @@ function tyhjennaTaulukko(taulukko){
 
 function uusiAsetus(tunnus, arvo){
     // tunnus string, arvo numeric
+    var mj;
     if(tkanta === null) return;
 
+    mj = "INSERT INTO asetukset (asia, arvo) VALUES ('" + tunnus + "', " +
+            arvo + ")";
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("INSERT INTO asetukset (asia, arvo)" +
-                          " VALUES ('" + tunnus + "', " + arvo +")" )
+            tx.executeSql(mj)
         })
     } catch (err) {
         console.log("Error adding to asetukset-table in database: " + err);
-        virheet = virheet + "Error adding to asetukset-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     }
-    return
+    return;
 }
 
 function uusiAsetus2(tunnus, arvo){
     // tunnus string, arvo string
+    var mj;
     if(tkanta === null) return;
     if (tunnus === tunnusUnTappdToken) {
         if (arvo === null || arvo === "" || arvo === undefined) {
@@ -635,40 +663,43 @@ function uusiAsetus2(tunnus, arvo){
     }
 
     //console.log("uusiAsetus2 " + tunnus + " = " + arvo)
+    mj = "INSERT INTO asetukset2 (asia, arvo) VALUES ('" + tunnus + "', '" +
+            arvo + "')";
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("INSERT INTO asetukset2 (asia, arvo)" +
-                          " VALUES ('" + tunnus + "', '" + arvo +"')" )
+            tx.executeSql(mj);
         })
     } catch (err) {
         console.log("Error adding to asetukset2-table in database: " + err);
-        virheet = virheet + "Error adding to asetukset2-table in database: " + err +" <br> "
+        virheet.push(err + " >> " + mj + " <<");
     }
-    return
+    return;
 }
 
 function uusiJuomari(massa, vetta, kunto, aika) {
+    var komento
+    komento = "INSERT INTO juomari (aika, paino, neste, maksa) VALUES (" +
+            aika + ", " + massa + ", " + vetta + ", " + kunto +")";
 
     if(tkanta === null) return;
     //console.log("uusi ms, kg, L, %:" + aika + ", " + massa + ", " + vetta + ", " + kunto)
 
     try {
         tkanta.transaction(function(tx){
-            tx.executeSql("INSERT INTO juomari (aika, paino, neste, maksa)" +
-                          " VALUES (" + aika + ", " + massa + ", " + vetta + ", " + kunto +")" )
+            tx.executeSql(komento)
         })
     } catch (err) {
-        console.log("Error adding to juomari-table in database: " + err);
-        virheet = virheet + "Error adding to juomari-table in database: " + err +" <br> "
+        console.log("Error adding to juomari-table in database -- query " + komento + " -- error: " + err);
+        virheet.push(err + " >> " + komento + " <<");
     }
 
-    return
+    return;
 }
 
 function vaihdaHipsut(mj) {
     //tuplaa merkit ' ja "
-    mj = mj.replace(/'/g,"''")
-    mj = mj.replace(/"/g,'""')
+    mj = mj.replace(/'/g,"''");
+    mj = mj.replace(/"/g,'""');
 
-    return mj
+    return mj;
 }

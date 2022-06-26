@@ -253,6 +253,21 @@ function poistaJuoma(juomaId) {
 }
 // */
 
+function paivaEro(aika1, aika2) {
+    var pvm1 = new Date(aika1), pvm2 = new Date(aika2);
+    var vyohykeEro, msVrk, tulos, msPv1, msPv2;
+    msVrk = 24*60*60*1000;
+    vyohykeEro = pvm2.getTimezoneOffset() - pvm1.getTimezoneOffset();
+    tulos = Math.floor((aika2 - aika1 + vyohykeEro*60*1000)/msVrk);
+    msPv1 = ((pvm1.getHours()*60 + pvm1.getMinutes())*60 + pvm1.getSeconds())*1000 + pvm1.getMilliseconds();
+    msPv2 = ((pvm2.getHours()*60 + pvm2.getMinutes() + vyohykeEro)*60 + pvm2.getSeconds())*1000 + pvm1.getMilliseconds();
+    if (msPv2 < msPv1) {
+        tulos += 1;
+    }
+
+    return tulos;
+}
+
 function vyohyke(aika) {
     var m0, m1
     var tunnus

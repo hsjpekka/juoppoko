@@ -34,7 +34,7 @@ CoverBackground {
     id: kansi
 
     function naytaPromillet() {
-        var pro = paaikkuna.juomari.promillejaHetkella(new Date().getTime()) //qqlaskePromillet(new Date().getTime())
+        var pro = juoja.promilleja() //qqlaskePromillet(new Date().getTime())
         var str = ""
 
         str = pro.toFixed(2)  + " ‰"

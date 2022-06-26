@@ -40,8 +40,9 @@ int main(int argc, char *argv[])
 {
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
-    juomari juoja;
-    view->engine()->rootContext()->setContextProperty("juomari", &juoja);
+    juomari juoja, testeri;
+    view->engine()->rootContext()->setContextProperty("juoja", &juoja);
+    view->engine()->rootContext()->setContextProperty("testaaja", &testeri);
     app->setApplicationVersion(JUOPPOKO_VERSIO);
     view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
     view->engine()->rootContext()->setContextProperty("unTappdSe", UTPD_SECRET);
