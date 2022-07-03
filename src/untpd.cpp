@@ -13,7 +13,39 @@ unTpd::unTpd(QObject *parent) : QObject(parent)
     server = "api.untappd.com";
     pathCommon = "/v4";
     //keyError = "status";
+}
 
+int unTpd::addToQuery(QUrlQuery &query, QString keyList)
+{
+    QStringList keys;
+    //QString result;
+    int i, iN, j, jN, result;
+    bool search;
+    keys = keyList.split(",",QString::SkipEmptyParts);
+    result = 0;
+    i = 0;
+    iN = keys.length();
+    jN = storedParameters.length();
+    while (i < iN) {
+        j = 0;
+        search = true;
+        while (j < jN && search) {
+            if (storedParameters.at(j).key == keys.at(i)) {
+                search = false;
+            } else {
+                j++;
+            }
+        }
+        if (j < jN) {
+            query.addQueryItem(storedParameters.at(j).key, storedParameters.at(j).value);
+            result++;
+        }
+        i++;
+    }
+
+    qInfo() << query.toString();
+
+    return result;
 }
 
 /*
@@ -91,44 +123,20 @@ void unTpd::getQueryStatus(QJsonObject reply)
 
     if (netQueryStatus != Success && !str.isEmpty() && !str.isNull()) {
         errorList.append(str);
+        qInfo() << str;
     }
 
     return;
 }
 
-bool unTpd::queryGet(QString path, QString parameters)
+bool unTpd::queryGet(QString path, QString definedQuery, QString parametersToAdd)
 {
-    return sendRequest(path, parameters, true);
+    return sendRequest(path, parametersToAdd, definedQuery, true);
 }
 
-bool unTpd::queryPost(QString path, QString parameters)
+bool unTpd::queryPost(QString path, QString definedQuery, QString parametersToAdd)
 {
-    return sendRequest(path, parameters, false);
-}
-
-bool unTpd::sendRequest(QString path, QString parameters, bool isGet)
-{
-    QUrl url;
-    QUrlQuery query;
-    QNetworkRequest request;
-
-    url.setScheme(scheme);
-    url.setHost(server);
-    url.setPath(pathCommon + path);
-    query = QUrlQuery(parameters);
-    //query.addQueryItem("access_token", userToken);
-    url.setQuery(query);
-    request.setUrl(url);
-
-    netQueryStatus = Pending;
-    if (isGet) {
-        netReply = netManager.get(request);
-    } else {
-        netReply = netManager.post(request, "");
-    }
-    connect(netReply, SIGNAL(finished()), this, SLOT(replyFromServer()));
-
-    return true;
+    return sendRequest(path, parametersToAdd, definedQuery, false);
 }
 
 void unTpd::replyFromServer()
@@ -190,6 +198,118 @@ QJsonObject unTpd::responseToJson(QNetworkReply *reply, QString *jsonStorage)
     return result;
 }
 
+bool unTpd::sendRequest(QString path, QString parametersToAdd, QString definedQuery, bool isGet)
+{
+    QUrl url;
+    QUrlQuery query;
+    QNetworkRequest request;
+
+    url.setScheme(scheme);
+    url.setHost(server);
+    url.setPath(pathCommon + path);
+    if (isUserInfoRequired) {
+        url.setUserName(userName);
+        if (!userPassword.isNull()) {
+            url.setPassword(userPassword);
+        }
+    }
+
+    query = QUrlQuery(definedQuery);
+    addToQuery(query, parametersToAdd);
+    url.setQuery(query);
+
+    request.setUrl(url);
+
+    netQueryStatus = Pending;
+    if (isGet) {
+        netReply = netManager.get(request);
+    } else {
+        netReply = netManager.post(request, "");
+    }
+    connect(netReply, SIGNAL(finished()), this, SLOT(replyFromServer()));
+
+    return true;
+}
+
+int unTpd::setQueryParameter(QString key, QString value)
+{
+    int i, N;
+    keyValuePair keyValue;
+    if (key.isNull() || key.isEmpty() || value.isNull()) {
+        return -1;
+    }
+    i = 0;
+    N = storedParameters.length();
+    keyValue.key = key;
+    keyValue.value = value;
+    while (i < N) {
+        if (storedParameters.at(i).key == key) {
+            storedParameters.replace(i, keyValue);
+            i = N + 2;
+        }
+        i++;
+    }
+    if (i == N) {
+        storedParameters.append(keyValue);
+    }
+
+    return storedParameters.length();
+}
+
+/*
+bool unTpd::setAuthorityToken(QString key, QString token)
+{
+    bool result = true;
+    if(!key.isNull()) {
+        authTokenKey = key;
+    } else {
+        result = false;
+    }
+    if (!token.isNull()) {
+        authToken = token;
+    } else {
+        result = false;
+    }
+
+    return result;
+}
+
+bool unTpd::setQueryAuthority(QString idKey, QString id, QString secretKey, QString secret)
+{
+    bool tulos = true;
+    if (!id.isNull() && !idKey.isNull()) {
+        appIdKey = idKey;
+        appId = id;
+    } else {
+        tulos = false;
+    }
+    if (!secret.isNull() && !secretKey.isNull()) {
+        appSecret = secret;
+        appSecretKey = secretKey;
+    } else {
+        tulos = false;
+    }
+
+    return tulos;
+}
+
+bool unTpd::setUserAuthority(QString user, QString passwd)
+{
+    bool result = true;
+    if (!user.isNull()) {
+        userName = user;
+    } else {
+        result = false;
+    }
+    if (!passwd.isNull()) {
+        userPassword = passwd;
+    } else {
+        result = false;
+    }
+    return result;
+}
+//*/
+
 bool unTpd::setServer(QString protocol, QString address, QString path)
 {
     bool result = true;
@@ -212,16 +332,8 @@ bool unTpd::setServer(QString protocol, QString address, QString path)
     return result;
 }
 
-bool unTpd::setAppAuthority(QString id, QString secret)
+bool unTpd::userInfoReguired(bool required)
 {
-    bool tulos = false;
-    if (!id.isNull()) {
-        appId = id;
-        tulos = true;
-    }
-    if (!secret.isNull()) {
-        appSecret = secret;
-        tulos = true;
-    }
-    return tulos;
+    isUserInfoRequired = required;
+    return isUserInfoRequired;
 }

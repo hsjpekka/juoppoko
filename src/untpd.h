@@ -14,21 +14,14 @@ class unTpd : public QObject
     Q_OBJECT
 public:
     explicit unTpd(QObject *parent = nullptr);
-    //Q_INVOKABLE bool acceptFriend(int targetId);
-    //Q_INVOKABLE bool addToWishList(int targetId);
-    //Q_INVOKABLE bool checkInBeer(int beerId, QString tzone, QString venueId, bool position, double lat, double lng, QString shout, double rating, bool fbook, bool twitter, bool fsquare);
-    //Q_INVOKABLE bool getBadges(QString target, int offset, int limit);
-    //Q_INVOKABLE bool getBeerFeed(int beerId, int maxId, int minId, int limit);
-    //Q_INVOKABLE bool searchBeer(QString searchString);
-    Q_INVOKABLE bool queryGet(QString path, QString parameters);
-    Q_INVOKABLE bool queryPost(QString path, QString parameters);
-    Q_INVOKABLE bool sendRequest(QString path, QString parameters, bool isGet);
-    Q_INVOKABLE bool setAppAuthority(QString id, QString secret);
-    //Q_INVOKABLE bool setUserAuthority(QString token);
+    Q_INVOKABLE bool queryGet(QString path, QString definedQuery, QString parametersToAdd="");
+    Q_INVOKABLE bool queryPost(QString path, QString definedQuery, QString parametersToAdd="");
+    Q_INVOKABLE int setQueryParameter(QString key, QString value);
     Q_INVOKABLE bool setServer(QString protocol, QString address, QString path);
+    Q_INVOKABLE bool storeQueryParameter(QString key, QString value);
+    Q_INVOKABLE bool userInfoReguired(bool required);
 
 signals:
-    //void finishedBeerSearch();
     void finishedQuery();
 
 private slots:
@@ -36,17 +29,26 @@ private slots:
 
 private:
     QString scheme, server, pathCommon;
-    QString appId, appSecret;//, userToken;
+    QString userName, userPassword;
     QString latestReply;
     QStringList errorList;
+    bool isUserInfoRequired;
 
     enum QueryStatus {NetError, ParseError, ServiceError, Pending, Success} netQueryStatus;
+    struct keyValuePair {QString key; QString value;};
+    QList<keyValuePair> storedParameters;
 
     QNetworkAccessManager netManager;
     QNetworkReply *netReply;
 
+    int addToQuery(QUrlQuery &query, QString keyList);
     void getQueryStatus(QJsonObject reply);
+    bool isAppIdNeeded(QString authType);
+    bool isAppSecretNeeded(QString authType);
+    bool isUserAuthNeeded(QString authType);
+    bool isTokenNeeded(QString authType);
     QJsonObject responseToJson(QNetworkReply *reply, QString *jsonStorage);
+    bool sendRequest(QString path, QString parametersToAdd, QString definedQuery, bool isGet);
 };
 
 #endif // UNTPD_H

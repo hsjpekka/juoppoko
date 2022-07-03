@@ -141,9 +141,9 @@ Item {
     }
 
     function xHttpYhteys(toiminto, haku, kysely, postOsoite, kutsu) {
-        var xhttp = new XMLHttpRequest();
+        //var xhttp = new XMLHttpRequest();
         var async = true, sync = false;
-        var yhteysNro // funktion kutsuhetkellä
+        var yhteysNro // funktion kutsuhetkellä        
 
         if (!naytaVainVirheet)
             yhteys.nakyville(); //yhteys.state = "nakyvilla";

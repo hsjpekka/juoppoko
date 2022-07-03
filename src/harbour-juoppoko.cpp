@@ -35,14 +35,17 @@
 #include <sailfishapp.h>
 #include <QScopedPointer>
 #include "juomari.h"
+#include "untpd.h"
 
 int main(int argc, char *argv[])
 {
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
-    juomari juoja, testeri;
+    juomari juoja, ennustaja;
+    unTpd untpdkysely;
+    view->engine()->rootContext()->setContextProperty("untpdKysely", &untpdkysely);
     view->engine()->rootContext()->setContextProperty("juoja", &juoja);
-    view->engine()->rootContext()->setContextProperty("testaaja", &testeri);
+    view->engine()->rootContext()->setContextProperty("testaaja", &ennustaja);
     app->setApplicationVersion(JUOPPOKO_VERSIO);
     view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
     view->engine()->rootContext()->setContextProperty("unTappdSe", UTPD_SECRET);
