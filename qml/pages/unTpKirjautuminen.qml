@@ -14,27 +14,11 @@ Page {
     readonly property string unTappdLoginUrl: "https://untappd.com/oauth/authenticate/?client_id=" +
                                      UnTpd.unTpdId + "&response_type=code&redirect_url=" +
                                      UnTpd.callbackURL
+    //path="oauth/authenticate/", query="response_type=code&redirect_url=" + UnTpd.callbackURL, toAdd="clientId"
     readonly property string accTokenAddress: "https://untappd.com/oauth/authorize/?client_id=" +
             UnTpd.unTpdId + "&client_secret=" + UnTpd.unTpdSecret +
             "&response_type=code&redirect_url=" + UnTpd.callbackURL + "&code="
-
-    function vaihdaTunnus(tunnus) {
-        muuttunut = true
-        UnTpd.unTpToken = tunnus
-        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, tunnus)
-        return
-    }
-
-    function lueToken() {
-        var i = urlTunnus.text.indexOf("?code=")
-        if (i < 0) {
-            uTpYhteys.tunnus = urlTunnus.text
-        } else {
-            uTpYhteys.tunnus = urlTunnus.text.substring(i+6)
-        }
-        uTpYhteys.haeToken()
-        return
-    }
+    //path="oauth/authorize/", query="response_type=code&redirect_url=" + UnTpd.callbackURL + "&code=", toAdd="clientId,clientSecret"
 
     Component {
         id: valikko
@@ -71,8 +55,33 @@ Page {
         }
     }
 
+    Connections {
+        target: untpdKysely
+        onFinishedQuery: {
+            //QString queryId, QString queryStatus, QString queryReply
+            var jsonVastaus, accessToken
+            console.log("vastaus tullut: " + queryId + ", " + queryStatus)
+            try {
+                jsonVastaus = JSON.parse(queryReply)
+                if ("response" in jsonVastaus && "access_token" in jsonVastaus.response)
+                    accessToken = jsonVastaus.response.access_token
+                else if ("meta" in jsonVastaus && "error_detail" in jsonVastaus.meta)
+                    nayta(jsonVastaus.meta.error_detail)
+                if (jsonVastaus.meta.http_code != 200)
+                    console.log("unTappd-response: " + queryReply)
+                if (accessToken) {
+                    vaihdaTunnus(accessToken)
+                    pageContainer.pop()
+                }
+            } catch (err) {
+                console.log("error while fetching unTappd access token: " + err)
+            }
+        }
+    }
+
     XhttpYhteys {
         id: uTpYhteys
+        xhttp: untpdKysely
         onValmis: {
             var jsonVastaus, accessToken
             try {
@@ -94,10 +103,11 @@ Page {
 
         property string tunnus
 
-        function haeToken() {
-            var kysely = accTokenAddress + tunnus
+        function haeLupanumero() {
+            //var kysely = accTokenAddress + tunnus
+            var polku="oauth/authenticate/", kysely="response_type=code&redirect_url=" + UnTpd.callbackURL, lisattavat="utpClientId"
             //console.log("kysely = " + kysely)
-            xHttpGet(kysely)
+            xHttpGet(polku, kysely, "haeLupanumero", lisattavat);
             return
         }
     }
@@ -260,12 +270,31 @@ Page {
                 xhttp.send()
                 // */
                 uTpYhteys.tunnus = replyUrl.slice(replyUrl.indexOf("?code=")+6)
-                uTpYhteys.haeToken()
+                uTpYhteys.haeLupanumero()
             }
         }
     }
 
-    Component.onDestruction:
+    Component.onDestruction: {
         if (muuttunut)
             muuttuu()
+    }
+
+    function vaihdaTunnus(tunnus) {
+        muuttunut = true
+        UnTpd.unTpToken = tunnus
+        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, tunnus)
+        return
+    }
+
+    function lueToken() {
+        var i = urlTunnus.text.indexOf("?code=")
+        if (i < 0) {
+            uTpYhteys.tunnus = urlTunnus.text
+        } else {
+            uTpYhteys.tunnus = urlTunnus.text.substring(i+6)
+        }
+        uTpYhteys.haeLupanumero()
+        return
+    }
 }

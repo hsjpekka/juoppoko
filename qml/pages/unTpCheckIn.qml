@@ -408,6 +408,7 @@ Dialog {
 
         XhttpYhteys {
             id: fsYhteys
+            //xhttp: untpdKysely
             y: sivu.isPortrait ? Theme.itemSizeLarge : Theme.itemSizeSmall //DialogHeader.qml
             z: 1
             onValmis: {
@@ -450,14 +451,14 @@ Dialog {
 
                 kysely = FourSqr.searchVenue(tark, true, lp, pp, hakusade, maara,
                                                       luokat, haku);
-                xHttpGet(kysely, "baareja");
+                xHttpGet(kysely[0], kysely[1], "baareja");
 
                 return
             }
 
             function haeUnTpdId(frSqrId, toiminto) {
                 var kysely = UnTpd.lookupFoursquare(frSqrId)
-                xHttpGet(kysely, toiminto)
+                xHttpGet(kysely[0], kysely[1], toiminto)
                 return
             }
         }

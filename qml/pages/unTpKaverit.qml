@@ -264,43 +264,43 @@ Page {
         //property string toiminto: ""
 
         function haeKavereita() {
-            var kysely = ""
+            var kysely = "";
             //toiminto = "kaverit"
             kysely = UnTpd.getFriendsInfo(tunnus, haku*haettavia, haettavia);
-            xHttpGet(kysely, "kaverit")
-            return
+            xHttpGet(kysely[0], kysely[1], "kaverit");
+            return;
         }
 
         function kaveriKyselyt() {
-            var kysely = ""
+            var kysely = "";
             //toiminto = "pyynnot"
-            kysely = UnTpd.getPendingFriends(pyynnot*haettavia, haettavia)
-            xHttpGet(kysely, "pyynnot")
-            return
+            kysely = UnTpd.getPendingFriends(pyynnot*haettavia, haettavia);
+            xHttpGet(kysely[0], kysely[1], "pyynnot");
+            return;
         }
 
         function hyvaksyKaveriksi(kohde) {
-            var kysely = ""
+            var kysely = "";
             //toiminto = "hyvaksy"
-            kysely = UnTpd.acceptFriend(kohde)
-            xHttpGet(kysely, "hyvaksy")
-            return
+            kysely = UnTpd.acceptFriend(kohde);
+            xHttpGet(kysely[0], kysely[1], "hyvaksy");
+            return;
         }
 
         function hylkaaPyynto(kohde) {
-            var kysely = ""
+            var kysely = "";
             //toiminto = "hylkaa"
-            kysely = UnTpd.rejectFriend(kohde)
-            xHttpGet(kysely, "hylkaa")
-            return
+            kysely = UnTpd.rejectFriend(kohde);
+            xHttpGet(kysely[0], kysely[1], "hylkaa");
+            return;
         }
 
         function poistaKaveri(kohde) {
-            var kysely = ""
+            var kysely = "";
             //toiminto = "poista"
-            kysely = UnTpd.removeFriend(kohde)
-            xHttpGet(kysely, "poista")
-            return
+            kysely = UnTpd.removeFriend(kohde);
+            xHttpGet(kysely[0], kysely[1], "poista");
+            return;
         }
     }
 

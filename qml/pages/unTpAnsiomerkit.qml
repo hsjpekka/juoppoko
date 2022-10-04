@@ -216,7 +216,7 @@ Page {
                 var kysely = ""
                 kysely = UnTpd.getBadges(kayttajaTunnus, hakuNro*merkkejaPerHaku,
                                                   merkkejaPerHaku);
-                xHttpGet(kysely);
+                xHttpGet(kysely[0], kysely[1], "merkit");
 
                 return
             }

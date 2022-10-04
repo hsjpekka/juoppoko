@@ -130,45 +130,45 @@ Page {
             //property string toiminto: ""
 
             function lisaaToiveisiin() {
-                var kysely = ""
+                var kysely = "";
                 if (olutId < 1) {
-                    viesti = qsTr("no beer selected")
-                    naytaViesti = true
-                    return
+                    viesti = qsTr("no beer selected");
+                    naytaViesti = true;
+                    return;
                 }
                 //toiminto = "toive";
 
                 kysely = UnTpd.addToWishList(olutId);
-                xHttpGet(kysely, "toive");
-                return
+                xHttpGet(kysely[0], kysely[1], "toive");
+                return;
             }
 
             function lueOluenTiedot(bid) {
-                var kysely = ""
+                var kysely = "";
                 if (bid < 0.5) {
-                    viesti = qsTr("no beer selected")
-                    naytaViesti = true
-                    return
+                    viesti = qsTr("no beer selected");
+                    naytaViesti = true;
+                    return;
                 }
 
                 //toiminto = "tiedot";
                 kysely = UnTpd.getBeerInfo(bid, false); // bid, compact
-                xHttpGet(kysely, "tiedot");
-                return
+                xHttpGet(kysely[0], kysely[1], "tiedot");
+                return;
             }
 
             function poistaToiveista() {
-                var kysely = ""
+                var kysely = "";
                 if (olutId < 1) {
-                    viesti = qsTr("no beer selected")
-                    naytaViesti = true
-                    return
+                    viesti = qsTr("no beer selected");
+                    naytaViesti = true;
+                    return;
                 }
 
                 //toiminto = "toive";
                 kysely = UnTpd.removeFromWishList(olutId);
-                xHttpGet(kysely, "toive");
-                return
+                xHttpGet(kysely[0], kysely[1], "toive");
+                return;
             }
         }
 

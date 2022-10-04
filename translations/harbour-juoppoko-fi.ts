@@ -39,31 +39,31 @@
     <name>KulutusKuvaajat</name>
     <message>
         <source>Sun</source>
-        <translation type="unfinished"></translation>
+        <translation>Su</translation>
     </message>
     <message>
         <source>Mon</source>
-        <translation type="unfinished"></translation>
+        <translation>Ma</translation>
     </message>
     <message>
         <source>Tue</source>
-        <translation type="unfinished"></translation>
+        <translation>Ti</translation>
     </message>
     <message>
         <source>Wed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ke</translation>
     </message>
     <message>
         <source>Thu</source>
-        <translation type="unfinished"></translation>
+        <translation>To</translation>
     </message>
     <message>
         <source>Fri</source>
-        <translation type="unfinished"></translation>
+        <translation>Pe</translation>
     </message>
     <message>
         <source>Sat</source>
-        <translation type="unfinished"></translation>
+        <translation>La</translation>
     </message>
 </context>
 <context>
@@ -158,26 +158,6 @@
 </context>
 <context>
     <name>XhttpYhteys</name>
-    <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request finished</source>
-        <translation></translation>
-    </message>
     <message>
         <source>press &apos;x&apos; to interrupt</source>
         <translation>keskeytä &apos;x&apos;:stä</translation>
@@ -342,19 +322,19 @@
     </message>
     <message>
         <source>body water content</source>
-        <translation type="unfinished">kehon neste-%</translation>
+        <translation>kehon neste-%</translation>
     </message>
     <message>
         <source>weight of the drinker</source>
-        <translation type="unfinished"></translation>
+        <translation>paino</translation>
     </message>
     <message>
         <source>lever condition %1</source>
-        <translation type="unfinished"></translation>
+        <translation>maksan kunto</translation>
     </message>
     <message>
         <source>blood alcohol content limit</source>
-        <translation type="unfinished"></translation>
+        <translation>promilleraja</translation>
     </message>
     <message>
         <source>juodut</source>
@@ -362,7 +342,11 @@
     </message>
     <message>
         <source>BAC</source>
-        <translation type="unfinished">veressä</translation>
+        <translation>promilleja</translation>
+    </message>
+    <message>
+        <source>recalculate</source>
+        <translation>päivitä</translation>
     </message>
 </context>
 <context>
@@ -433,7 +417,7 @@
  %1 
  - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
         <translation>Raja-arvot on lähteestä %1, jonka mukaan turvallinen määrä
-        naisille on 7 annosta viikossa ja miehille 14. Ja lisääntyneen riskin raja on naisille 16
+        naisille on 7 annosta viikossa ja miehille 14. Ja lisääntyneen riskin raja on naisille 16\
         annosta viikosssa ja miehille 24.</translation>
     </message>
     <message>

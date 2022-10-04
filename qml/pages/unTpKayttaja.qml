@@ -286,6 +286,7 @@ Page {
         XhttpYhteys {
             id: uTYhteys
             anchors.top: parent.top
+            //xhttp: untpdKysely
             z: 1
             onValmis: {
                 var jsonVastaus;
@@ -334,16 +335,16 @@ Page {
                 var kysely;
                 //toiminto = "tiedot";
                 kysely = UnTpd.getUserInfo(tunnus,"true");
-                xHttpGet(kysely, "tiedot");
-                return
+                xHttpGet(kysely[0], kysely[1], "tiedot");
+                return;
             }
 
             function lueKayttajanKirjaukset(tunnus, eka) { // jos tunnus = "" hakee omat tiedot
                 var kysely;
                 //toiminto = "kirjaukset";
                 kysely = UnTpd.getUserFeed(tunnus, eka);
-                xHttpGet(kysely, "kirjaukset");
-                return
+                xHttpGet(kysely[0], kysely[1], "kirjaukset");
+                return;
             }
 
             function lueIlmoitukset() {
@@ -352,36 +353,36 @@ Page {
 
                 kysely = UnTpd.getNotifications();//(offset, limit)
 
-                xHttpGet(kysely, "uutiset");
+                xHttpGet(kysely[0], kysely[1], "uutiset");
 
-                return
+                return;
             }
 
             function unTpdIlmoitaUutisista(vastaus) {
-                var maara
+                var maara;
 
-                ilmoitukset = vastaus
+                ilmoitukset = vastaus;
                 pageContainer.push(Qt.resolvedUrl("unTpIlmoitukset.qml"),
-                                   {"ilmoitukset": ilmoitukset})
+                                   {"ilmoitukset": ilmoitukset});
 
-                return
+                return;
             }
 
             function unTpdToast(ckId) {
-                var kysely = "", posoite = "";
+                var kysely = "";
                 //toiminto = "kippis";
-                posoite = UnTpd.toast(ckId);
-                xHttpPost("", posoite, "kippis");
-                return
+                kysely = UnTpd.toast(ckId);
+                xHttpPost(kysely[0], kysely[1], "kippis");
+                return;
             }
 
             function pyydaKaveriksi(kid) {
-                var kysely = ""
+                var kysely = "";
                 //toiminto = "kaveriksi"
-                kysely = UnTpd.requestFriend(kid)
-                xHttpGet(kysely, "kaveriksi")
-                console.log("kaveripyyntö: " + kysely)
-                return
+                kysely = UnTpd.requestFriend(kid);
+                xHttpGet(kysely[0], kysely[1], "kaveriksi")
+                console.log("kaveripyyntö: " + kysely);
+                return;
             }
         }
 

@@ -166,7 +166,8 @@ Page {
         XhttpYhteys {
             id: unTpKysely
             width: parent.width
-            unohdaVanhat: true
+            //unohdaVanhat: true
+            //xhttp: untpdKysely
             onValmis: {
                 var jsonVastaus;
                 try {
@@ -184,13 +185,13 @@ Page {
                 var kysely = "";
 
                 if (hakuteksti === "")
-                    return
+                    return;
 
                 kysely = UnTpd.searchBrewery(hakuteksti, hakunro*perHaku, perHaku);
 
-                xHttpGet(kysely);
+                xHttpGet(kysely[0], kysely[1], "panimot");
 
-                return
+                return;
             }
         }
 

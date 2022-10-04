@@ -29,7 +29,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
-//import QtPositioning 5.2
 import Nemo.Notifications 1.0
 
 import "../scripts/unTap.js" as UnTpd
@@ -66,6 +65,7 @@ Page {
 
     Component.onCompleted: {
         //promillerivi.muutaPromillet()
+        uTYhteys.unTpdOnkoUutisia()
     }
     onPvmChanged: {
         if (!alustusKaynnissa) {
@@ -85,6 +85,31 @@ Page {
             voltit.text = juomari.juodunVahvuus()
         }
     }
+
+    /*
+    Connections {
+        target: untpdKysely
+        onFinishedQuery: { //QString: queryId, status, queryResponse
+            var jsonVastaus;
+            if (sivu.status === PageStatus.Active ) {
+                console.log("Paaikkuna aktiivinen")
+                console.log("vastaus tullut: " + queryId + ", " + queryStatus)
+                try {
+                    jsonVastaus = JSON.parse(queryResponse);
+                    if (toiminto === "checkIn") {
+                        unTpdKirjausTehty(jsonVastaus)
+                    } else if (toiminto === "uutiset") {
+                        unTpdIlmoitaUutisista(jsonVastaus)
+                    } else if (toiminto === "kayttaja") {
+                        if ("user" in jsonVastaus.response)
+                            UnTpd.kayttaja = jsonVastaus.response.user.user_name
+                    }
+                } catch (err) {
+                    console.log("" + err)
+                }
+            }
+        }
+    } // */
 
     Timer { // kellon ja promillien päivitys
         id: paivitys
@@ -153,12 +178,6 @@ Page {
         //property int kerralla: 100
     }
 
-    //PositionSource {
-    //    id: paikkatieto
-    //    active: true
-    //    updateInterval: 15*60*1000 // 15 min
-    //}
-
     XhttpYhteys {
         id: uTYhteys
         anchors.top: parent.top
@@ -167,12 +186,14 @@ Page {
         onValmis: {
             var jsonVastaus;
             try {
-                jsonVastaus = JSON.parse(httpVastaus);
                 if (toiminto === "checkIn") {
+                    jsonVastaus = JSON.parse(httpVastaus);
                     unTpdKirjausTehty(jsonVastaus)
                 } else if (toiminto === "uutiset") {
+                    jsonVastaus = JSON.parse(httpVastaus);
                     unTpdIlmoitaUutisista(jsonVastaus)
                 } else if (toiminto === "kayttaja") {
+                    jsonVastaus = JSON.parse(httpVastaus);
                     if ("user" in jsonVastaus.response)
                         UnTpd.kayttaja = jsonVastaus.response.user.user_name
                 }
@@ -180,15 +201,13 @@ Page {
                 console.log("" + err)
             }
         }
-        onVirhe: {
-            console.log("yhteydenottovirhe: " + httpVastaus)
-        }
 
         property string ilmoitukset: ""
 
         function unTpdCheckIn() {
             var barId = "", naytaSijainti = false, leveys, pituus, huuto, tahtia;
             var osoite, kysely, face = "", twit = "", fsqr = "", vyohyketunnus;
+            var vastaus;
 
             if (!unTpdKaytossa)
                 return
@@ -222,11 +241,15 @@ Page {
             if (kirjausAsetukset.twitter)
                 twit = "on";
 
-            osoite = UnTpd.checkInAddress();
-            kysely = UnTpd.checkInData(olutId, vyohyketunnus, barId, naytaSijainti,
-                                              leveys, pituus, huuto, tahtia, face, twit, fsqr);
+            kysely = UnTpd.checkIn(olutId, vyohyketunnus, barId, naytaSijainti,
+                                    leveys, pituus, huuto, tahtia, face, twit, fsqr);
+            //osoite = vastaus[0];
+            //kysely = vastaus[1];
+            //osoite = UnTpd.checkInAddress();
+            //kysely = UnTpd.checkInData(olutId, vyohyketunnus, barId, naytaSijainti,
+            //                                  leveys, pituus, huuto, tahtia, face, twit, fsqr);
 
-            xHttpPost(kysely, osoite, "checkIn");
+            xHttpPost(kysely[0], kysely[1], "checkIn");
 
             return
         }
@@ -236,54 +259,7 @@ Page {
             //toiminto = "kayttaja"
             //console.log("kysy käyttäjä")
             kysely = UnTpd.getUserInfo("", "true")
-            xHttpGet(kysely, "kayttaja")
-            return
-        }
-
-        function unTpdKirjausTehty(jsonVastaus) {
-            //console.log(JSON.stringify(vastaus))
-            if ("meta" in jsonVastaus) {
-                if (jsonVastaus.meta.code === 200){
-                    onnistui = true;
-                    viesti = jsonVastaus.response.result;
-
-                    if (jsonVastaus.response.badges.count > 0) {
-                        UnTpd.newBadges = jsonVastaus.response.badges;
-                        UnTpd.newBadgesSet = true;
-                        pageContainer.push(Qt.resolvedUrl("unTpAnsiomerkit.qml"), {
-                                           "haeKaikki": false, "naytaKuvaus": true })
-                    }
-                } else {
-                    onnistui = false;
-                    viesti = jsonVastaus.meta.error_detail
-                }
-            } else {
-                onnistui = false;
-                viesti = qsTr("some error in transmission")
-            }
-
-            naytaViesti = true;
-
-            return
-        }
-
-        function unTpdIlmoitaUutisista(jsonVastaus) {
-            var maara
-            //console.log(JSON.stringify(jsonVastaus))
-            //console.log(" ilmoita uutisista !!")
-            ilmoitukset = JSON.stringify(jsonVastaus)
-            if ("notifications" in jsonVastaus && "unread_count" in jsonVastaus.notifications) {
-                maara = jsonVastaus.notifications.unread_count.friends
-                if (maara > 0) {
-                    uTvalinta.pyyntoja = maara*1
-                    utValikko.busy = true
-                }
-                maara = jsonVastaus.notifications.unread_count.news
-                if (maara > 0) {
-                    uTvalinta.uutisia = maara*1
-                }
-                //console.log(jsonVastaus.response.news.count + " notes" )
-            }
+            xHttpGet(kysely[0], kysely[1], "kayttaja")
             return
         }
 
@@ -296,7 +272,7 @@ Page {
 
             kysely = UnTpd.getNotifications();//(offset, limit)
 
-            xHttpGet(kysely, "uutiset");
+            xHttpGet(kysely[0], kysely[1], "uutiset");
 
             return
         }
@@ -342,7 +318,7 @@ Page {
 
         PushUpMenu {
             id: utValikko
-            visible: unTpdKaytossa
+            //visible: unTpdKaytossa
             onActiveChanged: {
                 busy = false
             }
@@ -350,6 +326,7 @@ Page {
             MenuItem {
                 id: uTvalinta
                 text: qsTr("unTappd %1").arg(_ilmoitus)
+                visible: unTpdKaytossa
                 onClicked: {
                     var s = pageContainer.push(Qt.resolvedUrl("unTpKayttaja.qml"),
                                                {"ilmoitukset": uTYhteys.ilmoitukset})
@@ -370,6 +347,7 @@ Page {
             }
             MenuItem {
                 text: qsTr("Active friends")
+                visible: unTpdKaytossa
                 onClicked: {
                     var s = pageContainer.push(Qt.resolvedUrl("unTpPub.qml"),
                                            {"kaljarinki": "kaverit"} )
@@ -1070,6 +1048,53 @@ Page {
         promillerivi.muutaPromillet();
 
         return;
+    }
+
+    function unTpdKirjausTehty(jsonVastaus) {
+        //console.log(JSON.stringify(vastaus))
+        if ("meta" in jsonVastaus) {
+            if (jsonVastaus.meta.code === 200){
+                uTYhteys.onnistui = true;
+                uTYhteys.viesti = jsonVastaus.response.result;
+
+                if (jsonVastaus.response.badges.count > 0) {
+                    UnTpd.newBadges = jsonVastaus.response.badges;
+                    UnTpd.newBadgesSet = true;
+                    pageContainer.push(Qt.resolvedUrl("unTpAnsiomerkit.qml"), {
+                                       "haeKaikki": false, "naytaKuvaus": true })
+                }
+            } else {
+                uTYhteys.onnistui = false;
+                uTYhteys.viesti = jsonVastaus.meta.error_detail
+            }
+        } else {
+            uTYhteys.onnistui = false;
+            uTYhteys.viesti = qsTr("some error in transmission")
+        }
+
+        uTYhteys.naytaViesti = true;
+
+        return
+    }
+
+    function unTpdIlmoitaUutisista(jsonVastaus) {
+        var maara
+        //console.log(JSON.stringify(jsonVastaus))
+        //console.log(" ilmoita uutisista !!")
+        uTYhteys.ilmoitukset = JSON.stringify(jsonVastaus)
+        if ("notifications" in jsonVastaus && "unread_count" in jsonVastaus.notifications) {
+            maara = jsonVastaus.notifications.unread_count.friends
+            if (maara > 0) {
+                uTvalinta.pyyntoja = maara*1
+                utValikko.busy = true
+            }
+            maara = jsonVastaus.notifications.unread_count.news
+            if (maara > 0) {
+                uTvalinta.uutisia = maara*1
+            }
+            //console.log(jsonVastaus.response.news.count + " notes" )
+        }
+        return
     }
 
 }

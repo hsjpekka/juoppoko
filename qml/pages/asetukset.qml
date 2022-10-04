@@ -32,65 +32,11 @@ Dialog {
 
     property bool untapped: false
 
-    function alkutoimet() {
-        massa = massa0
-        vetta = vetta0
-        kunto = kunto0
-        prom1 = prom10
-        prom2 = prom20
-        paiva1 = paiva10
-        paiva2 = paiva20
-        viikko1 = viikko10
-        viikko2 = viikko20
-        vuosi1 = vuosi10
-        vuosi2 = vuosi20
-
-        if (vetta > 0.649 && vetta < 0.651) {
-            cbNeste.currentIndex = 1
-        } else if (vetta > 0.749 && vetta < 0.751) {
-            cbNeste.currentIndex = 0
-        } else
-            cbNeste.currentIndex = 2
-
-        return
-    }
-
-    function palautaAlkuarvot() {
-
-        nesteTxt.text = (vetta0*100).toFixed(0)
-        vetta = vetta0
-        kuntoTxt.text = (kunto0*100).toFixed(0)
-        kunto = kunto0
-        massaTxt.text = massa0
-        massa = massa0
-
-    }
-
-    function laskeRajat(){
-        // http://www.paihdelinkki.fi/fi/tietopankki/tietoiskut/alkoholi/liikakayton-tunnistaminen
-        // miehillä riskiraja 24 annosta viikossa, naisilla 16
-        // miesten keskipaino 86 kg, naisten 70 kg
-        // 24 annosta ~ 364 ml,  85.5 kg * 75% * 5.5 = 352 ml
-        // 16 annosta ~ 243 ml,  70.4 kg * 65% * 5.5 = 251 ml
-        vk2txt.text = (massa*vetta*5.5).toFixed(0)
-        day2text.text = (massa*vetta*5.5*0.5).toFixed(0)
-
-        // alempi naisten kohtuukäytöstä 7 annosta viikossa
-        vk1txt.text = (massa*vetta*2.3).toFixed(0)
-        day1text.text = (massa*vetta*2.3*0.5).toFixed(0)
-
-        vs1txt.text = (massa*vetta*2.3*52).toFixed(0)
-
-        vs2txt.text = (massa*vetta*5.5*52).toFixed(0)
-
-    }
-
     SilicaFlickable {
         id: ylaosa
         anchors.fill: parent
         height: sivu.height
         contentHeight: column.height
-
 
         PullDownMenu {
             MenuItem {
@@ -110,8 +56,6 @@ Dialog {
                     pageContainer.push(Qt.resolvedUrl("unTpKayttaja.qml"))
                 }
             }
-
-
         }
 
         VerticalScrollDecorator {}
@@ -125,7 +69,6 @@ Dialog {
             }
 
             Row { //paino
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -458,5 +401,58 @@ Dialog {
 
     Component.onCompleted: {
         alkutoimet()
+    }
+
+    function alkutoimet() {
+        massa = massa0
+        vetta = vetta0
+        kunto = kunto0
+        prom1 = prom10
+        prom2 = prom20
+        paiva1 = paiva10
+        paiva2 = paiva20
+        viikko1 = viikko10
+        viikko2 = viikko20
+        vuosi1 = vuosi10
+        vuosi2 = vuosi20
+
+        if (vetta > 0.649 && vetta < 0.651) {
+            cbNeste.currentIndex = 1
+        } else if (vetta > 0.749 && vetta < 0.751) {
+            cbNeste.currentIndex = 0
+        } else
+            cbNeste.currentIndex = 2
+
+        return
+    }
+
+    function palautaAlkuarvot() {
+
+        nesteTxt.text = (vetta0*100).toFixed(0)
+        vetta = vetta0
+        kuntoTxt.text = (kunto0*100).toFixed(0)
+        kunto = kunto0
+        massaTxt.text = massa0
+        massa = massa0
+
+    }
+
+    function laskeRajat(){
+        // http://www.paihdelinkki.fi/fi/tietopankki/tietoiskut/alkoholi/liikakayton-tunnistaminen
+        // miehillä riskiraja 24 annosta viikossa, naisilla 16
+        // miesten keskipaino 86 kg, naisten 70 kg
+        // 24 annosta ~ 364 ml,  85.5 kg * 75% * 5.5 = 352 ml
+        // 16 annosta ~ 243 ml,  70.4 kg * 65% * 5.5 = 251 ml
+        vk2txt.text = (massa*vetta*5.5).toFixed(0)
+        day2text.text = (massa*vetta*5.5*0.5).toFixed(0)
+
+        // alempi naisten kohtuukäytöstä 7 annosta viikossa
+        vk1txt.text = (massa*vetta*2.3).toFixed(0)
+        day1text.text = (massa*vetta*2.3*0.5).toFixed(0)
+
+        vs1txt.text = (massa*vetta*2.3*52).toFixed(0)
+
+        vs2txt.text = (massa*vetta*5.5*52).toFixed(0)
+
     }
 }

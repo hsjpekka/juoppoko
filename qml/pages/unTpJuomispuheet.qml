@@ -313,21 +313,21 @@ Page {
             property int    valittu: -1
 
             function kommentoi() {
-                var posoite, kysely
+                var posoite, kysely;
                 //oiminto = "kommentoi";
 
-                posoite = UnTpd.addCommentAddress(ckdId)
-                kysely = UnTpd.addCommentString(juttuni.text)
+                //posoite = UnTpd.addCommentAddress(ckdId);
+                kysely = UnTpd.addComment(ckdId, juttuni.text);
 
-                xHttpPost(kysely, posoite, "kommentoi");
+                xHttpPost(kysely[0], kysely[1], "kommentoi");
 
-                return
+                return;
             }
 
             function poistaSanottu(nro) {
                 var id = sanotut.get(nro).commentId;
                 //var sanoja = sanotut.get(nro).kayttajaTunnus;
-                var po = UnTpd.removeComment(id), kysely="";
+                var kysely = UnTpd.removeComment(id);
 
                 //toiminto = "poistaKommentti";
                 valittu = nro;
@@ -335,7 +335,7 @@ Page {
                 //kysely = ""
                 //postOsoite = UnTpd.removeComment(id);
 
-                xHttpPost(kysely, po, "poistaKommentti");
+                xHttpPost(kysely[0], kysely[1], "poistaKommentti");
 
                 return
 

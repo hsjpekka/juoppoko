@@ -91,7 +91,7 @@ Page {
         function haeBaari(pubi) {
             var kysely, compact = false
             kysely = UnTpd.getVenueInfo(pubi, compact)
-            xHttpGet(kysely)
+            xHttpGet(kysely[0], kysely[1], "baari")
 
             return
         }

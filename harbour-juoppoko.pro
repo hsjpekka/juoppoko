@@ -13,6 +13,9 @@
 TARGET = harbour-juoppoko
 
 CONFIG += sailfishapp
+CONFIG += link_pkgconfig
+
+PKGCONFIG += amberwebauthorization
 
 SOURCES += \
     src/harbour-juoppoko.cpp \

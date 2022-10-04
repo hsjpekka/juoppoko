@@ -33,6 +33,7 @@ import "pages"
 import "scripts/tietokanta.js" as Tkanta
 import "scripts/unTap.js" as UnTpd
 import "scripts/foursqr.js" as FourSqr
+import QtPositioning 5.2
 
 ApplicationWindow{
     id: juoppoko
@@ -40,7 +41,7 @@ ApplicationWindow{
     initialPage: paaikkuna
     cover: kansi
 
-    Component.onCompleted: { //paaikkuna ja kansi luodaan ennen tätä vaihetta        
+    Component.onCompleted: {
         avaaTk();
         asetukset();
         lueJuomari();
@@ -59,12 +60,20 @@ ApplicationWindow{
     Paaikkuna {
         id: paaikkuna
         onKysyAsetukset: {
-            kysyAsetukset()
+            console.log("kysytään")
+            juoppoko.kysyAsetukset()
+            console.log("kysytty")
         }
     }
 
     Kansi {
         id: kansi
+    }
+
+    PositionSource {
+        id: paikkatieto
+        active: true
+        updateInterval: 15*60*1000 // 15 min
     }
 
     function asetukset() {
@@ -79,66 +88,11 @@ ApplicationWindow{
         FourSqr.fsqrVersion = fsqVer //Qt.application.arguments[args-6]
         //versioNro = Qt.application.arguments[args-7] //Qt.application.version
         //kone = ccKohde //Qt.application.arguments[args-8]
+        untpdKysely.setQueryParameter("utpToken", Tkanta.arvoUnTpToken, "access_token");
         juoja.asetaVrkVaihdos(Tkanta.vrkVaihtuu);
         juoja.asetaPromilleraja(Tkanta.promilleRaja1);
         console.log("muuttujia: " + UnTpd.unTpdId + ", " + UnTpd.callbackURL);
         return;
-    }
-
-    function lueJuodut(kaikki, alkuAika, loppuAika) { //jos kaikki=true, alku- ja loppuajalla ei merkitystä
-        var taulukko;
-        var i = 0;
-
-        taulukko = Tkanta.lueTkJuodut(kaikki, alkuAika, loppuAika).rows;
-        console.log(qsTr("%1 drinks, latest %2").arg(taulukko.length).arg(taulukko[taulukko.length-1].juoma))
-
-        while (i < taulukko.length) {
-            paaikkuna.juomari.juo(taulukko[i].id, taulukko[i].aika,
-                      taulukko[i].tilavuus, taulukko[i].prosenttia,
-                      taulukko[i].juoma, taulukko[i].kuvaus, taulukko[i].oluenId);
-            juoja.juo(taulukko[i].id, taulukko[i].tilavuus,
-                        taulukko[i].prosenttia, taulukko[i].aika, false);
-            i++;
-        }
-
-        paaikkuna.juomari.nakyma.positionViewAtEnd();
-        console.log("juodut luettu");
-        return;
-    }
-
-    function lueJuomari() {
-        var keho, kunto, paino, vetta, i;
-
-        keho = Tkanta.lueTkJuomari();
-        if (keho.length > 0){
-            i = 0;
-            console.log("painohistorioita " + keho.length)
-        } else {
-            i = -1;
-            console.log("ei painohistorioita " + keho)
-        }
-
-        while (i >= 0 && i < keho.length) {
-            paino = keho[i].paino;
-            vetta = keho[i].neste;
-            kunto = keho[i].maksa;
-            if (paino < 1) {
-                console.log("arvo " + (i+1) + ": paino < 1 kg, muutettu 75 kg");
-                paino = 75;
-            }
-            if (vetta < 0.01) {
-                console.log("arvo " + (i+1) + ": vesipitoisuus < 1 %, muutettu 70%");
-                vetta = 0.7;
-            }
-            if (maksa < 0.01) {
-                console.log("arvo " + (i+1) + ": maksan kunto < 1 %, muutettu 100%");
-                maksa = 1.0;
-            }
-            juoja.asetaKeho(paino, vetta, kunto, keho[i].aika);
-            i++;
-        }
-
-        return keho.length;
     }
 
     function avaaTk() {
@@ -201,6 +155,62 @@ ApplicationWindow{
         });
 
         return;
+    }
+
+    function lueJuodut(kaikki, alkuAika, loppuAika) { //jos kaikki=true, alku- ja loppuajalla ei merkitystä
+        var taulukko;
+        var i = 0;
+
+        taulukko = Tkanta.lueTkJuodut(kaikki, alkuAika, loppuAika).rows;
+        console.log(qsTr("%1 drinks, latest %2").arg(taulukko.length).arg(taulukko[taulukko.length-1].juoma))
+
+        while (i < taulukko.length) {
+            paaikkuna.juomari.juo(taulukko[i].id, taulukko[i].aika,
+                      taulukko[i].tilavuus, taulukko[i].prosenttia,
+                      taulukko[i].juoma, taulukko[i].kuvaus, taulukko[i].oluenId);
+            juoja.juo(taulukko[i].id, taulukko[i].tilavuus,
+                        taulukko[i].prosenttia, taulukko[i].aika, false);
+            i++;
+        }
+
+        paaikkuna.juomari.nakyma.positionViewAtEnd();
+        console.log("juodut luettu");
+        return;
+    }
+
+    function lueJuomari() {
+        var keho, kunto, paino, vetta, i;
+
+        keho = Tkanta.lueTkJuomari();
+        if (keho.length > 0){
+            i = 0;
+            console.log("painohistorioita " + keho.length)
+        } else {
+            i = -1;
+            console.log("ei painohistorioita " + keho)
+        }
+
+        while (i >= 0 && i < keho.length) {
+            paino = keho[i].paino;
+            vetta = keho[i].neste;
+            kunto = keho[i].maksa;
+            if (paino < 1) {
+                console.log("arvo " + (i+1) + ": paino < 1 kg, muutettu 75 kg");
+                paino = 75;
+            }
+            if (vetta < 0.01) {
+                console.log("arvo " + (i+1) + ": vesipitoisuus < 1 %, muutettu 70%");
+                vetta = 0.7;
+            }
+            if (maksa < 0.01) {
+                console.log("arvo " + (i+1) + ": maksan kunto < 1 %, muutettu 100%");
+                maksa = 1.0;
+            }
+            juoja.asetaKeho(paino, vetta, kunto, keho[i].aika);
+            i++;
+        }
+
+        return keho.length;
     }
 
 }

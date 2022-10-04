@@ -337,6 +337,26 @@ Page {
         }
     }
 
+    /*
+    Connections {
+        target: untpdKysely
+        onFinishedQuery: {
+            //QString queryId, QString queryStatus, QString queryReply
+            var jsonVastaus;
+            if (sivu.status === PageStatus.Active ) {
+                console.log("unTpPub aktiivinen")
+                try {
+                    jsonVastaus = JSON.parse(queryReply);
+                    paivitaLista(jsonVastaus)
+                } catch (err) {
+                    console.log("" + err)
+                    console.log("" + queryReply)
+                }
+            }
+        }
+    }
+    // */
+
     SilicaFlickable {
         width: sivu.width
         height: sivu.height
@@ -351,6 +371,7 @@ Page {
 
             MenuItem {
                 text: kaljarinki === "kaverit" ? qsTr("check pubs nearby") : qsTr("check friends")
+                visible: UnTpd.unTpToken > ""
                 onClicked: {
                     if (kaljarinki === "kaverit")
                         kaljarinki = "lahisto"
@@ -364,6 +385,7 @@ Page {
         XhttpYhteys {
             id: uTYhteys
             anchors.top: parent.top
+            //xhttp: untpdKysely
             z: 1
             onValmis: {
                 var jsonVastaus;
@@ -383,33 +405,33 @@ Page {
                 var kysely = "";
 
                 if (kaljarinki === "kaverit")
-                    kysely = UnTpd.getFriendsActivityFeed(uusinCheckin, 0, hakujaSivulle) // uusin, vanhin, per sivu
+                    kysely = UnTpd.getFriendsActivityFeed(uusinCheckin, 0, hakujaSivulle); // uusin, vanhin, per sivu
                 else if (kaljarinki === "lahisto") {
                     if (paikkatieto.position.longitudeValid && paikkatieto.position.latitudeValid) {
-                        pp = paikkatieto.position.coordinate.longitude
-                        lp = paikkatieto.position.coordinate.latitude
+                        pp = paikkatieto.position.coordinate.longitude;
+                        lp = paikkatieto.position.coordinate.latitude;
                     } else {
-                        lp = 60.28
-                        pp = 24.85
+                        lp = 60.28;
+                        pp = 24.85;
                     }
                     kysely = UnTpd.getPubFeed(lp, pp, sade, yksikko, uusinCheckin, 0, hakujaSivulle); // uusin, vanhin, per sivu
-                } else if (kaljarinki === "olut")
+                } else if (kaljarinki === "olut") {
                     kysely = UnTpd.getBeerFeed(tunniste, uusinCheckin, 0, hakujaSivulle); // uusin, vanhin, per sivu
-                else if (kaljarinki === "panimo")
+                } else if (kaljarinki === "panimo") {
                     kysely = UnTpd.getBreweryFeed(tunniste, uusinCheckin, 0, hakujaSivulle); // uusin, vanhin, per sivu
-                else if (kaljarinki === "kuppila")
+                } else if (kaljarinki === "kuppila") {
                     kysely = UnTpd.getVenueFeed(tunniste, uusinCheckin, 0, hakujaSivulle); // uusin, vanhin, per sivu
-
-                console.log(kaljarinki + "-kirjaukset: " + kysely)
-                xHttpGet(kysely)
-                return
+                }
+                console.log(kaljarinki + "-kirjaukset: " + kysely);
+                xHttpGet(kysely[0], kysely[1], "toiminta");
+                return;
             }
 
             function kippis(ckId) {
                 var kysely = "", posoite = ""
                 //toiminto = "kippis";
                 posoite = UnTpd.toast(ckId);
-                xHttpPost(kysely, posoite, "kippis");
+                xHttpPost(kysely[0], kysely[1], "kippis");
                 return
             }
         }

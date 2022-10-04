@@ -43,6 +43,12 @@ int main(int argc, char *argv[])
     QScopedPointer<QQuickView> view(SailfishApp::createView());
     juomari juoja, ennustaja;
     unTpd untpdkysely;
+    untpdkysely.setQueryParameter("utpClientId", UTPD_ID, "client_id");
+    untpdkysely.setClientId(UTPD_ID);
+    untpdkysely.setQueryParameter("utpClientSecret", UTPD_SECRET, "client_secret");
+    untpdkysely.setClientSecret(UTPD_SECRET);
+    //untpdkysely.setQueryParameter("utpCallbackUrl", CB_URL, "redirect_url");
+    untpdkysely.setClientRedirect(CB_URL);
     view->engine()->rootContext()->setContextProperty("untpdKysely", &untpdkysely);
     view->engine()->rootContext()->setContextProperty("juoja", &juoja);
     view->engine()->rootContext()->setContextProperty("testaaja", &ennustaja);
@@ -50,6 +56,9 @@ int main(int argc, char *argv[])
     view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
     view->engine()->rootContext()->setContextProperty("unTappdSe", UTPD_SECRET);
     view->engine()->rootContext()->setContextProperty("unTappdCb", CB_URL);
+    untpdkysely.setQueryParameter("fsqClientId", FSQ_ID, "client_id");
+    untpdkysely.setQueryParameter("fsqClientSecret", UTPD_SECRET, "client_secret");
+    untpdkysely.setQueryParameter("fsqVersion", UTPD_SECRET, "v");
     view->engine()->rootContext()->setContextProperty("fsqId", FSQ_ID);
     view->engine()->rootContext()->setContextProperty("fsqSec", FSQ_SECRET);
     view->engine()->rootContext()->setContextProperty("fsqVer", FSQ_VERSIO);

@@ -91,7 +91,7 @@ Page {
             var kysely, compact = false
             if (panimo > 0) {
                 kysely = UnTpd.getBreweryInfo(panimo, compact)
-                xHttpGet(kysely)
+                xHttpGet(kysely[0], kysely[1], "panimo")
             } else {
                 osoite.text = qsTr("no brewery selected (brewery id < 1)")
             }
