@@ -147,11 +147,17 @@ Page {
     Connections {
         target: untpdKysely
         onFinishedAuthentication: {
+            console.log("kirjautuminen tehty")
             if (token > "") {
                 vaihdaTunnus(token)
             } else {
                 console.log("error in getting authentication token: " + error + " " + untpdKysely.readOAuth2Token())
             }
+            sivu.pageContainer.pop()
+        }
+        onFinishedQuery: {
+            lueToken(queryReply)
+            sivu.pageContainer.pop()
         }
     }
 
@@ -259,7 +265,7 @@ Page {
 
                 EnterKey.iconSource: "image://theme/icon-m-enter-accept"
                 EnterKey.onClicked: {
-                    //lueToken()
+                    kysyToken()
                     focus = false
                 }
 
@@ -343,16 +349,44 @@ Page {
         return;
     }
 
-    /*
-    function lueToken() {
-        var i = urlTunnus.text.indexOf("?code=");
-        if (i < 0) {
-            uTpYhteys.tunnus = urlTunnus.text;
+    function kysyToken() {
+        var i, polku, kysely, lisattavat;
+        // https://untappd.com/oauth/authorize/?client_id=CLIENTID
+        // &client_secret=CLIENTSECRET&response_type=code
+        // &redirect_url=REDIRECT_URL&code=CODE
+        polku="oauth/authorize/";
+        lisattavat = untpdKysely.appIdKey + ", " + untpdKysely.appSecretKey;
+        kysely = "response_type=code&redirect_url=" + UnTpd.callbackURL;
+
+        i = urlTunnus.text.indexOf("?code=");
+        if (i < 0 && urlTunnus.text.length > 0) {
+            kysely += "&code=" + urlTunnus.text;
         } else {
-            uTpYhteys.tunnus = urlTunnus.text.substring(i+6);
+            kysely += "&code=" + urlTunnus.text.substring(i+6);
         }
-        uTpYhteys.haeLupanumero();
+
+        untpdKysely.queryGet(untpdKysely.oauthTokenRequest, polku, kysely, lisattavat);
         return;
     }
+
+    function lueToken(mj) {
+        // {
+        //"meta": {
+        //  "http_code": 200
+        //},
+        //"response": {
+        //  "access_token": "TOKEHERE"
+        //}
+        var vJson = JSON.parse(mj), tulos;
+        if (vJson["response"]) {
+            tulos = vJson["response"]["access_token"];
+        }
+        if (tulos > "") {
+            vaihdaTunnus(tulos);
+        }
+
+        return tulos;
+    }
+
     // */
 }

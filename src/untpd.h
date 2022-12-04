@@ -10,8 +10,10 @@
 #include <QNetworkReply>
 //#include <QScopedPointer>
 //#include <sailfishapp.h>
-//#include <oauth2.h>
-//#include <redirectlistener.h>
+#include <oauth2.h>
+#include <redirectlistener.h>
+
+using namespace Amber::Web::Authorization;
 
 class unTpd : public QObject
 {
@@ -22,7 +24,6 @@ public:
     Q_INVOKABLE void authenticate(QString pathAuthorization, QString redirect, QString pathToken);
     Q_INVOKABLE void authenticateAmber();
     Q_INVOKABLE void authenticateAmber(QString pathAuthorization, QString redirect, QString pathToken);
-    //Q_INVOKABLE void fetchOAuth2Token();
     Q_INVOKABLE bool isNetworkAvailable();
     Q_INVOKABLE bool queryGet(QString queryId, QString url);
     Q_INVOKABLE bool queryGet(QString queryId, QString path, QString definedQuery, QString parametersToAdd="");
@@ -42,31 +43,29 @@ public:
     Q_INVOKABLE bool singleGet(QString path, QString definedQuery, QString parametersToAdd="");
     Q_INVOKABLE bool singlePost(QString path, QString definedQuery, QString parametersToAdd="");
 
+    Q_INVOKABLE QString keyAppId();
+    Q_INVOKABLE QString keyAppSecret();
+    Q_INVOKABLE QString keyTokenRequest();
+    Q_INVOKABLE QString keyToken();
+
 signals:
     void finishedQuery(QString queryId, QString queryStatus, QString queryReply);
     void finishedAuthentication(QString token, QString error);
-    //void failed(QString queryId);
 
 private slots:
     void replyFromServer(QNetworkReply *reply);
-    //void redirectListenerFailed();
-    //void oauth2ErrorChanged();
-    //void oauth2UriChanged();
-    //void oauth2ReceivedAccessToken();
-    //void oauth2ReceivedRedirect();
 
 private:
-    //QGuiApplication *prgrm;
-    //OAuth2 oauth2;
-    //RedirectListener listener;
     QString oauthPath, oauthId, oauthRedirect, oauthSecret, tokenPath, oauthToken;
     QString scheme, server, userName, userPassword;
     int serverPort;
-    //QString latestReply;
+    OAuth2 oauth2;
+    RedirectListener listener;
     QStringList errorList;
     bool isUserInfoRequired;
 
-    const QString oauthTokenRequest="OAuth2Token";
+    const QString oauthTokenRequest="OAuth2Token", tokenKey="access_token",
+        appIdKey="client_id", appSecretKey="client_secret";
     enum QueryStatus {NetError, ParseError, ServiceError, Pending, Success};// netQueryStatus;
     struct keyValuePair {QString id; QString key; QString value;};
     QList<keyValuePair> storedParameters;
@@ -74,22 +73,17 @@ private:
     QList<sentRequest> requestHistory;
 
     QNetworkAccessManager netManager;
-    //QNetworkReply *netReply;
 
     int addToQuery(QUrlQuery &query, QString keyList);
     void assembleUrl(QUrl &url, QString path, QString definedQuery, QString paramsToAdd);
     QString errorStatusToString(QueryStatus status);
     int findRequest(QNetworkReply *reply);
     QueryStatus getQueryStatus(QJsonObject reply);
-    bool isAppIdNeeded(QString authType);
-    bool isAppSecretNeeded(QString authType);
-    bool isUserAuthNeeded(QString authType);
-    bool isTokenNeeded(QString authType);
     QString readResponse(QNetworkReply *reply);
     QJsonObject responseToJson(QNetworkReply *reply, QString *replyString);
     bool sendRequest(QString queryId, QUrl url, bool isGet);
     bool sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet);
-    QString uriKey(QString uriStr, QString key);
+    QString uriKey(QString uriStr, QString key, int n = -1);
 };
 
 #endif // UNTPD_H

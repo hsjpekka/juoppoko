@@ -74,7 +74,7 @@ Item {
             if (!naytaVainVirheet && hakuja <= 0) {
                 piiloon()
             }
-            console.log("haku valmis, queryStatus " + queryStatus)
+
             if (queryStatus != "Success") {
                 nayta(queryStatus)
             }
@@ -83,12 +83,6 @@ Item {
             }
         }
     }
-
-    //ContextProperty {
-    //    id: verkko
-        // /run/state/namespaces/
-        //key: "Internet.NetworkState"
-    //}
 
     Timer {
         id: viestinNaytto
@@ -401,12 +395,14 @@ Item {
         }
 
         if (UnTpd.unTpToken > "") {
-            lisattavat += "utpToken";
+            lisattavat += untpdKysely.keyToken();
         } else {
-            lisattavat += "utpClientId, utpClientSecret";
+            lisattavat += untpdKysely.keyAppId() + ", "
+                    + untpdKysely.keyAppSecret();
         }
 
         //naytaKeskeytys.restart();
+        console.log(">>> " + kysely + ", " + lisattavat)
 
         if (haku === _get) {
             //viestit.text = qsTr("posting GET-query");
@@ -424,7 +420,6 @@ Item {
             hakuja++;
         }
 
-        //console.log(">>> " + kysely)
         return;
     }
 }

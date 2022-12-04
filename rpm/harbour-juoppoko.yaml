@@ -36,7 +36,7 @@ Requires:
   - sailfishsilica-qt5 >= 0.10.9
   - qml(org.freedesktop.contextkit)
   - amber-web-authorization
-#  - libamberwebauthorization
+  - libamberwebauthorization
 
 # All installed files
 Files:
