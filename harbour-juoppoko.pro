@@ -12,8 +12,8 @@
 # The name of your application
 TARGET = harbour-juoppoko
 
-CONFIG += sailfishapp
 CONFIG += link_pkgconfig
+CONFIG += sailfishapp
 
 PKGCONFIG += amberwebauthorization
 
@@ -63,15 +63,25 @@ DISTFILES += \
     qml/harbour-juoppoko.qml
 
 # defines windowsissa "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"", linuxissa XXX
-DEFINES += \
-     "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"" \
-     "UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\"" \
-     "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
-     "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
-     "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
-     "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
-     "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
-     "JUOPPOKO_VERSIO=\"\\\"2.5.0\\\"\""
+#DEFINES += \
+#     "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"" \
+#     "UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\"" \
+#     "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
+#     "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
+#     "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
+#     "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
+#     "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
+#     "JUOPPOKO_VERSIO=\"\\\"2.5.0\\\"\""
+
+#DEFINES += \
+#     UTPD_ID=\\\$${_CL_ID}\\\" \
+#     UTPD_SECRET=\\\"$${_CL_SECRET}\\\" \
+#     FSQ_ID=\\\"$${_FSQ_ID}\\\" \
+#     FSQ_SECRET=\\\"$${_FSQ_SECRET}\\\" \
+#     CC_KOHDE=\\\"$${_CC_KOHDE}\\\"\
+#     FSQ_VERSIO=\\\"20180712\\\" \
+#     CB_URL=\\\"juoppoko.untpd.tunnistus\\\" \
+#     JUOPPOKO_VERSIO=\\\"2.5.0\\\"
 
 QT += positioning
 
@@ -89,4 +99,5 @@ TRANSLATIONS += translations/$${TARGET}-fi.ts \
 
 HEADERS += \
     src/juomari.h \
+    src/salaisuudet.h \
     src/untpd.h

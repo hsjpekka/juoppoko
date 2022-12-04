@@ -76,13 +76,16 @@ Page {
     Connections {
         target: juoppoko
         onTiedotLuettu: {
-            kuvaaja.alusta(juoja.juodunAika(0))
-            aloitus.start()
+            alustusKaynnissa = false
+            if (juoja.juotuja() > 0) {
+                kuvaaja.alusta(juoja.juodunAika(0))
+                aloitus.start()
+                tuoppi.olutId = juomari.juodunOlutId()
+                txtJuoma.text = juomari.juodunNimi()
+                txtMaara.text = juomari.juodunTilavuus()
+                voltit.text = juomari.juodunVahvuus()
+            }
             promillerivi.muutaPromillet()
-            tuoppi.olutId = juomari.juodunOlutId()
-            txtJuoma.text = juomari.juodunNimi()
-            txtMaara.text = juomari.juodunTilavuus()
-            voltit.text = juomari.juodunVahvuus()
         }
     }
 
@@ -178,6 +181,7 @@ Page {
         //property int kerralla: 100
     }
 
+    //*
     XhttpYhteys {
         id: uTYhteys
         anchors.top: parent.top
@@ -277,6 +281,7 @@ Page {
             return
         }
     }
+    // */
 
     SilicaFlickable {
         id: ylaosa
@@ -554,8 +559,8 @@ Page {
                 function muutaPromillet() {
                     var prml = juoja.promilleja(pvm.getTime());
 
-                    console.log("selvänä " + kellonaika(juoja.selvana()) +
-                                ", rajalla " + kellonaika(juoja.rajalla()))
+                    //console.log("selvänä " + kellonaika(juoja.selvana()) +
+                    //            ", rajalla " + kellonaika(juoja.rajalla()))
 
                     if (prml < 3.0){
                         txtPromilleja.text = "" + prml.toFixed(2) + " ‰";
@@ -578,14 +583,14 @@ Page {
                     if (pvm.getTime() > juoja.rajalla().getTime()) {//prml < Tkanta.promilleRaja1 //nytMs > juomari.rajalla.getTime()) // msKunnossa.getTime() // verrataan hetkeä nytMs listan viimeisen juoman jälkeiseen hetkeen
                         txtAjokunnossa.text = " -";
                     } else {
-                        console.log("ajokunnossa " + kellonaika(juoja.rajalla()))
+                        //console.log("ajokunnossa " + kellonaika(juoja.rajalla()))
                         txtAjokunnossa.text = kellonaika(juoja.rajalla())
                     }
 
                     if (pvm.getTime() > juoja.selvana().getTime()) { //prml <= 0 // msSelvana.getTime()
                         txtSelvana.text = " -";
                     } else {
-                        console.log("selvänä " + kellonaika(juoja.selvana()))
+                        //console.log("selvänä " + kellonaika(juoja.selvana()))
                         txtSelvana.text = kellonaika(juoja.selvana());
                     }
 
@@ -774,7 +779,7 @@ Page {
                     width: sivu.width - txtMaara.width - voltit.width
                     readOnly: true
                     color: Theme.primaryColor
-                    placeholderText: qsTr("beer")
+                    text: qsTr("beer")
                     label: tuoppi.arvostelu > 0 ? "" + (tuoppi.arvostelu/2+0.5).toFixed(1) + "/5" : " "
                     onClicked: {
                         tuoppi.muutaUusi()

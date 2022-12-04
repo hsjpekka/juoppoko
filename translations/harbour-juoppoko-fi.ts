@@ -159,20 +159,8 @@
 <context>
     <name>XhttpYhteys</name>
     <message>
-        <source>press &apos;x&apos; to interrupt</source>
-        <translation>keskeytä &apos;x&apos;:stä</translation>
-    </message>
-    <message>
-        <source>no net</source>
-        <translation>ei verkkoa</translation>
-    </message>
-    <message>
         <source>not connected</source>
         <translation>ei yhdistetty</translation>
-    </message>
-    <message>
-        <source>error: </source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -369,6 +357,10 @@
     <message>
         <source>%1 drinks, latest %2</source>
         <translation type="unfinished">juomia %1, viimeisin %2</translation>
+    </message>
+    <message>
+        <source>%1 drinks</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -919,20 +911,12 @@
         <translation>CODE tai url, jossa CODE on</translation>
     </message>
     <message>
-        <source>open in external browser</source>
-        <translation>avaa selaimessa</translation>
-    </message>
-    <message>
         <source>unTappd login url</source>
         <translation>unTappd kirjautumisosoite</translation>
     </message>
     <message>
         <source>plain CODE</source>
         <translation>pelkkä CODE</translation>
-    </message>
-    <message>
-        <source>use SilicaWebView</source>
-        <translation>käytä SilicaWebView&apos;tä</translation>
     </message>
     <message>
         <source>If you have problems with the default browser, paste the login url below to the address field of another browser.</source>
@@ -951,12 +935,20 @@
         <translation>Selainongelmia?</translation>
     </message>
     <message>
-        <source>To use your unTappd-profile, sign in at %1 and follow the instructions below, or try the webview (pull down menu).</source>
-        <translation>Käyttääksesi unTappd-tiliäsi, kirjaudu osoitteessa %1 ja seuraa alla olevia ohjeita, tai yritä selainsivulla (vetovalikosta).</translation>
-    </message>
-    <message>
         <source>After signing in, the browser will redirect you to a non-existing address %1. Copy the address, or just the CODE, to the text field below, and press enter.</source>
         <translation>Kirjauduttuasi selain siirtyy olemassa olemattomalle sivulle %1. Kopioi osoite tai pelkkä CODE alla olevaan kenttään, ja paina enteriä. </translation>
+    </message>
+    <message>
+        <source>authenticate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To use your unTappd-profile, sign in at %1 and follow the instructions below, or try the browser (pull down menu).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amber authenticate</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

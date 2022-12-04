@@ -28,7 +28,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef QT_QML_DEBUG
+#ifndef QT_QML_DEBUG
 #include <QtQuick>
 #endif
 
@@ -36,6 +36,7 @@
 #include <QScopedPointer>
 #include "juomari.h"
 #include "untpd.h"
+#include "salaisuudet.h"
 
 int main(int argc, char *argv[])
 {
@@ -43,26 +44,25 @@ int main(int argc, char *argv[])
     QScopedPointer<QQuickView> view(SailfishApp::createView());
     juomari juoja, ennustaja;
     unTpd untpdkysely;
-    untpdkysely.setQueryParameter("utpClientId", UTPD_ID, "client_id");
-    untpdkysely.setClientId(UTPD_ID);
-    untpdkysely.setQueryParameter("utpClientSecret", UTPD_SECRET, "client_secret");
-    untpdkysely.setClientSecret(UTPD_SECRET);
-    //untpdkysely.setQueryParameter("utpCallbackUrl", CB_URL, "redirect_url");
-    untpdkysely.setClientRedirect(CB_URL);
+
+    app->setApplicationVersion(JUOPPOKO_VERSIO);
+
+    untpdkysely.setOAuthId(UTPD_ID);
+    untpdkysely.setOAuthSecret(UTPD_SECRET);
+    untpdkysely.setOAuthRedirect(CB_URL);
+    untpdkysely.setOAuthPath("https://untappd.com/oauth/authenticate/");
+    untpdkysely.setOAuthTokenPath("https://untappd.com/oauth/authorize/");
+    untpdkysely.setServer("https","api.untappd.com");
+    untpdkysely.setQueryParameter("fsqClientId", FSQ_ID, "client_id");
+    untpdkysely.setQueryParameter("fsqClientSecret", FSQ_SECRET, "client_secret");
+    untpdkysely.setQueryParameter("fsqVersion", FSQ_VERSIO, "v");
+
+    view->engine()->rootContext()->setContextProperty("ccKohde", "kone");
+    view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
+    view->engine()->rootContext()->setContextProperty("unTappdCb", CB_URL);
     view->engine()->rootContext()->setContextProperty("untpdKysely", &untpdkysely);
     view->engine()->rootContext()->setContextProperty("juoja", &juoja);
     view->engine()->rootContext()->setContextProperty("testaaja", &ennustaja);
-    app->setApplicationVersion(JUOPPOKO_VERSIO);
-    view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
-    view->engine()->rootContext()->setContextProperty("unTappdSe", UTPD_SECRET);
-    view->engine()->rootContext()->setContextProperty("unTappdCb", CB_URL);
-    untpdkysely.setQueryParameter("fsqClientId", FSQ_ID, "client_id");
-    untpdkysely.setQueryParameter("fsqClientSecret", UTPD_SECRET, "client_secret");
-    untpdkysely.setQueryParameter("fsqVersion", UTPD_SECRET, "v");
-    view->engine()->rootContext()->setContextProperty("fsqId", FSQ_ID);
-    view->engine()->rootContext()->setContextProperty("fsqSec", FSQ_SECRET);
-    view->engine()->rootContext()->setContextProperty("fsqVer", FSQ_VERSIO);
-    view->engine()->rootContext()->setContextProperty("ccKohde", CC_KOHDE);
 
     view->setSource(SailfishApp::pathToMainQml());
     view->show();

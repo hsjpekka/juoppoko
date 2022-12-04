@@ -80,12 +80,12 @@ ApplicationWindow{
         //var args = Qt.application.arguments.length
         UnTpd.programName = Qt.application.arguments[0]
         UnTpd.unTpdId = unTappdId //Qt.application.arguments[args-1]
-        UnTpd.unTpdSecret = unTappdSe //Qt.application.arguments[args-2]
+        //UnTpd.unTpdSecret = unTappdSe //Qt.application.arguments[args-2]
         UnTpd.callbackURL = unTappdCb //Qt.application.arguments[args-3]
         UnTpd.unTpToken = Tkanta.arvoUnTpToken;
-        FourSqr.appId = fsqId //Qt.application.arguments[args-4]
-        FourSqr.appSecret = fsqSec //Qt.application.arguments[args-5]
-        FourSqr.fsqrVersion = fsqVer //Qt.application.arguments[args-6]
+        //FourSqr.appId = fsqId //Qt.application.arguments[args-4]
+        //FourSqr.appSecret = fsqSec //Qt.application.arguments[args-5]
+        //FourSqr.fsqrVersion = fsqVer //Qt.application.arguments[args-6]
         //versioNro = Qt.application.arguments[args-7] //Qt.application.version
         //kone = ccKohde //Qt.application.arguments[args-8]
         untpdKysely.setQueryParameter("utpToken", Tkanta.arvoUnTpToken, "access_token");
@@ -162,7 +162,11 @@ ApplicationWindow{
         var i = 0;
 
         taulukko = Tkanta.lueTkJuodut(kaikki, alkuAika, loppuAika).rows;
-        console.log(qsTr("%1 drinks, latest %2").arg(taulukko.length).arg(taulukko[taulukko.length-1].juoma))
+        if (taulukko.length > 0) {
+            console.log(qsTr("%1 drinks, latest %2").arg(taulukko.length).arg(taulukko[taulukko.length-1].juoma))
+        } else {
+            console.log(qsTr("%1 drinks").arg(taulukko.length))
+        }
 
         while (i < taulukko.length) {
             paaikkuna.juomari.juo(taulukko[i].id, taulukko[i].aika,
@@ -202,9 +206,9 @@ ApplicationWindow{
                 console.log("arvo " + (i+1) + ": vesipitoisuus < 1 %, muutettu 70%");
                 vetta = 0.7;
             }
-            if (maksa < 0.01) {
+            if (kunto < 0.01) {
                 console.log("arvo " + (i+1) + ": maksan kunto < 1 %, muutettu 100%");
-                maksa = 1.0;
+                kunto = 1.0;
             }
             juoja.asetaKeho(paino, vetta, kunto, keho[i].aika);
             i++;

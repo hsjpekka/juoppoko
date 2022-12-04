@@ -13,7 +13,8 @@ juomari::juomari(QObject *parent) : QObject(parent)
     imeytymisaika = 0; // h
     vrkVaihtuu.setHMS(5,0,0,0); // 5:00-4:59 samaa päivää
 
-    asetaPohjat(0, QDateTime(QDate(-1, 0, 0)));
+    //qInfo() << QDateTime(QDate(1, 1, 1)).toString();
+    asetaPohjat(0, QDateTime(QDate(1, 1, 1)));
 
     raja1 = 0.5;
     tarkka = false;
@@ -64,7 +65,7 @@ juomari::mlMaarat juomari::alkoholiaMl(QDateTime nyt, int iJuoma, int iKeho) {
         mlPalanut = 0.0;
     }
 
-    qInfo() << iJuoma << edellinen.vatsassaEnnen << eroTunti << mlVatsassa << mlVeressa << mlImeytynyt << mlPalanut << juodut.length();
+    //qInfo() << iJuoma << edellinen.vatsassaEnnen << eroTunti << mlVatsassa << mlVeressa << mlImeytynyt << mlPalanut << juodut.length();
     tulos.vatsassa = mlVatsassa - mlPalanut;
     tulos.veressa = mlVeressa - mlPalanut;
     return tulos;
@@ -260,6 +261,7 @@ int juomari::asetaPohjat(double mlAlkoholia, QDateTime aika) {
         milloinRajalla = milloinPromilleja(raja1, aika);
         milloinSelvana = milloinPromilleja(0, aika);
     } else {
+        qInfo() << "pohjat epäonnistui" << mlAlkoholia << aika.isValid();
         onnistuiko = -1;
     }
 
@@ -416,7 +418,7 @@ int juomari::juo(int id, int ml, double prosentteja, QDateTime aika, bool paivit
     }
 
     i = etsiJuomanJarjestys(aika);
-    qInfo() << juodut.length() << i;
+    //qInfo() << juodut.length() << i;
 
     ryyppy.aika = aika;
     ryyppy.id = id;
@@ -424,9 +426,9 @@ int juomari::juo(int id, int ml, double prosentteja, QDateTime aika, bool paivit
     ryyppy.pros = prosentteja/100;
     paljonkoPohjia(ryyppy, aika, i);
 
-    qInfo() << juodut.length() << i;
+    //qInfo() << juodut.length() << i;
     juodut.insert(i, ryyppy);
-    qInfo() << juodut.length() << i;
+    //qInfo() << juodut.length() << i;
 
     if (paivita) {
         paivitaRajat();
@@ -759,7 +761,7 @@ int juomari::poistaJuoma(int id, bool tarkistaKaikki) {
     laskeUudelleen(i);
     paivitaRajat();
 
-    qInfo() << tulos << juodut.length();
+    //qInfo() << tulos << juodut.length();
 
     return tulos;
 }
@@ -784,7 +786,7 @@ double juomari::promilleja(QDateTime aika, bool veresta) {
     juoja = kehonOminaisuudet(k);
 
     tulos = mlAlkoholia*tiheys/(juoja.paino*juoja.vesiPros);
-    qInfo() << aika.time().toString() << j << k << mlAlkoholia << juoja.paino;
+    //qInfo() << aika.time().toString() << j << k << mlAlkoholia << juoja.paino;
 
     return tulos;
 }

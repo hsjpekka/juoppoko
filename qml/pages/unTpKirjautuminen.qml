@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import QtWebKit 3.0
+//import QtWebKit 3.0
+import Amber.Web.Authorization 1.0
 import "../scripts/unTap.js" as UnTpd
 import "../scripts/tietokanta.js" as Tkanta
 import "../components"
@@ -8,18 +9,46 @@ import "../components"
 Page {
     id: sivu
 
+    Component.onDestruction: {
+        if (muuttunut)
+            muuttuu()
+    }
+
     signal muuttuu
     property bool muuttunut: false
+    property string vanhaTunnus: UnTpd.unTpToken
 
     readonly property string unTappdLoginUrl: "https://untappd.com/oauth/authenticate/?client_id=" +
                                      UnTpd.unTpdId + "&response_type=code&redirect_url=" +
                                      UnTpd.callbackURL
     //path="oauth/authenticate/", query="response_type=code&redirect_url=" + UnTpd.callbackURL, toAdd="clientId"
-    readonly property string accTokenAddress: "https://untappd.com/oauth/authorize/?client_id=" +
-            UnTpd.unTpdId + "&client_secret=" + UnTpd.unTpdSecret +
-            "&response_type=code&redirect_url=" + UnTpd.callbackURL + "&code="
+    //readonly property string accTokenAddress: "https://untappd.com/oauth/authorize/?client_id=" +
+    //        UnTpd.unTpdId + "&client_secret=" + UnTpd.unTpdSecret +
+    //        "&response_type=code&redirect_url=" + UnTpd.callbackURL + "&code="
     //path="oauth/authorize/", query="response_type=code&redirect_url=" + UnTpd.callbackURL + "&code=", toAdd="clientId,clientSecret"
 
+    /*
+    OAuth2Implicit {
+        id: oAuth
+
+        clientId:  UnTpd.unTpdId // use your app's clientId value
+        clientSecret: UnTpd.unTpdSecret // use your app's clientSecret value
+        redirectUri: UnTpd.callbackURL
+        //redirectListener.port: 7357 // your app's localhost redirect port.  Not required for Google.
+
+        authorizationEndpoint: "https://untappd.com/oauth/authenticate/"
+        tokenEndpoint: "https://untappd.com/oauth/authorize/"
+        //scopes: ["https://www.googleapis.com/auth/userinfo.email","https://www.googleapis.com/auth/userinfo.profile"]
+        //customParameters: ({ "prompt":"consent" })
+
+        onErrorOccurred: console.log("OAuth2 Error: " + error.code + " = " + error.message + " : " + error.httpCode)
+        onReceivedAccessToken: {
+            console.log("Got access token: " + token.access_token)
+            vaihdaTunnus(token.access_token)
+        }
+    }
+    // */
+    /*
     Component {
         id: valikko
         PullDownMenu {
@@ -54,7 +83,9 @@ Page {
             }
         }
     }
+    // */
 
+    /*
     Connections {
         target: untpdKysely
         onFinishedQuery: {
@@ -111,12 +142,24 @@ Page {
             return
         }
     }
+    // */
+
+    Connections {
+        target: untpdKysely
+        onFinishedAuthentication: {
+            if (token > "") {
+                vaihdaTunnus(token)
+            } else {
+                console.log("error in getting authentication token: " + error + " " + untpdKysely.readOAuth2Token())
+            }
+        }
+    }
 
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
         //pullDownMenu: valikko
-        visible: !webView.visible
+        //visible: !webView.visible
 
         PullDownMenu {
             MenuItem {
@@ -134,6 +177,19 @@ Page {
                     pageContainer.pop()
                 }
             }
+            MenuItem {
+                text: qsTr("Amber authenticate")
+                onClicked: {
+                    untpdKysely.authenticateAmber()
+                }
+            }
+            MenuItem {
+                text: qsTr("authenticate")
+                onClicked: {
+                    untpdKysely.authenticate()
+                }
+            }
+
             /*
             MenuItem {
                 text: qsTr("open in external browser")
@@ -142,13 +198,14 @@ Page {
                     webView.visible = !webView.visible
                 }
             } // */
+            /*
             MenuItem {
                 text: qsTr("use SilicaWebView")
                 visible: !webView.visible
                 onClicked: {
                     webView.visible = !webView.visible
                 }
-            }
+            } // */
         }
 
         Column {
@@ -169,7 +226,8 @@ Page {
 
                 plainText: qsTr("To use your unTappd-profile, sign in at %1 and " +
                                 "follow the instructions below, " +
-                                "or try the webview (pull down menu).").arg(unTappdLoginUrl)
+                                "or try the browser (pull down menu).").arg(unTappdLoginUrl)
+                //"or try the webview (pull down menu).").arg(unTappdLoginUrl)
             }
 
             SectionHeader {
@@ -201,7 +259,7 @@ Page {
 
                 EnterKey.iconSource: "image://theme/icon-m-enter-accept"
                 EnterKey.onClicked: {
-                    lueToken()
+                    //lueToken()
                     focus = false
                 }
 
@@ -238,6 +296,7 @@ Page {
         }
     }
 
+    /*
     SilicaWebView {
         id: webView
         anchors.fill: parent
@@ -255,7 +314,7 @@ Page {
 
             if (vertailu.test(loadRequest.url.toString())) {
                 replyUrl = loadRequest.url.toString()
-                /*
+                // / *
                 code = replyUrl.slice(replyUrl.indexOf("?code=")+6)
                 accTokenAddress += code
                 xhttp.onreadystatechange = function() {
@@ -268,33 +327,32 @@ Page {
                 }
                 xhttp.open("GET", accTokenAddress, true)
                 xhttp.send()
-                // */
+                // * /
                 uTpYhteys.tunnus = replyUrl.slice(replyUrl.indexOf("?code=")+6)
                 uTpYhteys.haeLupanumero()
             }
         }
     }
+    // */
 
-    Component.onDestruction: {
-        if (muuttunut)
-            muuttuu()
+    function vaihdaTunnus(tunniste) {
+        console.log("tunnus vaihtuu: " + tunniste)
+        muuttunut = true;
+        UnTpd.unTpToken = tunniste;
+        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, tunniste);
+        return;
     }
 
-    function vaihdaTunnus(tunnus) {
-        muuttunut = true
-        UnTpd.unTpToken = tunnus
-        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, tunnus)
-        return
-    }
-
+    /*
     function lueToken() {
-        var i = urlTunnus.text.indexOf("?code=")
+        var i = urlTunnus.text.indexOf("?code=");
         if (i < 0) {
-            uTpYhteys.tunnus = urlTunnus.text
+            uTpYhteys.tunnus = urlTunnus.text;
         } else {
-            uTpYhteys.tunnus = urlTunnus.text.substring(i+6)
+            uTpYhteys.tunnus = urlTunnus.text.substring(i+6);
         }
-        uTpYhteys.haeLupanumero()
-        return
+        uTpYhteys.haeLupanumero();
+        return;
     }
+    // */
 }

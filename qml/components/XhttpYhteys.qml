@@ -69,13 +69,17 @@ Item {
     Connections {
         target: xhttp
         onFinishedQuery: { //QString: queryId, queryStatus, queryResponse
-            valmis(queryId, queryStatus, queryResponse)
+            valmis(queryId, queryStatus, queryReply)
             hakuja--
             if (!naytaVainVirheet && hakuja <= 0) {
                 piiloon()
             }
+            console.log("haku valmis, queryStatus " + queryStatus)
             if (queryStatus != "Success") {
-                nakyville()
+                nayta(queryStatus)
+            }
+            if (hakuja <= 0) {
+                viestinNaytto.running = true
             }
         }
     }
@@ -406,14 +410,14 @@ Item {
 
         if (haku === _get) {
             //viestit.text = qsTr("posting GET-query");
-            console.log("nyt lähtee GET: " + polku + " ? " + kysely + " & " + lisattavat)
+            //console.log("nyt lähtee GET: " + polku + " ? " + kysely + " & " + lisattavat)
             // <<<<<<< >>>>>>>>>
             xhttp.queryGet(tunniste, polku, kysely, lisattavat);
             // <<<<<<< >>>>>>>>>
             hakuja++;
         } else if (haku === _post) {
             //viestit.text = qsTr("posting POST-query");
-            console.log("nyt lähtee POST: " + polku + " ? " + kysely + " & " + lisattavat)
+            //console.log("nyt lähtee POST: " + polku + " ? " + kysely + " & " + lisattavat)
             // <<<<<<< >>>>>>>>>
             xhttp.queryPost(tunniste, polku, kysely, lisattavat);
             // <<<<<<< >>>>>>>>>
@@ -422,5 +426,5 @@ Item {
 
         //console.log(">>> " + kysely)
         return;
-    } // */
+    }
 }

@@ -8,186 +8,130 @@ import "../scripts/tietokanta.js" as Tkanta
 Page {
     id: sivu
 
+    Component.onCompleted: {
+        if (UnTpd.unTpToken > ""){
+            avaaKirjautumissivu = false
+            haeKayttajatiedot = false
+            uTYhteys.lueKayttajanTiedot(muuJuoja)
+            uTYhteys.lueKayttajanKirjaukset(muuJuoja)
+            console.log("käyttäjä" + muuJuoja)
+        }
+    }
+
+    Component.onDestruction: {
+        sulkeutuu()
+    }
+
     signal sulkeutuu
 
     property bool   avaaKirjautumissivu: true
     property bool   haeKayttajatiedot: true
     property string ilmoitukset: ""
-    property string kayttaja: ""
+    property string muuJuoja: ""
     property bool   lueUudelleen: false
     property date   pvm
     property bool   tilastotNakyvat: false
     //property int    valittu
 
-    function kirjaudu() {
-        var sivu=pageContainer.push(Qt.resolvedUrl("unTpKirjautuminen.qml"))
-        sivu.muuttuu.connect( function() {
-            tyhjennaKentat()
-            if (UnTpd.unTpToken != ""){
-                kayttaja = ""
-                uTYhteys.lueKayttajanTiedot(kayttaja)
-                uTYhteys.lueKayttajanKirjaukset(kayttaja, 0)
+    XhttpYhteys {
+        id: uTYhteys
+        anchors.top: parent.top
+        //xhttp: untpdKysely
+        z: 1
+        onValmis: {
+            var jsonVastaus;
+            try {
+                jsonVastaus = JSON.parse(httpVastaus);
+                if (toiminto === "tiedot") {
+                    if ("user" in jsonVastaus.response)
+                        console.log("unTpKayttaja.qml ->uTYhteys: " + jsonVastaus.response.user.user_name + ", " + jsonVastaus.response.user.uid)
+                    else {
+                        console.log("unTpKayttaja.qml ->uTYhteys: " + "ei user-tietoja")
+                        console.log("  ===  " + JSON.stringify(jsonVastaus))
+                    }
+                    kirjoitaTiedot(jsonVastaus)
+                } else if (toiminto === "kirjaukset")
+                    kirjoitaKirjaukset(jsonVastaus)
+                else if (toiminto === "uutiset")
+                    unTpdIlmoitaUutisista(httpVastaus)
+            } catch (err) {
+                console.log("unTpKayttaja.qml ->uTYhteys: " + err)
             }
-        })
-        return
-    }
-
-    function kirjoitaKirjaukset(jsonVastaus) {
-        var vastaus = jsonVastaus.response.checkins
-        var id, aika = "", bid, etiketti, merkki, lausahdus, maljoja, omaMalja, huutoja, baari,
-                panimo, osallistunut, pubId
-        var i=0, N = vastaus.count, aikams, paivays = new Date()
-        var kentta
-        while (i < N) {
-            lausahdus = ""
-            baari = ""
-            //paikka = ""
-            panimo = ""
-
-            id = vastaus.items[i].checkin_id
-            bid = vastaus.items[i].beer.bid
-            etiketti = vastaus.items[i].beer.beer_label
-            merkki = vastaus.items[i].beer.beer_name
-
-            lausahdus = vastaus.items[i].checkin_comment
-
-            aikams = Date.parse(vastaus.items[i].created_at)
-            paivays.setTime(aikams)
-            pvm = paivays
-            aika = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-
-            if ("venue_name" in vastaus.items[i].venue) {
-                baari = vastaus.items[i].venue.venue_name
-                //if (baari === "kotsaa") {
-                    //console.log("" + JSON.stringify(vastaus.items[i]))
-                //}
-            } else
-                baari = ""
-            if ("venue_id" in vastaus.items[i].venue)
-                pubId = vastaus.items[i].venue.venue_id
-            else
-                pubId = -1
-            /* for (kentta in vastaus.items[i].venue) {
-                if (kentta === "venue_name") {
-                    baari = vastaus.items[i].venue.venue_name
-                } else if (kentta === "venue_id") {
-                    pubId = vastaus.items[i].venue.venue_id
-                }
-            } // */
-            panimo = vastaus.items[i].brewery.brewery_name
-            //}
-
-            maljoja = vastaus.items[i].toasts.count
-            omaMalja = vastaus.items[i].toasts.auth_toast
-            huutoja = vastaus.items[i].comments.count
-            osallistunut = olenkoJutellut(vastaus.items[i].comments)
-            kirjausLista.lisaa(id, bid, aika, "", kayttaja, "", etiketti, merkki, panimo,
-                                      baari, pubId, maljoja, omaMalja, lausahdus, huutoja,
-                                      vastaus.items[i].comments, osallistunut)
-            i++
         }
-    }
-
-    function kirjoitaTiedot(jsonVastaus){
-        var vastaus
-        if ("user" in jsonVastaus.response) {
-            vastaus = jsonVastaus.response.user
-        } else {
-            return
+        onVirhe: {
+            var jsonVastaus;
+            try {
+                jsonVastaus = JSON.parse(httpVastaus);
+                if (toiminto === "tiedot") {
+                    if ("user" in jsonVastaus.response)
+                        console.log(jsonVastaus.response.user.user_name + ", " + jsonVastaus.response.user.uid)
+                    else {
+                        console.log("unTpKayttaja.qml ->uTYhteys: " + "ei user-tietoja")
+                        console.log("  ===  " + JSON.stringify(jsonVastaus))
+                    }
+                    kirjoitaTiedot(jsonVastaus)
+                } else if (toiminto === "kirjaukset")
+                    kirjoitaKirjaukset(jsonVastaus)
+                else if (toiminto === "uutiset")
+                    unTpdIlmoitaUutisista(httpVastaus)
+            } catch (err) {
+                console.log("unTpKayttaja.qml ->uTYhteys: " + err)
+            }
         }
 
-        kayttaja = vastaus.user_name
-        otsikko.title = vastaus.user_name + " @UnTappd"
-        nimi.text = vastaus.first_name + " " + vastaus.last_name
-        nimi.color = Theme.highlightColor
-        logo.kId = vastaus.uid
-
-        kuva1.source = vastaus.user_avatar
-        kuva2.source = vastaus.user_cover_photo
-
-        if (vastaus.bio != "") {
-            kuvaus.text = vastaus.bio
-            kuvaus.label = vastaus.location + vastaus.url
-        } else {
-            kuvaus.text = vastaus.url
-            kuvaus.label = vastaus.location
+        function lueKayttajanTiedot(tunnus) { // jos tunnus = "" hakee omat tiedot
+            var kysely;
+            //toiminto = "tiedot";
+            kysely = UnTpd.getUserInfo(tunnus,"true");
+            xHttpGet(kysely[0], kysely[1], "tiedot");
+            return;
         }
 
-        if (vastaus.stats.total_badges > 0){
-            merkkeja.text = qsTr("badges") + " ..."
-            merkkeja.color = Theme.primaryColor
-        }
-        merkkeja.label = vastaus.stats.total_badges
-
-        if (vastaus.stats.total_friends > 0)
-            kavereita.text = qsTr("friends")
-        kavereita.label = vastaus.stats.total_friends
-
-        if (vastaus.stats.total_checkins > 0)
-            kirjauksia.text = qsTr("checkins")
-        kirjauksia.label = vastaus.stats.total_checkins
-
-        if (vastaus.stats.total_beers > 0)
-            oluita.text = qsTr("beers")
-        oluita.label = vastaus.stats.total_beers
-
-        if (vastaus.stats.total_created_beers > 0)
-            luodutOluet.text = qsTr("beers created")
-        luodutOluet.label = vastaus.stats.total_created_beers
-
-        if (vastaus.stats.total_photos > 0)
-            kuvia.text = qsTr("photos")
-        kuvia.label = vastaus.stats.total_photos
-
-        if (vastaus.stats.total_followings > 0)
-            seurattavia.text = qsTr("followed")
-        seurattavia.label = vastaus.stats.total_followings
-
-        return
-    }
-
-    function olenkoJutellut(jutut) {
-        var juttuja = jutut.count, i = 0
-        while(i < juttuja){
-            if (jutut.items[i].comment_editor == true)
-                return true
-            i++
+        function lueKayttajanKirjaukset(tunnus, eka) { // jos tunnus = "" hakee omat tiedot
+            var kysely;
+            //toiminto = "kirjaukset";
+            kysely = UnTpd.getUserFeed(tunnus, eka);
+            xHttpGet(kysely[0], kysely[1], "kirjaukset");
+            return;
         }
 
-        return false
-    }
+        function lueIlmoitukset() {
+            var kysely;
+            //toiminto = "uutiset";
 
-    function tyhjennaKentat() {
-        otsikko.title = qsTr("UnTappd account")
-        nimi.text = qsTr("")
-        //nimi.color = Theme.secondaryHighlightColor
-        //nimi.label = ""
-        kuva1.source = ""
-        kuva2.source = ""
-        kuvaus.text = ""
-        kuvaus.label = ""
-        merkkeja.text = ""
-        merkkeja.label = ""
-        kavereita.text = ""
-        kavereita.label = ""
-        kirjauksia.text = ""
-        kirjauksia.label = ""
-        oluita.text = ""
-        oluita.label = ""
-        luodutOluet.text = ""
-        luodutOluet.label = ""
-        kuvia.text = ""
-        kuvia.label = ""
-        seurattavia.text = ""
-        seurattavia.label = ""
+            kysely = UnTpd.getNotifications();//(offset, limit)
 
-        tyhjennaKirjaukset()
+            xHttpGet(kysely[0], kysely[1], "uutiset");
 
-        return
-    }
+            return;
+        }
 
-    function tyhjennaKirjaukset() {
-        return kirjausLista.clear()
+        function unTpdIlmoitaUutisista(vastaus) {
+            var maara;
+
+            ilmoitukset = vastaus;
+            pageContainer.push(Qt.resolvedUrl("unTpIlmoitukset.qml"),
+                               {"ilmoitukset": ilmoitukset});
+
+            return;
+        }
+
+        function unTpdToast(ckId) {
+            var kysely = "";
+            //toiminto = "kippis";
+            kysely = UnTpd.toast(ckId);
+            xHttpPost(kysely[0], kysely[1], "kippis");
+            return;
+        }
+
+        function pyydaKaveriksi(kid) {
+            var kysely = "";
+            //toiminto = "kaveriksi"
+            kysely = UnTpd.requestFriend(kid);
+            xHttpGet(kysely[0], kysely[1], "kaveriksi")
+            console.log("kaveripyyntö: " + kysely);
+            return;
+        }
     }
 
     Component {
@@ -225,7 +169,7 @@ Page {
         PullDownMenu{
             MenuItem {
                 text: (UnTpd.unTpToken === "") ? qsTr("sign in") : qsTr("change user")
-                visible: kayttaja === "" || kayttaja === UnTpd.kayttaja
+                visible: muuJuoja === "" || muuJuoja === UnTpd.kayttaja
                 onClicked: {
                     kirjaudu()
                 }
@@ -242,11 +186,11 @@ Page {
 
             MenuItem {
                 text: qsTr("send friend request")
-                visible: kayttaja !== "" && kayttaja !== UnTpd.kayttaja
+                visible: muuJuoja !== "" && muuJuoja !== UnTpd.kayttaja
                 onClicked: {
                     var varmistus
                     varmistus = pageContainer.push(Qt.resolvedUrl("unTpKaveripyynto.qml"),
-                                                {"kaveri": kayttaja, "nimi": nimi.text,
+                                                {"kaveri": muuJuoja, "nimi": nimi.text,
                                                     "kuva": kuva1.source })
                     varmistus.accepted.connect( function() {
                         uTYhteys.pyydaKaveriksi(logo.kId)
@@ -256,21 +200,19 @@ Page {
 
             MenuItem {
                 text: qsTr("read my data")
-                visible: kayttaja !== "" && kayttaja !== UnTpd.kayttaja
+                visible: muuJuoja !== "" && muuJuoja !== UnTpd.kayttaja
                 onClicked: {
-                    kayttaja = ""
+                    muuJuoja = ""
                     tyhjennaKentat()
-                    uTYhteys.lueKayttajanTiedot(kayttaja)
-                    uTYhteys.lueKayttajanKirjaukset(kayttaja, 0)
+                    uTYhteys.lueKayttajanTiedot(muuJuoja)
+                    uTYhteys.lueKayttajanKirjaukset(muuJuoja, 0)
                 }
             }
 
             MenuItem {
                 text: qsTr("notifications")
-                visible: kayttaja === "" || kayttaja === UnTpd.kayttaja
+                visible: muuJuoja === "" || muuJuoja === UnTpd.kayttaja
                 onClicked: {
-                    //console.log("pitäisi välittyä " + uTYhteys.ilmoitukset.length + " merkkiä")
-                    //console.log(uTYhteys.ilmoitukset.substring(0, 40))
                     if (lueUudelleen)
                         uTYhteys.lueIlmoitukset()
                     else {
@@ -281,109 +223,6 @@ Page {
                 }
             }
 
-        }
-
-        XhttpYhteys {
-            id: uTYhteys
-            anchors.top: parent.top
-            //xhttp: untpdKysely
-            z: 1
-            onValmis: {
-                var jsonVastaus;
-                try {
-                    jsonVastaus = JSON.parse(httpVastaus);
-                    if (toiminto === "tiedot") {
-                        if ("user" in jsonVastaus.response)
-                            console.log(jsonVastaus.response.user.user_name + ", " + jsonVastaus.response.user.uid)
-                        else {
-                            console.log("ei user-tietoja")
-                            console.log("  ===  " + JSON.stringify(jsonVastaus))
-                        }
-                        kirjoitaTiedot(jsonVastaus)
-                    } else if (toiminto === "kirjaukset")
-                        kirjoitaKirjaukset(jsonVastaus)
-                    else if (toiminto === "uutiset")
-                        unTpdIlmoitaUutisista(httpVastaus)
-                } catch (err) {
-                    console.log("" + err)
-                }
-            }
-            onVirhe: {
-                var jsonVastaus;
-                try {
-                    jsonVastaus = JSON.parse(httpVastaus);
-                    if (toiminto === "tiedot") {
-                        if ("user" in jsonVastaus.response)
-                            console.log(jsonVastaus.response.user.user_name + ", " + jsonVastaus.response.user.uid)
-                        else {
-                            console.log("ei user-tietoja")
-                            console.log("  ===  " + JSON.stringify(jsonVastaus))
-                        }
-                        kirjoitaTiedot(jsonVastaus)
-                    } else if (toiminto === "kirjaukset")
-                        kirjoitaKirjaukset(jsonVastaus)
-                    else if (toiminto === "uutiset")
-                        unTpdIlmoitaUutisista(httpVastaus)
-                } catch (err) {
-                    console.log("" + err)
-                }
-            }
-
-            //property string toiminto: ""
-
-            function lueKayttajanTiedot(tunnus) { // jos tunnus = "" hakee omat tiedot
-                var kysely;
-                //toiminto = "tiedot";
-                kysely = UnTpd.getUserInfo(tunnus,"true");
-                xHttpGet(kysely[0], kysely[1], "tiedot");
-                return;
-            }
-
-            function lueKayttajanKirjaukset(tunnus, eka) { // jos tunnus = "" hakee omat tiedot
-                var kysely;
-                //toiminto = "kirjaukset";
-                kysely = UnTpd.getUserFeed(tunnus, eka);
-                xHttpGet(kysely[0], kysely[1], "kirjaukset");
-                return;
-            }
-
-            function lueIlmoitukset() {
-                var kysely;
-                //toiminto = "uutiset";
-
-                kysely = UnTpd.getNotifications();//(offset, limit)
-
-                xHttpGet(kysely[0], kysely[1], "uutiset");
-
-                return;
-            }
-
-            function unTpdIlmoitaUutisista(vastaus) {
-                var maara;
-
-                ilmoitukset = vastaus;
-                pageContainer.push(Qt.resolvedUrl("unTpIlmoitukset.qml"),
-                                   {"ilmoitukset": ilmoitukset});
-
-                return;
-            }
-
-            function unTpdToast(ckId) {
-                var kysely = "";
-                //toiminto = "kippis";
-                kysely = UnTpd.toast(ckId);
-                xHttpPost(kysely[0], kysely[1], "kippis");
-                return;
-            }
-
-            function pyydaKaveriksi(kid) {
-                var kysely = "";
-                //toiminto = "kaveriksi"
-                kysely = UnTpd.requestFriend(kid);
-                xHttpGet(kysely[0], kysely[1], "kaveriksi")
-                console.log("kaveripyyntö: " + kysely);
-                return;
-            }
         }
 
         Column {
@@ -566,7 +405,7 @@ Page {
                     onClicked: {
                         if (text != "")
                             pageContainer.push(Qt.resolvedUrl("unTpAnsiomerkit.qml"), {
-                                                              "kayttajaTunnus": kayttaja})
+                                                              "kayttajaTunnus": muuJuoja})
                     }
                 }
 
@@ -586,17 +425,17 @@ Page {
                     onClicked: {
                         if (text != "") {
                             var uusi = pageContainer.push(Qt.resolvedUrl("unTpKaverit.qml"), {
-                                                          "tunnus": kayttaja})
+                                                          "tunnus": muuJuoja})
                             uusi.sulkeutuu.connect(function() {
-                                if (uusi.tunnus != kayttaja) {
-                                    kayttaja = uusi.tunnus;
+                                if (uusi.tunnus != muuJuoja) {
+                                    muuJuoja = uusi.tunnus;
                                     tyhjennaKentat();
-                                    uTYhteys.lueKayttajanTiedot(kayttaja);
-                                    uTYhteys.lueKayttajanKirjaukset(kayttaja, 0)
+                                    uTYhteys.lueKayttajanTiedot(muuJuoja);
+                                    uTYhteys.lueKayttajanKirjaukset(muuJuoja, 0)
                                 }
 
                                 if (uusi._muuttunut) {
-                                    uTYhteys.lueKayttajanTiedot(kayttaja);
+                                    uTYhteys.lueKayttajanTiedot(muuJuoja);
                                 }
                             })
                         }
@@ -664,7 +503,7 @@ Page {
                 onMovementEnded: {
                     if (atYEnd) {
                         var vikaKirjaus = kirjausLista.get(kirjausLista.count-1).checkinId
-                        uTYhteys.lueKayttajanKirjaukset(kayttaja, vikaKirjaus - 1)
+                        uTYhteys.lueKayttajanKirjaukset(muuJuoja, vikaKirjaus - 1)
                     }
                 }
 
@@ -675,17 +514,177 @@ Page {
         VerticalScrollDecorator{}
     }
 
-    Component.onCompleted: {
-        if (UnTpd.unTpToken > ""){
-            avaaKirjautumissivu = false
-            haeKayttajatiedot = false
-            uTYhteys.lueKayttajanTiedot(kayttaja)
-            uTYhteys.lueKayttajanKirjaukset(kayttaja)
-        }
+    function kirjaudu() {
+        var sivu=pageContainer.push(Qt.resolvedUrl("unTpKirjautuminen.qml"));
+        sivu.muuttuu.connect( function() {
+            tyhjennaKentat();
+            if (UnTpd.unTpToken != ""){
+                muuJuoja = "";
+                uTYhteys.lueKayttajanTiedot(muuJuoja);
+                uTYhteys.lueKayttajanKirjaukset(muuJuoja, 0);
+            }
+            return;
+        })
+        return;
     }
 
-    Component.onDestruction: {
-        sulkeutuu()
+    function kirjoitaKirjaukset(jsonVastaus) {
+        var vastaus = jsonVastaus.response.checkins;
+        var id, aika = "", bid, etiketti, merkki, lausahdus, maljoja, omaMalja, huutoja, baari,
+                panimo, osallistunut, pubId;
+        var i=0, N = vastaus.count, aikams, paivays = new Date();
+        var kentta;
+        while (i < N) {
+            lausahdus = "";
+            baari = "";
+            //paikka = ""
+            panimo = "";
+
+            id = vastaus.items[i].checkin_id;
+            bid = vastaus.items[i].beer.bid;
+            etiketti = vastaus.items[i].beer.beer_label;
+            merkki = vastaus.items[i].beer.beer_name;
+
+            lausahdus = vastaus.items[i].checkin_comment;
+
+            aikams = Date.parse(vastaus.items[i].created_at);
+            paivays.setTime(aikams);
+            pvm = paivays;
+            aika = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat);
+
+            if ("venue_name" in vastaus.items[i].venue) {
+                baari = vastaus.items[i].venue.venue_name;
+            } else {
+                baari = "";
+            }
+            if ("venue_id" in vastaus.items[i].venue) {
+                pubId = vastaus.items[i].venue.venue_id;
+            } else {
+                pubId = -1;
+            }
+            panimo = vastaus.items[i].brewery.brewery_name;
+            //}
+
+            maljoja = vastaus.items[i].toasts.count;
+            omaMalja = vastaus.items[i].toasts.auth_toast;
+            huutoja = vastaus.items[i].comments.count;
+            osallistunut = olenkoJutellut(vastaus.items[i].comments);
+            kirjausLista.lisaa(id, bid, aika, "", muuJuoja, "", etiketti, merkki, panimo,
+                                      baari, pubId, maljoja, omaMalja, lausahdus, huutoja,
+                                      vastaus.items[i].comments, osallistunut);
+            i++;
+        }
+        return;
+    }
+
+    function kirjoitaTiedot(jsonVastaus){
+        var vastaus;
+        if ("user" in jsonVastaus.response) {
+            vastaus = jsonVastaus.response.user;
+        } else {
+            return;
+        }
+
+        if (UnTpd.kayttaja === "") {
+            UnTpd.kayttaja = vastaus.user_name;
+        }
+
+        if (vastaus.user_name !== UnTpd.kayttaja) {
+            muuJuoja = vastaus.user_name;
+        } else {
+            muuJuoja = "";
+        }
+        otsikko.title = vastaus.user_name + " @UnTappd";
+        nimi.text = vastaus.first_name + " " + vastaus.last_name;
+        nimi.color = Theme.highlightColor;
+        logo.kId = vastaus.uid;
+
+        kuva1.source = vastaus.user_avatar;
+        kuva2.source = vastaus.user_cover_photo;
+
+        if (vastaus.bio != "") {
+            kuvaus.text = vastaus.bio;
+            kuvaus.label = vastaus.location + vastaus.url;
+        } else {
+            kuvaus.text = vastaus.url;
+            kuvaus.label = vastaus.location;
+        }
+
+        if (vastaus.stats.total_badges > 0){
+            merkkeja.text = qsTr("badges") + " ...";
+            merkkeja.color = Theme.primaryColor;
+        }
+        merkkeja.label = vastaus.stats.total_badges;
+
+        if (vastaus.stats.total_friends > 0)
+            kavereita.text = qsTr("friends");
+        kavereita.label = vastaus.stats.total_friends;
+
+        if (vastaus.stats.total_checkins > 0)
+            kirjauksia.text = qsTr("checkins");
+        kirjauksia.label = vastaus.stats.total_checkins;
+
+        if (vastaus.stats.total_beers > 0)
+            oluita.text = qsTr("beers");
+        oluita.label = vastaus.stats.total_beers;
+
+        if (vastaus.stats.total_created_beers > 0)
+            luodutOluet.text = qsTr("beers created");
+        luodutOluet.label = vastaus.stats.total_created_beers;
+
+        if (vastaus.stats.total_photos > 0)
+            kuvia.text = qsTr("photos");
+        kuvia.label = vastaus.stats.total_photos;
+
+        if (vastaus.stats.total_followings > 0)
+            seurattavia.text = qsTr("followed");
+        seurattavia.label = vastaus.stats.total_followings;
+
+        return;
+    }
+
+    function olenkoJutellut(jutut) {
+        var juttuja = jutut.count, i = 0;
+        while(i < juttuja){
+            if (jutut.items[i].comment_editor == true)
+                return true;
+            i++;
+        }
+
+        return false;
+    }
+
+    function tyhjennaKentat() {
+        otsikko.title = qsTr("UnTappd account");
+        nimi.text = qsTr("");
+        //nimi.color = Theme.secondaryHighlightColor
+        //nimi.label = ""
+        kuva1.source = "";
+        kuva2.source = "";
+        kuvaus.text = "";
+        kuvaus.label = "";
+        merkkeja.text = "";
+        merkkeja.label = "";
+        kavereita.text = "";
+        kavereita.label = "";
+        kirjauksia.text = "";
+        kirjauksia.label = "";
+        oluita.text = "";
+        oluita.label = "";
+        luodutOluet.text = "";
+        luodutOluet.label = "";
+        kuvia.text = "";
+        kuvia.label = "";
+        seurattavia.text = "";
+        seurattavia.label = "";
+
+        tyhjennaKirjaukset();
+
+        return;
+    }
+
+    function tyhjennaKirjaukset() {
+        return kirjausLista.clear();
     }
 
 }

@@ -1,14 +1,13 @@
 .pragma library
 
 var apiUrl = "https://api.foursquare.com/v2/"
-var appId = ""
-var appSecret = ""
-var fsqrVersion = ""
-var lastLat = 61.61
-var lastLong = 22.58
+//var appId = ""
+//var appSecret = ""
+//var fsqrVersion = ""
+var lastLat = 61.61, lastLong = 22.58
 
-function auth() {
-    return "client_id=" + appId + "&client_secret=" + appSecret + "&v=" + fsqrVersion
+function auth(appId, appSecret, fsqrVersion) {
+    return "client_id=" + appId + "&client_secret=" + appSecret + "&v=" + fsqrVersion;
 }
 
 function searchVenue(intent, valid, lat, long, radius, limit, category, query) {

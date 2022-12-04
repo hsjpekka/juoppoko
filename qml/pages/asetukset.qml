@@ -3,6 +3,11 @@ import Sailfish.Silica 1.0
 
 Dialog {
     id: sivu
+
+    Component.onCompleted: {
+        alkutoimet()
+    }
+
     property int massa0
     property int massa
     property real vetta0
@@ -397,10 +402,6 @@ Dialog {
 
         }// column
 
-    }
-
-    Component.onCompleted: {
-        alkutoimet()
     }
 
     function alkutoimet() {

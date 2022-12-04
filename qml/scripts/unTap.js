@@ -9,22 +9,22 @@ var programName = "", queryLimit = 25
 var kayttaja = ""
 var unTpdId = "" // ohjelman clientId
 var unTpOsoite = "https://api.untappd.com/v4" // url
-var unTpdSecret = "" // ohjelman salasana
+//var unTpdSecret = "" // ohjelman salasana
 var unTpToken = "" // käyttäjän valtuutus
 var yhteys = ""
 
 function olutVaihtuu(beerId){
     if (beerId != oluenId) {
-        oluenEtiketti = ""
-        oluenHappamuus = -1
-        oluenId = beerId
-        oluenNimi = ""
-        oluenPanimo = ""
-        oluenTyyppi = ""
-        oluenVahvuus = -1
-        saateSanat = ""
+        oluenEtiketti = "";
+        oluenHappamuus = -1;
+        oluenId = beerId;
+        oluenNimi = "";
+        oluenPanimo = "";
+        oluenTyyppi = "";
+        oluenVahvuus = -1;
+        saateSanat = "";
     }
-    return
+    return;
 }
 
 //
@@ -34,7 +34,7 @@ function olutVaihtuu(beerId){
 
 function userAut() {
     // access_token=ACESSTOKENHERE
-    return "access_token=" + unTpToken
+    return "access_token=" + unTpToken;
 }
 
 //function appAut() {
