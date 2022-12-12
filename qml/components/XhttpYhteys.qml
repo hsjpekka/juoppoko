@@ -390,10 +390,10 @@ Item {
         }
         if (!naytaVainVirheet)
             yhteys.nakyville(); //yhteys.state = "nakyvilla";
+
         if (lisattavat === undefined) {
             lisattavat = "";
         }
-
         if (UnTpd.unTpToken > "") {
             lisattavat += untpdKysely.keyToken();
         } else {

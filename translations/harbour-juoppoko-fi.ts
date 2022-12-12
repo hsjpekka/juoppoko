@@ -136,6 +136,10 @@
         <source>%1 ‰ at</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>My unTappd account</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UnTpKirjauksenKooste</name>
@@ -899,10 +903,6 @@
 <context>
     <name>unTpKirjautuminen</name>
     <message>
-        <source>cancel</source>
-        <translation>peru</translation>
-    </message>
-    <message>
         <source>sign out</source>
         <translation>kirjaudu ulos</translation>
     </message>
@@ -943,11 +943,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To use your unTappd-profile, sign in at %1 and follow the instructions below, or try the browser (pull down menu).</source>
+        <source>signing out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Amber authenticate</source>
+        <source>To use your unTappd-profile, choose &apos;authenticate&apos; in the pull down menu, or follow the instructions below.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

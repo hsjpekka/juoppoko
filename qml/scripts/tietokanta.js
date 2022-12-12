@@ -109,10 +109,10 @@ function lisaaTkJuodut(xid, hetki, maara, vahvuus, juoma, kuvaus, olutId) {
 
 function lueTkAsetukset() {
     var luettu = 0, vanhaVaihdosTunnus = false, mj;
-    mj = "SELECT asia, arvo FROM asetukset";
 
     if(tkanta === null) return luettu;
 
+    mj = "SELECT asia, arvo FROM asetukset";
     try {
         tkanta.transaction(function(tx) {
             var taulukko  = tx.executeSql(mj);
@@ -202,6 +202,7 @@ function lueTkAsetukset() {
                 //console.log("asetukset2: " + taulukko2.rows[luettu2].asia + " " + taulukko2.rows[luettu2].arvo)
                 if (taulukko2.rows[luettu2].asia === tunnusUnTappdToken ){
                     arvoUnTpToken = taulukko2.rows[luettu2].arvo;
+                    console.log("unTappdToken: " + arvoUnTpToken);
                     if (arvoUnTpToken === null || arvoUnTpToken === undefined)
                         arvoUnTpToken = "";
                     if (arvoUnTpToken !== "")
@@ -561,8 +562,9 @@ function paivitaAsetus2(tunnus, arvo) {
     // tunnus string, arvo string
     if(tkanta === null) return;
     if (tunnus === tunnusUnTappdToken) {
+        console.log("paivitaAsetus2: " + tunnus + ", " + arvo);
         if (arvo === null || arvo === "" || arvo === undefined)
-            luettuUnTpToken = false
+            luettuUnTpToken = false;
         else
             luettuUnTpToken = true;
     }

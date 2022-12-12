@@ -10,8 +10,8 @@ Page {
 
     Component.onCompleted: {
         if (UnTpd.unTpToken > ""){
-            avaaKirjautumissivu = false
-            haeKayttajatiedot = false
+            //avaaKirjautumissivu = false
+            //haeKayttajatiedot = false
             uTYhteys.lueKayttajanTiedot(muuJuoja)
             uTYhteys.lueKayttajanKirjaukset(muuJuoja)
             console.log("käyttäjä" + muuJuoja)
@@ -24,19 +24,15 @@ Page {
 
     signal sulkeutuu
 
-    property bool   avaaKirjautumissivu: true
-    property bool   haeKayttajatiedot: true
     property string ilmoitukset: ""
     property string muuJuoja: ""
     property bool   lueUudelleen: false
     property date   pvm
     property bool   tilastotNakyvat: false
-    //property int    valittu
 
     XhttpYhteys {
         id: uTYhteys
         anchors.top: parent.top
-        //xhttp: untpdKysely
         z: 1
         onValmis: {
             var jsonVastaus;
@@ -81,7 +77,6 @@ Page {
 
         function lueKayttajanTiedot(tunnus) { // jos tunnus = "" hakee omat tiedot
             var kysely;
-            //toiminto = "tiedot";
             kysely = UnTpd.getUserInfo(tunnus,"true");
             xHttpGet(kysely[0], kysely[1], "tiedot");
             return;
@@ -89,7 +84,6 @@ Page {
 
         function lueKayttajanKirjaukset(tunnus, eka) { // jos tunnus = "" hakee omat tiedot
             var kysely;
-            //toiminto = "kirjaukset";
             kysely = UnTpd.getUserFeed(tunnus, eka);
             xHttpGet(kysely[0], kysely[1], "kirjaukset");
             return;
@@ -97,10 +91,7 @@ Page {
 
         function lueIlmoitukset() {
             var kysely;
-            //toiminto = "uutiset";
-
             kysely = UnTpd.getNotifications();//(offset, limit)
-
             xHttpGet(kysely[0], kysely[1], "uutiset");
 
             return;
@@ -118,7 +109,6 @@ Page {
 
         function unTpdToast(ckId) {
             var kysely = "";
-            //toiminto = "kippis";
             kysely = UnTpd.toast(ckId);
             xHttpPost(kysely[0], kysely[1], "kippis");
             return;
@@ -126,10 +116,8 @@ Page {
 
         function pyydaKaveriksi(kid) {
             var kysely = "";
-            //toiminto = "kaveriksi"
             kysely = UnTpd.requestFriend(kid);
             xHttpGet(kysely[0], kysely[1], "kaveriksi")
-            console.log("kaveripyyntö: " + kysely);
             return;
         }
     }
@@ -537,7 +525,6 @@ Page {
         while (i < N) {
             lausahdus = "";
             baari = "";
-            //paikka = ""
             panimo = "";
 
             id = vastaus.items[i].checkin_id;
@@ -563,15 +550,15 @@ Page {
                 pubId = -1;
             }
             panimo = vastaus.items[i].brewery.brewery_name;
-            //}
 
             maljoja = vastaus.items[i].toasts.count;
             omaMalja = vastaus.items[i].toasts.auth_toast;
             huutoja = vastaus.items[i].comments.count;
             osallistunut = olenkoJutellut(vastaus.items[i].comments);
-            kirjausLista.lisaa(id, bid, aika, "", muuJuoja, "", etiketti, merkki, panimo,
-                                      baari, pubId, maljoja, omaMalja, lausahdus, huutoja,
-                                      vastaus.items[i].comments, osallistunut);
+            kirjausLista.lisaa(id, bid, aika, "", muuJuoja, "", etiketti,
+                               merkki, panimo, baari, pubId, maljoja,
+                               omaMalja, lausahdus, huutoja,
+                               vastaus.items[i].comments, osallistunut);
             i++;
         }
         return;
@@ -657,8 +644,6 @@ Page {
     function tyhjennaKentat() {
         otsikko.title = qsTr("UnTappd account");
         nimi.text = qsTr("");
-        //nimi.color = Theme.secondaryHighlightColor
-        //nimi.label = ""
         kuva1.source = "";
         kuva2.source = "";
         kuvaus.text = "";

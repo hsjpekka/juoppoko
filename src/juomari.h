@@ -37,7 +37,7 @@ public:
     Q_INVOKABLE double lueMaksa(QDateTime pvm = QDateTime::currentDateTime());
     Q_INVOKABLE double luePaino(QDateTime pvm = QDateTime::currentDateTime());
     Q_INVOKABLE double lueVesimaara(QDateTime pvm = QDateTime::currentDateTime());
-    Q_INVOKABLE int muutaJuoma(int id, int ml, double prosentteja, QDateTime aika, bool paivitaRajat = true);
+    Q_INVOKABLE int muutaJuoma(int id, int ml, double prosentteja, QDateTime aika);
     Q_INVOKABLE bool onkoOletukset();
     Q_INVOKABLE void paivitaRajat();
     Q_INVOKABLE double paljonkoAikana(QDateTime alku, QDateTime loppu, bool paivittain = true); // ml aikavälillä

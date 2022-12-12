@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
     untpdkysely.setOAuthId(UTPD_ID);
     untpdkysely.setOAuthSecret(UTPD_SECRET);
     untpdkysely.setOAuthRedirect(CB_URL);
+    untpdkysely.setServer("https","api.untappd.com");
     untpdkysely.setOAuthPath("https://untappd.com/oauth/authenticate/");
     untpdkysely.setOAuthTokenPath("https://untappd.com/oauth/authorize/");
-    untpdkysely.setServer("https","api.untappd.com");
     untpdkysely.setQueryParameter("fsqClientId", FSQ_ID, "client_id");
     untpdkysely.setQueryParameter("fsqClientSecret", FSQ_SECRET, "client_secret");
     untpdkysely.setQueryParameter("fsqVersion", FSQ_VERSIO, "v");
@@ -60,12 +60,14 @@ int main(int argc, char *argv[])
     view->engine()->rootContext()->setContextProperty("ccKohde", "kone");
     view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
     view->engine()->rootContext()->setContextProperty("unTappdCb", CB_URL);
+    //view->engine()->rootContext()->setContextProperty("unTappdSe", UTPD_SECRET);
     view->engine()->rootContext()->setContextProperty("untpdKysely", &untpdkysely);
     view->engine()->rootContext()->setContextProperty("juoja", &juoja);
     view->engine()->rootContext()->setContextProperty("testaaja", &ennustaja);
 
     view->setSource(SailfishApp::pathToMainQml());
     view->show();
+
     return app->exec();
 
     /*

@@ -16,12 +16,7 @@ unTpd::unTpd(QObject *parent) : QObject(parent)
 {
     scheme = "https";
     server = "api.untappd.com";
-    //pathCommon = "/v4";
     serverPort = -1;
-    //keyError = "status";
-    //isClientIdNeeded = false;
-    //isClientSecretNeeded = false;
-    //isTokenRequired = false;
 }
 
 int unTpd::addToQuery(QUrlQuery &query, QString keyList)
@@ -30,6 +25,7 @@ int unTpd::addToQuery(QUrlQuery &query, QString keyList)
     //QString result;
     int i, iN, j, jN, result;
     bool search;
+    qDebug() << "addToQuery:  " << query.toString() << keyList;
     keyList.replace(" ", "");
     keys = keyList.split(",",QString::SkipEmptyParts);
     result = 0;
@@ -42,8 +38,10 @@ int unTpd::addToQuery(QUrlQuery &query, QString keyList)
         while (j < jN && search) {
             //qInfo() << storedParameters.at(j).id << keys.at(i);
             if (storedParameters.at(j).id == keys.at(i)) {
+                qInfo() << "löytyi" << i << j << keys.at(i) << storedParameters.at(j).value;
                 search = false;
             } else {
+                qInfo() << "onko?" << i << j << keys.at(i) << "=" << storedParameters.at(j).id << "(" << storedParameters.at(j).value << ")";
                 j++;
             }
         }
@@ -54,30 +52,10 @@ int unTpd::addToQuery(QUrlQuery &query, QString keyList)
         i++;
     }
 
-    qInfo() << query.toString() << keyList << iN << jN;
+    qInfo() << query.toString() << keyList << iN << j << jN << search;
 
     return result;
 }
-
-/*
-void unTpd::appendClientId(bool isRequired)
-{
-    isClientIdNeeded = isRequired;
-    return;
-}
-
-void unTpd::appendClientSecret(bool isRequired)
-{
-    isClientSecretNeeded = isRequired;
-    return;
-}
-
-void unTpd::appendUserToken(bool isRequired)
-{
-    isTokenRequired = isRequired;
-    return;
-}
-// */
 
 void unTpd::assembleUrl(QUrl &url, QString path, QString definedQuery, QString paramsToAdd)
 {
@@ -284,26 +262,6 @@ void unTpd::authenticateAmber(QString pathAuthorization, QString redirect, QStri
     return;
 }
 // */
-/*
-void unTpd::download()
-{
-    QUrl url;
-    QUrlQuery query;
-    QNetworkRequest request;
-    QString path;
-
-    url.setScheme(scheme);
-    url.setHost(server);
-    url.setPath(path);
-    //query.addQueryItem("access_token", userToken);
-    url.setQuery(query);
-    request.setUrl(url);
-
-    //activityReply = netManager.get(request);
-    //connect(activityReply, SIGNAL(finished()), this, SLOT(fromCloudActivity()));
-
-    return;
-} // */
 
 QString unTpd::errorStatusToString(QueryStatus status)
 {
@@ -430,18 +388,6 @@ QString unTpd::keyToken()
     return tokenKey;
 }
 
-//void unTpd::oauth2ErrorChanged()
-//{
-//    qWarning() << "Error! " << oauth2.error().code() << ":" << oauth2.error().message();
-//}
-
-//void unTpd::redirectListenerFailed()
-//{
-//    qWarning() << "Redirect listener failed to listen!";
-//    emit failed();
-//    return;
-//}
-
 bool unTpd::queryGet(QString queryId, QString url) {
     QUrl u(url);
     return sendRequest(queryId, u, true);
@@ -461,13 +407,6 @@ bool unTpd::queryPost(QString queryId, QString path, QString definedQuery, QStri
 {
     return sendRequest(queryId, path, parametersToAdd, definedQuery, false);
 }
-
-/*
-QString unTpd::readOauthToken()
-{
-    return oauthToken;
-}
-// */
 
 QString unTpd::readOAuth2Token() {
     return oauthToken;
@@ -563,7 +502,7 @@ bool unTpd::sendRequest(QString queryId, QString path, QString parametersToAdd, 
 {
     QUrl url;
     assembleUrl(url, path, definedQuery, parametersToAdd);
-    qDebug() << url.toString();
+    qDebug() << url.toString() << parametersToAdd;
     return sendRequest(queryId, url, isGet);
 }
 
@@ -657,11 +596,14 @@ int unTpd::setQueryParameter(QString id, QString value, QString key)
 {
     int i, N;
     keyValuePair keyValue;
-    if (id.isNull() || id.isEmpty() || value.isNull()) {
+    if (id.isEmpty()) {
         return -1;
     }
-    if (key.isNull() || key.isEmpty()) {
+    if (key.isEmpty()) {
         key = id;
+    }
+    if (value.isNull()) {
+        value = "";
     }
     i = 0;
     N = storedParameters.length();
@@ -681,60 +623,6 @@ int unTpd::setQueryParameter(QString id, QString value, QString key)
 
     return storedParameters.length();
 }
-
-/*
-bool unTpd::setAuthorityToken(QString key, QString token)
-{
-    bool result = true;
-    if(!key.isNull()) {
-        authTokenKey = key;
-    } else {
-        result = false;
-    }
-    if (!token.isNull()) {
-        authToken = token;
-    } else {
-        result = false;
-    }
-
-    return result;
-}
-
-bool unTpd::setQueryAuthority(QString idKey, QString id, QString secretKey, QString secret)
-{
-    bool tulos = true;
-    if (!id.isNull() && !idKey.isNull()) {
-        appIdKey = idKey;
-        appId = id;
-    } else {
-        tulos = false;
-    }
-    if (!secret.isNull() && !secretKey.isNull()) {
-        appSecret = secret;
-        appSecretKey = secretKey;
-    } else {
-        tulos = false;
-    }
-
-    return tulos;
-}
-
-bool unTpd::setUserAuthority(QString user, QString passwd)
-{
-    bool result = true;
-    if (!user.isNull()) {
-        userName = user;
-    } else {
-        result = false;
-    }
-    if (!passwd.isNull()) {
-        userPassword = passwd;
-    } else {
-        result = false;
-    }
-    return result;
-}
-//*/
 
 bool unTpd::setServer(QString protocol, QString address, int port)
 {

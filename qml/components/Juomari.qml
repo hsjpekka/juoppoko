@@ -60,7 +60,7 @@ Item {
     }
 
     function juodunAika(xid) {
-        var ms = -1
+        var ms = -1;
 
         if (xid >= 0 && xid < juomat.count) {
             ms = juomat.get(xid).msPvm*msPaivassa + juomat.get(xid).kelloMs;
@@ -68,21 +68,29 @@ Item {
         } else if (xid === undefined && juomat.count > 0) {
             ms = juomat.get(juomat.count-1).msPvm*msPaivassa + juomat.get(juomat.count-1).kelloMs;
         } else {
-            console.log("index out of list");
+            console.log("Juomari: xid listan ulkopuolella.");
+        }
+        if (ms === undefined) {
+            ms = -1;
+            console.log("Juomari: aikaa ei määritetty.");
         }
 
-        return ms
+        return ms;
     }
 
     function juodunNimi(xid) {
-        var nimi = ""
+        var nimi = "";
         if (xid >= 0 && xid < juomat.count) {
             nimi = juomat.get(xid).juomanNimi;
         } else if (xid === undefined && juomat.count > 0) {
             nimi = juomat.get(juomat.count-1).juomanNimi;
         }
+        if (nimi === undefined) {
+            nimi = "";
+            console.log("Juomari: juoman nimeä ei määritetty.");
+        }
 
-        return nimi
+        return nimi;
     }
 
     function juodunKuvaus(xid) {
@@ -92,58 +100,82 @@ Item {
         } else if (xid === undefined && juomat.count > 0) {
             mj = juomat.get(juomat.count-1).kuvaus;
         }
-        return mj
+        if (mj === undefined) {
+            mj = "";
+            console.log("Juomari: kuvausta ei määritetty.");
+        }
+        return mj;
     }
 
     function juodunOlutId(xid) {
-        var olut = -1
+        var olut = -1;
         if (xid >= 0 && xid < juomat.count) {
             olut = juomat.get(xid).oluenId;
         } else if (xid === undefined && juomat.count > 0) {
             olut = juomat.get(juomat.count-1).oluendId;
         }
+        if (olut === undefined) {
+            olut = -1;
+            console.log("Juomari: oluen tunnusta ei määritetty.");
+        }
 
-        return olut
+        return olut;
     }
 
     function juodunPohjilla(xid) {
-        var ml = -1
+        var ml = -1;
         if (xid >= 0 && xid < juomat.count) {
             ml = juomat.get(xid).mlVeressa;
         } else if (xid === undefined && juomat.count > 0) {
             ml = juomat.get(juomat.count-1).mlVeressa;
         }
-        return ml
+        if (ml === undefined) {
+            ml = -1;
+            console.log("Juomari: pohjia ei määritetty.");
+        }
+        return ml;
     }
 
     function juodunTilavuus(xid) {
-        var ml = -1
+        var ml = -1;
         if (xid >= 0 && xid < juomat.count) {
             ml = juomat.get(xid).juomanTilavuus;
         } else if (xid === undefined && juomat.count > 0) {
             ml = juomat.get(juomat.count-1).juomanTilavuus;
         }
-        return ml
+        if (ml === undefined) {
+            ml = -1;
+            console.log("Juomari: juoman kokoa ei määritetty.");
+        }
+        return ml;
     }
 
     function juodunTunnus(xid) {
-        var mj = ""
+        var mj = "";
         if (xid >= 0 && xid < juomat.count){
             mj = juomat.get(xid).tunnus;
         } else if (xid === undefined && juomat.count > 0) {
             mj = juomat.get(juomat.count-1).tunnus;
         }
-        return mj
+        if (mj === undefined) {
+            mj = "";
+            console.log("Juomari: juoman arkistointitunnusta ei määritetty.");
+        }
+        return mj;
     }
 
     function juodunVahvuus(xid) {
-        var pros = -1
+        var pros = -1;
         if (xid >= 0 && xid < juomat.count){
             pros = juomat.get(xid).juomanPros;
         } else if (xid === undefined && juomat.count > 0) {
             pros = juomat.get(juomat.count-1).juomanPros;
         }
-        return pros // %
+        if (pros === undefined) {
+            pros = -1;
+            console.log("Juomari: vahvuutta ei määritetty.");
+        }
+        return pros; // %
     }
 
     function juotuAikana(kesto, loppuHetki) {

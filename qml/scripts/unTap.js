@@ -9,7 +9,7 @@ var programName = "", queryLimit = 25
 var kayttaja = ""
 var unTpdId = "" // ohjelman clientId
 var unTpOsoite = "https://api.untappd.com/v4" // url
-//var unTpdSecret = "" // ohjelman salasana
+var unTpdSecret = "" // ohjelman salasana
 var unTpToken = "" // käyttäjän valtuutus
 var yhteys = ""
 
@@ -564,7 +564,7 @@ function getUserInfo(targetName, compact) { //(address1, appReg, auth, targetNam
     //else
     //    query +=  userAut();
 
-    if (compact != "")
+    if (compact > "")
         parameters = "compact=" + compact;
 
     //return encodeURI(query);

@@ -4,7 +4,7 @@
 juomari::juomari(QObject *parent) : QObject(parent)
 {
     omaKeho oletusKeho;
-    oletusKeho.aika = QDate(0,0,0);
+    oletusKeho.aika = QDate(1,1,1);
     oletusKeho.maksa = oletusMaksa;
     oletusKeho.paino = oletusPaino;
     oletusKeho.vesiPros = oletusVesi;
@@ -13,7 +13,6 @@ juomari::juomari(QObject *parent) : QObject(parent)
     imeytymisaika = 0; // h
     vrkVaihtuu.setHMS(5,0,0,0); // 5:00-4:59 samaa päivää
 
-    //qInfo() << QDateTime(QDate(1, 1, 1)).toString();
     asetaPohjat(0, QDateTime(QDate(1, 1, 1)));
 
     raja1 = 0.5;
@@ -54,11 +53,7 @@ juomari::mlMaarat juomari::alkoholiaMl(QDateTime nyt, int iJuoma, int iKeho) {
     mlImeytynyt = osuus*mlVatsassa - edellinen.veressaEnnen;
     mlVeressa = edellinen.veressaEnnen + mlImeytynyt;
 
-    //if (tarkka) {
-        mlPalanut = eroTunti*palonopeus(iKeho);
-    //} else {
-    //    palanut = eroTunti*palonopeus();
-    //}
+    mlPalanut = eroTunti*palonopeus(iKeho);
     if (mlPalanut > mlVeressa) {
         mlPalanut = mlVeressa;
     } else if (mlPalanut < 0) {
@@ -265,7 +260,6 @@ int juomari::asetaPohjat(double mlAlkoholia, QDateTime aika) {
         onnistuiko = -1;
     }
 
-    qInfo() << "uudet pohjat " << mlAlkoholia << "ml" << onnistuiko << aika.date().toString();
     return onnistuiko;
 }
 
@@ -418,7 +412,6 @@ int juomari::juo(int id, int ml, double prosentteja, QDateTime aika, bool paivit
     }
 
     i = etsiJuomanJarjestys(aika);
-    //qInfo() << juodut.length() << i;
 
     ryyppy.aika = aika;
     ryyppy.id = id;
@@ -426,9 +419,7 @@ int juomari::juo(int id, int ml, double prosentteja, QDateTime aika, bool paivit
     ryyppy.pros = prosentteja/100;
     paljonkoPohjia(ryyppy, aika, i);
 
-    //qInfo() << juodut.length() << i;
     juodut.insert(i, ryyppy);
-    //qInfo() << juodut.length() << i;
 
     if (paivita) {
         paivitaRajat();
@@ -589,7 +580,7 @@ QDateTime juomari::milloinPromilleja(double prom, QDateTime aika) {
 
     tunteja = (alkoholia - alkoholiaRajalla)/palonopeus(i);
 
-    return aika.addMSecs(tunteja*msTunti);
+    return ryyppy.aika.addMSecs(tunteja*msTunti);
 }
 
 double juomari::mlPromilleiksi(double ml, QDateTime aika) {
@@ -603,7 +594,7 @@ double juomari::mlPromilleiksi(double ml, QDateTime aika) {
     return promillet;
 }
 
-int juomari::muutaJuoma(int id, int ml, double prosentteja, QDateTime aika, bool paivitaRajat) {
+int juomari::muutaJuoma(int id, int ml, double prosentteja, QDateTime aika) {
     int i;
     juotu ryyppy;
 
@@ -624,15 +615,7 @@ int juomari::muutaJuoma(int id, int ml, double prosentteja, QDateTime aika, bool
 
     laskeUudelleen(i);
 
-    if (paivitaRajat) {
-        if (juodut.length() > 0) {
-            milloinRajalla = milloinPromilleja(raja1, juodut.last().aika);
-            milloinSelvana = milloinPromilleja(0, juodut.last().aika);
-        } else {
-            milloinRajalla = milloinPromilleja(raja1, pohjat.aika);
-            milloinSelvana = milloinPromilleja(0, pohjat.aika);
-        }
-    }
+    paivitaRajat();
 
     return 0;
 }
@@ -655,8 +638,13 @@ bool juomari::onkoOletukset() {
 }
 
 void juomari::paivitaRajat() {
-    milloinRajalla = milloinPromilleja(raja1);
-    milloinSelvana = milloinPromilleja(0);
+    if (juodut.length() > 0) {
+        milloinRajalla = milloinPromilleja(raja1, juodut.last().aika);
+        milloinSelvana = milloinPromilleja(0, juodut.last().aika);
+    } else {
+        milloinRajalla = milloinPromilleja(raja1, pohjat.aika);
+        milloinSelvana = milloinPromilleja(0, pohjat.aika);
+    }
     return;
 }
 
@@ -671,7 +659,11 @@ double juomari::paljonkoAikana(QDateTime alku, QDateTime loppu, bool paivittain)
     }
     nPaivia = juodut.at(0).aika.daysTo(juodut.last().aika);
     iPaivia = juodut.at(0).aika.daysTo(alku);
-    i = juodut.count() * iPaivia / nPaivia;
+    if (nPaivia == 0) {
+        i = juodut.count() - 1;
+    } else {
+        i = juodut.count() * iPaivia / nPaivia;
+    }
     if (i >= juodut.count()) {
         i = juodut.count() - 1;
     } else if (i < 0) {
@@ -684,7 +676,7 @@ double juomari::paljonkoAikana(QDateTime alku, QDateTime loppu, bool paivittain)
         i++;
     }
     tulos = 0;
-    while (i < juodut.count() && juodut.at(i).aika < loppu) {
+    while (i < juodut.count() && juodut.at(i).aika <= loppu) {
         tulos += juodut.at(i).ml*juodut.at(i).pros;
         i++;
     }
@@ -791,14 +783,6 @@ double juomari::promilleja(QDateTime aika, bool veresta) {
     return tulos;
 }
 
-//double juomari::promilleja(QDateTime aika, bool veresta) {
-//    return promilleja(false, aika);
-//}
-
-//double juomari::promilleja(qint64 ms1970) {
-//    return promilleja(QDateTime::fromMSecsSinceEpoch(ms1970));
-//}
-
 double juomari::promilleja(qint64 ms1970, bool veresta) {
     return promilleja(QDateTime::fromMSecsSinceEpoch(ms1970), veresta);
 }
@@ -816,14 +800,16 @@ double juomari::promilletMlitroiksi(double promillet, QDateTime aika) {
 
 QDateTime juomari::rajalla() {
     if (!milloinRajalla.isValid()) {
-        milloinRajalla = milloinPromilleja(raja1);
+        milloinRajalla = milloinPromilleja(raja1, juodut.last().aika);
     }
+    qDebug() << "rajalla " << milloinRajalla.toLocalTime();
     return milloinRajalla;
 }
 
 QDateTime juomari::selvana() {
     if (!milloinSelvana.isValid()) {
-        milloinSelvana = milloinPromilleja(0);
+        milloinSelvana = milloinPromilleja(0, juodut.last().aika);
     }
+    qDebug() << "selvänä " << milloinSelvana.toLocalTime();
     return milloinSelvana;
 }

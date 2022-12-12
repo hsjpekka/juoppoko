@@ -5,81 +5,86 @@ import "../scripts/unTap.js" as UnTpd
 
 Page {
     id: sivu
-    //property int hakuNro: 0
-    //property int merkkejaSivulla: 50
+    Component.onCompleted: {
+        if (haeKaikki)
+            uTYhteys.haeMerkit()
+        else
+            naytaUudet()
+    }
+
     property bool   haeKaikki: true
     property bool   kaikkiHaettu: false
     property string kayttajaTunnus: "" // itse, jos ""
     property bool   naytaKuvaus: false
 
     function lueMerkit(merkkiTiedot) {
-        var i = 0, taso = "", mj = ""
-        console.log("merkkejä " + merkkiTiedot.count)
+        var i = 0, taso = "", mj = "";
+        //console.log("merkkejä " + merkkiTiedot.count)
 
         while (i < merkkiTiedot.count){
-            if (merkkiTiedot.items[i].is_level)
-                taso = merkkiTiedot.items[i].levels.count + ""
+            if (merkkiTiedot.items[i].is_level) {
+                taso = merkkiTiedot.items[i].levels.count + "";
+            }
 
             isotMerkit.lisaaIsoMerkki(merkkiTiedot.items[i].media.badge_image_lg,
                            merkkiTiedot.items[i].badge_name,
                             merkkiTiedot.items[i].badge_description,
-                            merkkiTiedot.items[i].created_at)
+                            merkkiTiedot.items[i].created_at);
 
-            i++
+            i++;
         }
-        return
+        return;
     }
 
     function naytaUudet(){
-        var i = 0, mj = "", merkit = UnTpd.newBadges
+        var i = 0, mj = "", merkit = UnTpd.newBadges;
         if (UnTpd.newBadgesSet) {
             while (i < merkit.count) {
-                if (merkit.items[i].is_local_badge)
-                    mj = qsTr("Local Badge")
+                if (merkit.items[i].is_local_badge) {
+                    mj = qsTr("Local Badge");
+                }
                 //else
                     //mj = qsTr("not Local Badge")
 
                 if (merkit.items[i].venue_name > ""){
-                    if (mj !== "")
-                        mj += "\n"
-                    mj += merkit.items[i].venue_name
+                    if (mj !== "") {
+                        mj += "\n";
+                    }
+                    mj += merkit.items[i].venue_name;
                 }
 
                 isotMerkit.lisaaIsoMerkki(merkit.items[i].badge_image.lg,
                                merkit.items[i].badge_name,
                                merkit.items[i].badge_description,
-                               mj)
-                i++
+                               mj);
+                i++;
             }
         }
         else {
-            isotMerkit.lisaaIsoMerkki("",qsTr("No badges during this session!"), "", qsTr("Depressing."))
+            isotMerkit.lisaaIsoMerkki("",qsTr("No badges during this session!"), "", qsTr("Depressing."));
         }
 
-        return
+        return;
     }
 
     function tyhjennaIsotMerkit(){
-        //var i = isotMerkit.count
-        //while (i>0) {
-        //    isotMerkit.remove(0)
-        //    i--
-        //}
-        isotMerkit.clear()
-        uTYhteys.hakuNro = 0
+        isotMerkit.clear();
+        uTYhteys.hakuNro = 0;
 
-        return
+        return;
     }
 
     ListModel {
         id: isotMerkit
-        function lisaaIsoMerkki(merkki, nimi, kuvaus, paivays){
-            var mj= kuvaus + "\n \n" + paivays
-            console.log("erkki " + nimi + ", " + isotMerkit.count)
-            isotMerkit.append({"nimi": nimi, "merkinUrl": merkki, "kuvaus": mj })
-            valitutMerkit.positionViewAtBeginning()
 
-            return
+        function lisaaIsoMerkki(merkki, nimi, kuvaus, paivays){
+            var mj= kuvaus + "\n \n" + paivays;
+            //console.log("erkki " + nimi + ", " + isotMerkit.count)
+            isotMerkit.append({"nimi": nimi, "merkinUrl": merkki,
+                                  "kuvaus": mj });
+            valitutMerkit.positionViewAtBeginning();
+
+            return;
         }
     }
 
@@ -87,17 +92,21 @@ Page {
         id: ansiomerkki
         Item {
             id: ansio1
-            width: sivu.width
+            width: sivu.width - Theme.horizontalPageMargin
+            x: 0.5*(sivu.width - width)
             height: merkkinaytto.height + Theme.paddingLarge
-            property int reunus: Theme.paddingLarge
+            //property int reunus: Theme.paddingLarge
+            Connections {
+                target: sivu
+                onNaytaKuvausChanged: {
+                    merkinKuvaus.visible = sivu.naytaKuvaus
+                }
+            }
 
             Rectangle {
                 anchors.fill: parent
-                anchors.leftMargin: reunus + border.width
+                anchors.leftMargin: border.width
                 anchors.rightMargin: anchors.leftMargin
-                //height: ansio1.height
-                //width: ansio1.width - 2*(reunus + border.width)
-                //x: 0.5*(sivu.width - width)
                 border.width: 2
                 border.color: Theme.secondaryHighlightColor
                 radius: Theme.paddingMedium
@@ -106,31 +115,36 @@ Page {
 
             Column {
                 id: merkkinaytto
+                width: parent.width - 2*Theme.horizontalPageMargin
+                x: 0.5*(parent.width - width)
                 y: 0.5*Theme.paddingLarge
+
                 Label {
                     id: merkinNimi
                     text: nimi
-                    x: 0.5*(sivu.width - width)
-                    font.pixelSize: Theme.fontSizeLarge
+                    width: parent.width
                     color: Theme.highlightColor
+                    font.pixelSize: Theme.fontSizeLarge
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: Text.AlignHCenter
                 }
 
                 Image {
                     id: merkki
-                    source: merkinUrl                   
-                    x: 0.5*(sivu.width - width)
-                    //width: 400
+                    source: merkinUrl
+                    width: parent.width
+                    fillMode: Image.PreserveAspectFit
+                    horizontalAlignment: Image.AlignHCenter
                 }
 
-                TextArea {
+                LinkedLabel {
                     id: merkinKuvaus
                     text: kuvaus
-                    width: sivu.width - reunus*2
-                    readOnly: true
-                    visible: naytaKuvaus
+                    width: parent.width
                     color: Theme.highlightColor
-                    horizontalAlignment: TextEdit.AlignHCenter
-                    x: 0.5*(sivu.width - width)
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    visible: naytaKuvaus
                 }
             }
 
@@ -147,11 +161,6 @@ Page {
     SilicaListView {
         id: valitutMerkit
         anchors.fill: parent
-        //anchors.leftMargin: Theme.horizontalPageMargin
-        //anchors.rightMargin: Theme.horizontalPageMargin
-        //height: sivu.height// - y
-        //width: sivu.width
-        //clip: true
 
         model: isotMerkit
         header: PageHeader {
@@ -171,7 +180,6 @@ Page {
                 onClicked: {
                     haeKaikki = !haeKaikki;
                     tyhjennaIsotMerkit();
-                    //tyhjennaPienetMerkit()
                     if (haeKaikki) {
                         naytaKuvaus = false;
                         uTYhteys.haeMerkit()
@@ -184,7 +192,6 @@ Page {
                 text: naytaKuvaus? qsTr("hide descriptions") : qsTr("show descriptions")
                 onClicked: {
                     naytaKuvaus = !naytaKuvaus
-                    //kuvaustenNaytto(naytaKuvaus)
                 }
             }
         }
@@ -226,12 +233,4 @@ Page {
         VerticalScrollDecorator {}
 
     } // valitutMerkit-lista
-
-    Component.onCompleted: {
-        console.log("kayttaja: " + kayttajaTunnus + ", " + haeKaikki)
-        if (haeKaikki)
-            uTYhteys.haeMerkit()
-        else
-            naytaUudet()
-    }
 }

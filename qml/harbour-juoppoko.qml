@@ -88,7 +88,7 @@ ApplicationWindow{
         //FourSqr.fsqrVersion = fsqVer //Qt.application.arguments[args-6]
         //versioNro = Qt.application.arguments[args-7] //Qt.application.version
         //kone = ccKohde //Qt.application.arguments[args-8]
-        untpdKysely.setQueryParameter("utpToken", Tkanta.arvoUnTpToken, "access_token");
+        untpdKysely.setQueryParameter(untpdKysely.keyToken(), Tkanta.arvoUnTpToken, untpdKysely.keyToken());
         juoja.asetaVrkVaihdos(Tkanta.vrkVaihtuu);
         juoja.asetaPromilleraja(Tkanta.promilleRaja1);
         console.log("muuttujia: " + UnTpd.unTpdId + ", " + UnTpd.callbackURL);
@@ -96,7 +96,6 @@ ApplicationWindow{
     }
 
     function avaaTk() {
-
         if(tk == null) {
             try {
                 tk = LocalStorage.openDatabaseSync("juoppoko", "0.1", "juodun alkoholin paivyri", 10000);
@@ -177,8 +176,8 @@ ApplicationWindow{
             i++;
         }
 
-        paaikkuna.juomari.nakyma.positionViewAtEnd();
-        console.log("juodut luettu");
+        //paaikkuna.juomari.nakyma.positionViewAtEnd();
+        //console.log("juodut luettu");
         return;
     }
 

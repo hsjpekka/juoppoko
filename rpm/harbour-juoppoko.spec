@@ -23,12 +23,12 @@ Source100:  harbour-juoppoko.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
 Requires:   qml(org.freedesktop.contextkit)
 Requires:   amber-web-authorization
-Requires:   libamberwebauthorization
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(amberwebauthorization)
+BuildRequires:  pkgconfig(qt5embedwidget)
 BuildRequires:  desktop-file-utils
 
 %description

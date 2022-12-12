@@ -12,15 +12,28 @@
 # The name of your application
 TARGET = harbour-juoppoko
 
-CONFIG += link_pkgconfig
-CONFIG += sailfishapp
+#OAuth2 & RedirectListener need link_pkgconfig
+#link_pkgconfig has to be before sailfishapp
+CONFIG += \
+    link_pkgconfig \
+    sailfishapp
 
+#sailfish webview
+PKGCONFIG += qt5embedwidget
+#OAuth2 & RedirectListener
 PKGCONFIG += amberwebauthorization
+
+QT += positioning
 
 SOURCES += \
     src/harbour-juoppoko.cpp \
     src/juomari.cpp \
     src/untpd.cpp
+
+HEADERS += \
+    src/juomari.h \
+    src/salaisuudet.h \
+    src/untpd.h
 
 OTHER_FILES += \
     translations/*.ts
@@ -83,8 +96,6 @@ DISTFILES += \
 #     CB_URL=\\\"juoppoko.untpd.tunnistus\\\" \
 #     JUOPPOKO_VERSIO=\\\"2.5.0\\\"
 
-QT += positioning
-
 # to disable building translations every time, comment out the
 # following CONFIG line
 CONFIG += sailfishapp_i18n
@@ -96,8 +107,3 @@ CONFIG += sailfishapp_i18n
 
 TRANSLATIONS += translations/$${TARGET}-fi.ts \
     translations/$${TARGET}-C.ts
-
-HEADERS += \
-    src/juomari.h \
-    src/salaisuudet.h \
-    src/untpd.h
