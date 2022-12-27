@@ -8,17 +8,23 @@ import "../scripts/foursqr.js" as FourSqr
 
 Dialog {
     id: sivu
-
-    //anchors.leftMargin: Theme.paddingLarge
-    //anchors.rightMargin: Theme.paddingLarge
+    onAccepted: {
+        UnTpd.postFacebook = face; //facebook.checked
+        UnTpd.postTwitter = tweet; //twitter.checked
+        UnTpd.postFoursquare = foursq; //foursquare.checked
+    }
+    Component.onCompleted: {
+        paikkatieto.start()
+        koordinaatit()
+        sijaintiTuore = false
+    }
 
     property string baari: ""
     property string baarinTunnus: ""
     property bool   haettu: false
-    property int    hakunro: 0
+    property int    hakutunnus: 0 // foursquare session_token = "haku" + hakunro
     property int    hakusade: 500
     property int    ikoninKoko: 88 // 32, 44, 64 ja 88 saatavilla
-    //property int    valittuBaariNr: 0
 
     property string aikaaSitten: ""
     property alias  lpiiri: leveyspiiri.text
@@ -33,261 +39,6 @@ Dialog {
     property bool   asetuksetNakyvat: false
     property bool   julkaisutNakyvat: false
 
-    /*
-    function qqhaeBaareja(haku) {
-        var xhttp = new XMLHttpRequest();
-        var kysely = ""
-        var pp, lp, maara=25, luokat = "", tark = ""
-        // tark = checkin (oletus), global, browse, match
-
-        if (paikkatieto.position.longitudeValid)
-            pp = paikkatieto.position.coordinate.longitude
-        else
-            pp = FourSqr.lastLong
-
-        if (paikkatieto.position.latitudeValid)
-            lp = paikkatieto.position.coordinate.latitude
-        else
-            lp = FourSqr.lastLat
-
-        // 4d4b7105d754a06374d81259 - food
-        // 4d4b7105d754a06376d81259 - nightlife spot
-        if (tyyppiRajaus.checked)
-            luokat = "4d4b7105d754a06374d81259,4d4b7105d754a06376d81259"
-        else
-            luokat = ""
-
-        hetkinen.running = true
-        fourSqrViestit.text = qsTr("posting query")
-
-        kysely = FourSqr.searchVenue(tark, true, lp, pp, hakusade, maara, luokat, haku)
-
-        //console.log(kysely)
-
-        xhttp.onreadystatechange = function () {
-            //console.log("haeOluita - " + xhttp.readyState + " - " + xhttp.status + " , " + hakunro)
-            if (xhttp.readyState == 0)
-                fourSqrViestit.text = qsTr("request not initialized") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 1)
-                fourSqrViestit.text = qsTr("server connection established") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 2)
-                fourSqrViestit.text = qsTr("request received") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 3)
-                fourSqrViestit.text = qsTr("processing request") + ", " + xhttp.statusText
-            else { //if (xhttp.readyState == 4){
-                //console.log(xhttp.responseText)
-                var vastaus = JSON.parse(xhttp.responseText);
-
-                fourSqrViestit.text = xhttp.statusText
-
-                if (xhttp.status == 200) {
-                    //console.log(xhttp.responseText)
-                    paivitaHaetut(vastaus)
-                } else {
-                    console.log("search pub: " + xhttp.status + ", " + xhttp.statusText)
-                }
-
-                hetkinen.running = false
-            }
-
-        }
-
-        xhttp.open("GET", kysely, true)
-        xhttp.send();
-
-        return
-    }
-    // */
-
-    function haunAloitus(hakuteksti) {
-        loydetytBaarit.clear();
-        hakunro = 0;
-        haettu = true;
-        kuvaBaari.source = "";
-        return fsYhteys.haeBaareja(hakuteksti);
-    }
-
-    function kopioiBaari(nro) {
-        //console.log(nro)
-        baari = loydetytBaarit.get(nro).nimi
-        txtBaari.text = baari
-        txtBaari.label = (loydetytBaarit.get(nro).osoite == "") ? loydetytBaarit.get(nro).tyyppi : loydetytBaarit.get(nro).osoite
-        kuvaBaari.source = loydetytBaarit.get(nro).kuvake
-        baarinTunnus = loydetytBaarit.get(nro).baariId
-        pituuspiiri.text = loydetytBaarit.get(nro).baarinPituusPiiri
-        leveyspiiri.text = loydetytBaarit.get(nro).baarinLeveysPiiri
-        asemanTalletus.checked = true
-        return
-    }
-
-    // /*
-    function koordinaatit() {
-        var pvm = new Date(paikkatieto.position.timestamp)
-        var aikaero = 1000*60*60*24*10, minEro = 10*60*1000
-
-        if (!paikkatieto.position.longitudeValid || !paikkatieto.position.latitudeValid) {            
-            //asema.text = qsTr("defaults to lat: %1, long: %2").arg(FourSqr.lastLat).arg(FourSqr.lastLong)
-            //asema.label = qsTr("timestamp") + ": " + paikkatieto.position.timestamp
-            pituuspiiri.text = FourSqr.lastLong
-            leveyspiiri.text = FourSqr.lastLat            
-        } else {
-            //asema.text = qsTr("lat: %1, long: %2, alt: %3").arg(paikkatieto.position.coordinate.latitude).arg(paikkatieto.position.coordinate.longitude).arg(paikkatieto.position.coordinate.altitude)
-            //asema.label = qsTr("timestamp") + " " + Qt.formatDateTime(paivays)
-            pituuspiiri.text = paikkatieto.position.coordinate.longitude
-            leveyspiiri.text = paikkatieto.position.coordinate.latitude
-            aikaero = new Date().getTime() - pvm.getTime()
-        }
-
-        //console.log(" pvm " + pvm + " - " + pvm.getTime() )
-
-        //sijainninTila.text = new Date().getTime() + " " + paikkatieto.active + " - " + paikkatieto.valid + " - " + paikkatieto.position.timestamp + " - " + pvm.getTime()
-
-        if (aikaero < minEro) {
-            sijaintiTuore = true
-        } else
-            sijaintiTuore = false
-
-        if (paikkatieto.position.latitudeValid){
-            if (aikaero < 60*60*1000){
-                aikaaSitten = "(" + qsTr("location determined %1 min ago").arg(Math.round(aikaero/(60*1000))) + ")"
-            } else {
-                aikaaSitten = "(" + qsTr("location determined %1 hours ago").arg(Math.round(aikaero/(60*60*1000))) + ")"
-            }
-        }
-
-        return
-    }
-    // */
-
-    function onkoTietoa(tietue, kentta){
-        var kentat = Object.keys(tietue)
-        var i = 0, n = kentat.length
-        var onko = false
-
-        while ( i<n && !onko ){
-            if (kentat[i] === kentta) // oli ==
-                onko = true
-            i++
-        }
-
-        return onko
-    }
-
-    function naytaKapakanTiedot(jsonVastaus) {
-        var kapakkaId, mj="", i=0
-        try {
-            kapakkaId = jsonVastaus.response.venue.items[0].venue_id
-            if (jsonVastaus.response.venue.count > 1) {
-                while (i<jsonVastaus.response.venue.count) {
-                    mj += jsonVastaus.response.venue.items[i].venue_name + ", "
-                    i++
-                }
-                console.log("löydettyjä " + i + ": " + mj)
-            }
-            pageContainer.push(Qt.resolvedUrl("../pages/unTpTarjoaja.qml"),
-                               {"tunniste": kapakkaId })
-        } catch (err) {
-            console.log("error: " + err)
-        }
-
-        return
-    }
-
-    function naytaKapakanKirjaukset(jsonVastaus) {
-        var kapakkaId, mj="", i=0
-        try {
-            kapakkaId = jsonVastaus.response.venue.items[0].venue_id
-            if (jsonVastaus.response.venue.count > 1) {
-                while (i<jsonVastaus.response.venue.count) {
-                    mj += jsonVastaus.response.venue.items[i].venue_name + ", "
-                    i++
-                }
-                console.log("löydettyjä " + i + ": " + mj)
-            }
-            pageContainer.push(Qt.resolvedUrl("unTpPub.qml"), {"tunniste": kapakkaId,
-                                   "kaljarinki": "kuppila" })
-        } catch (err) {
-            console.log("error: " + err)
-        }
-
-        return
-    }
-
-    function paivitaHaetut(vastaus) { // vastaus = JSON(fourSqr-vastaus)
-        var haetut = vastaus.response.venues
-        var i=0, n=haetut.length, j, m
-        var tunnus, nimi, osoite, etaisyys, tyyppi, pitpii, levpii
-        var kuvake = ""
-
-        while (i<n) {
-            tyyppi = ""
-            if ("categories" in haetut[i]) {
-                var luokat = haetut[i].categories
-                tyyppi = luokat[0].name
-                if ("icon" in luokat[0])
-                    if ("prefix" in luokat[0].icon)
-                        kuvake = luokat[0].icon.prefix + ikoninKoko + luokat[0].icon.suffix
-                j = 1
-                m = luokat.length
-                while (j<m) {
-                    if (luokat[j].primary == true) {
-                        tyyppi = luokat[j].name
-                        j = m
-                        if ("icon" in luokat[i])
-                            if ("prefix" in luokat[i].icon)
-                                kuvake = luokat[j].icon.prefix + ikoninKoko + luokat[j].icon.suffix
-                    }
-                    j++
-                }
-            }
-
-            nimi = ""
-            if ("name" in haetut[i])
-                nimi = haetut[i].name
-
-            osoite = ""
-            if (onkoTietoa(haetut[i].location,"address")){
-                osoite = haetut[i].location.address
-            }
-            if (onkoTietoa(haetut[i].location,"distance")){
-                if (osoite != "")
-                    osoite += ", "
-                osoite += haetut[i].location.distance + " m"
-            }
-            if (onkoTietoa(haetut[i].location,"lat")) {
-                levpii = haetut[i].location.lat
-            } else
-                levpii = leveyspiiri.text
-            if (onkoTietoa(haetut[i].location,"lng")) {
-                pitpii = haetut[i].location.lng
-            } else
-                pitpii = pituuspiiri.text
-
-            loydetytBaarit.lisaa(haetut[i].id, nimi, osoite, tyyppi, encodeURI(kuvake), levpii, pitpii)
-            i++
-        }
-
-        if (n === 0) {
-            txtBaari.text = qsTr("None found.")
-            txtBaari.label = qsTr("Better luck next time.")
-            asetuksetNakyvat = true
-        }
-
-        return
-    }
-
-    function printableMethod(method) {
-        if (method === PositionSource.SatellitePositioningMethods)
-            return qsTr("Satellite");
-        else if (method === PositionSource.NoPositioningMethods)
-            return qsTr("Not available")
-        else if (method === PositionSource.NonSatellitePositioningMethods)
-            return qsTr("Non-satellite")
-        else if (method === PositionSource.AllPositioningMethods)
-            return qsTr("Multiple")
-        return qsTr("source error");
-    }
-
     Timer {
         id: jokoHaetaan
         interval: 1*1000 // ms
@@ -296,10 +47,11 @@ Dialog {
         onTriggered: {
             if (paikkatieto.position.latitudeValid){
                 koordinaatit()
-                if (haettu || haettava.activeFocus)
+                if (haettu || haettava.activeFocus) {
                     repeat = false
-                else
+                } else {
                     haunAloitus("")
+                }
             }
         }
     }
@@ -310,7 +62,6 @@ Dialog {
         updateInterval: 5*60*1000 // 5 min
         onPositionChanged: {
             koordinaatit()
-            //console.log("paikkatieto vaihtui")
         }
     }
 
@@ -318,10 +69,8 @@ Dialog {
         id: baarienTiedot
         ListItem {
             id: baarinTiedot
-            //height: Theme.fontSizeMedium*3
             contentHeight: baarinNimi.height
             width: sivu.width
-            //highlightedColor: Theme.highlightColor
             menu: ContextMenu {
                 MenuItem {
                     text: qsTr("venue info")
@@ -341,14 +90,10 @@ Dialog {
 
             onClicked: {
                 var kuppilaNr = baariLista.indexAt(mouseX,y+mouseY)
-                //valittuBaariNr = baariLista.indexAt(mouseX,y+mouseY)
                 kopioiBaari(kuppilaNr)
             }
 
             property string frsqId: baariId
-            //property string katuosoite: osoite
-            //property string pipi: baarinPituusPiiri
-            //property string lepi: baarinLeveysPiiri
 
             Row {
                 x: Theme.paddingLarge
@@ -360,16 +105,12 @@ Dialog {
                     border.width: 1
                     radius: 5
                     color: "transparent"
-                    border.color: (baarinTiedot.baarinId == baarinTunnus) ? Theme.highlightColor :
+                    border.color: (baarinTiedot.frsqId == baarinTunnus) ? Theme.highlightColor :
                                                                             "transparent"
                     Image {
                         id: baarinIkoni
                         source: kuvake
-
-                        //height: Theme.fontSizeMedium*3.3
-                        //width: height:
                     }
-
                 }
 
                 TextField {
@@ -378,90 +119,26 @@ Dialog {
                     label: tyyppi
                     readOnly: true
                     width: sivu.width - baarinIkoni.width - 2*Theme.paddingLarge
-                    //width: 0.5*sivu.width - x
-                    //color: baarinTiedot.highlighted ? Theme.highlightColor : Theme.primaryColor
-                    color: (baarinTiedot.baarinId == baarinTunnus) ? Theme.highlightColor :
+                    color: (baarinTiedot.frsqId == baarinTunnus) ? Theme.highlightColor :
                                                                      Theme.primaryColor
                     onClicked: {
                         var kuppilaNr = baariLista.indexAt(mouseX,baarinTiedot.y+0.5*height)
-                        //valittuBaariNr = baariLista.indexAt(mouseX,baarinTiedot.y+0.5*height)
                         kopioiBaari(kuppilaNr)
                     }
                     onPressAndHold: {
                         baarinTiedot.openMenu()
                     }
-                        //z: -1
                 }
-            } // row
+            }
         }
-
     }
 
     SilicaFlickable {
         id: ruutu
         anchors.fill: sivu
-        height: sivu.height
         contentHeight: column.height
-        //width: sivu.width
 
         VerticalScrollDecorator {}
-
-        XhttpYhteys {
-            id: fsYhteys
-            //xhttp: untpdKysely
-            y: sivu.isPortrait ? Theme.itemSizeLarge : Theme.itemSizeSmall //DialogHeader.qml
-            z: 1
-            onValmis: {
-                var jsonVastaus
-                try {
-                    jsonVastaus = JSON.parse(httpVastaus)
-                    if (toiminto === "baareja")
-                        paivitaHaetut(jsonVastaus)
-                    else if (toiminto === "tiedot")
-                        naytaKapakanTiedot(jsonVastaus)
-                    else if (toiminto === "toiminta")
-                        naytaKapakanKirjaukset(jsonVastaus)
-                } catch (err) {
-                    console.log("error: " + err)
-                }
-            }
-
-            property int hakuNro: 0
-
-            function haeBaareja(haku) {
-                var pp, lp, maara=25, luokat = "", tark = ""
-                var kysely = ""
-
-                if (paikkatieto.position.longitudeValid)
-                    pp = paikkatieto.position.coordinate.longitude
-                else
-                    pp = FourSqr.lastLong;
-
-                if (paikkatieto.position.latitudeValid)
-                    lp = paikkatieto.position.coordinate.latitude
-                else
-                    lp = FourSqr.lastLat;
-
-                // 4d4b7105d754a06374d81259 - food
-                // 4d4b7105d754a06376d81259 - nightlife spot
-                if (tyyppiRajaus.checked)
-                    luokat = "4d4b7105d754a06374d81259,4d4b7105d754a06376d81259"
-                else
-                    luokat = "";
-
-                kysely = FourSqr.searchVenue(tark, true, lp, pp, hakusade, maara,
-                                                      luokat, haku);
-                xHttpGet(kysely[0], kysely[1], "baareja");
-
-                return
-            }
-
-            function haeUnTpdId(frSqrId, toiminto) {
-                var kysely = UnTpd.lookupFoursquare(frSqrId)
-                xHttpGet(kysely[0], kysely[1], toiminto)
-                return
-            }
-        }
 
         Column {
             id: column
@@ -479,7 +156,6 @@ Dialog {
                 IconTextSwitch {
                     id: facebook
                     checked: false
-                    //width: icon.width + rightMargin + leftMargin + Theme.itemSizeExtraSmall + leftMargin - Theme.paddingLarge
                     width: icon.width + Theme.itemSizeExtraSmall + Theme.paddingMedium
                     icon.source: parent.hakemisto + "f_logo_RGB-Blue_58.png"
                     icon.height: Theme.iconSizeMedium
@@ -507,15 +183,14 @@ Dialog {
                 id: asemanTalletus
                 icon.source: "image://theme/icon-m-location"
                 checked: true
-                //highlighted: !sijaintiTuore
-                text: checked ? qsTr("shows co-ordinates") : qsTr("hides place")
+                text: checked ? qsTr("shows place") : qsTr("hides place")
                 onCheckedChanged: {
                     if (checked == false) {
                         asetuksetNakyvat = false
                     }
                     naytaSijainti = checked
-                    baarinTunnus = ""
-                    kuvaBaari.source = ""
+                    //baarinTunnus = ""
+                    //kuvaBaari.source = ""
                     txtBaari.text = ""
                 }
             }
@@ -575,7 +250,6 @@ Dialog {
 
                     Row { //asema
                         id: asemaRivi
-                        //x: Theme.paddingLarge
 
                         IconButton{
                             id: syotaKoordinaatit
@@ -589,48 +263,50 @@ Dialog {
 
                         TextField {
                             id: pituuspiiri
-                            text: "???"
+                            text: Number(FourSqr.lastLong).toLocaleString(Qt.locale())
                             label: qsTr("lng")
-                            //wrapMode: Text.WordWrap
                             color: readOnly ? (sijaintiTuore? Theme.highlightColor : Theme.secondaryHighlightColor) : Theme.primaryColor
                             readOnly: !syotaKoordinaatit.highlighted
                             width: (sivu.width - 2*asetuksetRivi.x - 2*asemaRivi.spacing - syotaKoordinaatit.width )/2
-                            //x: Theme.paddingLarge
                             inputMethodHints: Qt.ImhFormattedNumbersOnly
                             validator: DoubleValidator {bottom: -180.0; top: 180.0}
+                            onTextChanged: {
+                                if (!readOnly)
+                                    FourSqr.lastLong = Number.fromLocaleString(Qt.locale(), text)
+                            }
+                            EnterKey.onClicked: {
+                                leveyspiiri.focus = true
+                            }
                         }
 
                         TextField {
                             id: leveyspiiri
-                            text: "???"
+                            text: Number(FourSqr.lastLat).toLocaleString(Qt.locale())
                             label: qsTr("lat")
-                            //wrapMode: Text.WordWrap
                             color: readOnly ? (sijaintiTuore? Theme.highlightColor : Theme.secondaryHighlightColor) : Theme.primaryColor
                             readOnly: !syotaKoordinaatit.highlighted
                             width: pituuspiiri.width
                             inputMethodHints: Qt.ImhFormattedNumbersOnly
                             validator: DoubleValidator {bottom: -180.0; top: 180.0}
-                            //visible: asetuksetNakyvat
-                            //x: Theme.paddingLarge
+                            onTextChanged: {
+                                if (!readOnly)
+                                    FourSqr.lastLat = Number.fromLocaleString(Qt.locale(), text)
+                            }
+                            EnterKey.onClicked: {
+                                focus = false
+                            }
                         }
                     }
 
                     ComboBox {
                         id: etaisyys
                         width: sivu.width - hakuasetukset.x
-                        //visible: asetuksetNakyvat
                         label: qsTr("radius")
 
-                        //width: Theme.fontSizeSmall*7// font.pixelSize*8
-
                         menu: ContextMenu {
-                            //id: drinkMenu
                             MenuItem { text: "50 m" }
                             MenuItem { text: "500 m" }
                             MenuItem { text: "2 km" }
-                            //MenuItem { text: qsTr("radius %1").arg("50 m") }
-                            //MenuItem { text: qsTr("radius %1").arg("500 m") }
-                            //MenuItem { text: qsTr("radius %1").arg("2 km") }
                             MenuItem { text: qsTr("not limited") }
                         }
 
@@ -658,11 +334,10 @@ Dialog {
 
                     TextSwitch {
                         id: tyyppiRajaus
-                        //visible: asetuksetNakyvat
                         checked: true
-                        text: checked? qsTr("limits to Foursquare categories %1 and %2").arg("Food").arg("Nightlife Spot") :
-                                       qsTr("searches in all categories")                        
-                    } // */
+                        text: checked? qsTr("limits to Foursquare categories %1").arg("Dining and Drinking") :
+                                       qsTr("searches in all categories")
+                    }
                 }
             }
 
@@ -702,44 +377,8 @@ Dialog {
                     readOnly: true
                     width: parent.width - kuvaBaari.width
                     onPressAndHold: valittuKuppila.openMenu()
-                    //x: Theme.paddingLarge
                 }
             }
-
-            /*
-            Row {
-                id: hakurivi
-                spacing: Theme.paddingSmall
-                x: Theme.paddingMedium
-
-                IconButton {
-                    id: tyhjennaHaku
-                    icon.source: "image://theme/icon-m-clear"
-                    //width: Theme.fontSizeMedium*3
-                    onClicked: {
-                        haettava.text = ""
-                    }
-                }
-
-                TextField {
-                    id: haettava
-                    placeholderText: qsTr("place")
-                    //label: qsTr("search text")
-                    //text:
-                    width: sivu.width - 2*hakurivi.x - tyhjennaHaku.width
-                           - hae.width - 2*hakurivi.spacing
-                }
-
-                IconButton {
-                    id: hae
-                    icon.source: "image://theme/icon-m-search"
-                    width: Theme.fontSizeMedium*3
-                    highlighted: asemanTalletus.checked
-                    onClicked: {
-                        haunAloitus(haettava.text)
-                    }
-                }
-            } // hakurivi */
 
             SearchField {
                 id: haettava
@@ -755,6 +394,9 @@ Dialog {
                 onTextChanged: {
                     if (text.length > 2)
                         minTauko.restart()
+                    if (text.length === 0) {
+                        hakutunnus++
+                    }
                 }
 
                 Timer {
@@ -792,33 +434,272 @@ Dialog {
                 VerticalScrollDecorator {}
 
                 onMovementEnded: {
-                    //console.log("siirtyminen loppui")
                     if (atYEnd) {
-                        //console.log("siirtyminen loppui " + atYEnd)
-                        hakunro = hakunro + 1
                         fsYhteys.haeBaareja(haettava.text)
                     }
+                }
 
+                XhttpYhteys {
+                    id: fsYhteys
+                    y: sivu.isPortrait ? Theme.itemSizeLarge : Theme.itemSizeSmall //DialogHeader.qml
+                    z: 1
+                    onValmis: {
+                        var jsonVastaus
+                        try {
+                            jsonVastaus = JSON.parse(httpVastaus)
+                            if (toiminto === "baareja") {
+                                //console.log("baarihaku: " + httpVastaus)
+                                paivitaHaetut(jsonVastaus)
+                            } else if (toiminto === "tiedot") {
+                                naytaKapakanTiedot(jsonVastaus)
+                            } else if (toiminto === "toiminta") {
+                                naytaKapakanKirjaukset(jsonVastaus)
+                            }
+                        } catch (err) {
+                            console.log("error: " + err)
+                        }
+                    }
+
+                    property int hakuNro: 0
+
+                    function haeBaareja(haku) {
+                        var pp, lp, maara=25, luokat = "", sijainti = "";
+                        var kysely = "", tunnus = "haku", otsikko = "";
+
+                        if (paikkatieto.position.longitudeValid &&
+                                paikkatieto.position.latitudeValid) {
+                            pp = paikkatieto.position.coordinate.longitude;
+                            lp = paikkatieto.position.coordinate.latitude
+                        } else {
+                            pp = FourSqr.lastLong;
+                            lp = FourSqr.lastLat;
+                        }
+
+                        if (naytaSijainti) {
+                            sijainti = lp + "," + pp;
+                        }
+
+                        // pilgrim api
+                        // 4d4b7105d754a06374d81259 - food
+                        // 4d4b7105d754a06376d81259 - nightlife spot
+                        // places api
+                        // 13000 - Dining and drinking
+                        if (tyyppiRajaus.checked) {
+                            luokat = "13000"
+                        } else {
+                            luokat = "";
+                        }
+
+                        xhttp.setServer(FourSqr.apiProtocol, FourSqr.apiServer);
+                        kysely = FourSqr.searchVenue(haku, sijainti, hakusade,
+                                                     luokat, maara, tunnus + hakutunnus);
+                        otsikko = "fsqAPIkey";
+                        //otsikko += "Accept:application/json";
+                        xHttpGetOtsikoilla(kysely[0], kysely[1], otsikko, "baareja");
+                        //xHttpGet(kysely[0], kysely[1], "baareja");
+                        xhttp.setServer(UnTpd.apiProtocol, UnTpd.apiServer);
+
+                        console.log("baarihaku:" + kysely[0] + ", " + kysely[1] + ", " + otsikko);
+
+                        return;
+                    }
+
+                    function haeUnTpdId(frSqrId, toiminto) {
+                        var kysely = UnTpd.lookupFoursquare(frSqrId);
+                        xHttpGet(kysely[0], kysely[1], toiminto);
+                        return;
+                    }
                 }
             }
+        }
+    }
 
+    function haunAloitus(hakuteksti) {
+        loydetytBaarit.clear();
+        fsYhteys.hakuNro = 0;
+        haettu = true;
+        kuvaBaari.source = "";
+        return fsYhteys.haeBaareja(hakuteksti);
+    }
+
+    function kopioiBaari(nro) {
+        baari = loydetytBaarit.get(nro).nimi;
+        txtBaari.text = baari;
+        txtBaari.label = (loydetytBaarit.get(nro).osoite == "") ?
+                    loydetytBaarit.get(nro).tyyppi :
+                    loydetytBaarit.get(nro).osoite;
+        kuvaBaari.source = loydetytBaarit.get(nro).kuvake;
+        baarinTunnus = loydetytBaarit.get(nro).baariId;
+        pituuspiiri.text = loydetytBaarit.get(nro).baarinPituusPiiri;
+        leveyspiiri.text = loydetytBaarit.get(nro).baarinLeveysPiiri;
+        asemanTalletus.checked = true;
+        return;
+    }
+
+    function koordinaatit() {
+        var pvm = new Date(paikkatieto.position.timestamp);
+        var aikaero = 1000*60*60*24*10, minEro = 10*60*1000;
+
+        if (paikkatieto.position.longitudeValid ||
+                paikkatieto.position.latitudeValid) {
+            if (paikkatieto.position.longitudeValid) {
+                pituuspiiri.text = paikkatieto.position.coordinate.longitude;
+            }
+            if (paikkatieto.position.latitudeValid) {
+                leveyspiiri.text = paikkatieto.position.coordinate.latitude;
+            }
+            aikaero = new Date().getTime() - pvm.getTime();
+            if (aikaero < 60*60*1000){
+                aikaaSitten = "(" + qsTr("location determined %1 min ago").arg(Math.round(aikaero/(60*1000))) + ")";
+            } else {
+                aikaaSitten = "(" + qsTr("location determined %1 hours ago").arg(Math.round(aikaero/(60*60*1000))) + ")";
+            }
         }
 
+        if (aikaero < minEro) {
+            sijaintiTuore = true;
+        } else {
+            sijaintiTuore = false;
+        }
+
+        return;
     }
 
-    onAccepted: {
-        UnTpd.postFacebook = face; //facebook.checked
-        UnTpd.postTwitter = tweet; //twitter.checked
-        UnTpd.postFoursquare = foursq; //foursquare.checked
+    function onkoTietoa(tietue, kentta){
+        var kentat = Object.keys(tietue);
+        var i = 0, n = kentat.length;
+        var onko = false;
 
-        if (baarinTunnus > "")
-            console.log("valittu baari " + baarinTunnus + ", " + baari);
+        while ( i<n && !onko ){
+            if (kentat[i] === kentta){
+                onko = true;
+            }
+            i++;
+        }
+
+        return onko;
     }
 
-    Component.onCompleted: {
-        paikkatieto.start()
-        koordinaatit()
-        sijaintiTuore = false
+    function naytaKapakanTiedot(jsonVastaus) {
+        var kapakkaId, mj="", i=0;
+        try {
+            kapakkaId = jsonVastaus.response.venue.items[0].venue_id;
+            if (jsonVastaus.response.venue.count > 1) {
+                while (i<jsonVastaus.response.venue.count) {
+                    mj += jsonVastaus.response.venue.items[i].venue_name + ", ";
+                    i++;
+                }
+            }
+            pageContainer.push(Qt.resolvedUrl("../pages/unTpTarjoaja.qml"),
+                               {"tunniste": kapakkaId });
+        } catch (err) {
+            console.log("error: " + err);
+        }
+
+        return;
     }
 
+    function naytaKapakanKirjaukset(jsonVastaus) {
+        var kapakkaId, mj="", i=0;
+        try {
+            kapakkaId = jsonVastaus.response.venue.items[0].venue_id;
+            if (jsonVastaus.response.venue.count > 1) {
+                while (i<jsonVastaus.response.venue.count) {
+                    mj += jsonVastaus.response.venue.items[i].venue_name + ", ";
+                    i++;
+                }
+            }
+            pageContainer.push(Qt.resolvedUrl("unTpPub.qml"), {"tunniste": kapakkaId,
+                                   "kaljarinki": "kuppila" });
+        } catch (err) {
+            console.log("error: " + err);
+        }
+
+        return
+    }
+
+    function paivitaHaetut(vastaus) { // vastaus = JSON(fourSqr-vastaus)
+        var haetut = vastaus.results;
+        var i=0, n=haetut.length, j, m;
+        var tunnus, nimi, osoite, etaisyys, tyyppi, pitpii, levpii;
+        var kuvake = "";
+
+        while (i<n) {
+            tyyppi = "";
+            if ("categories" in haetut[i]) {
+                var luokat = haetut[i].categories;
+                tyyppi = luokat[0].name;
+                if ("icon" in luokat[0] && "prefix" in luokat[0].icon) {
+                    kuvake = luokat[0].icon.prefix + ikoninKoko +
+                            luokat[0].icon.suffix;
+                }
+                /*
+                j = 1;
+                m = luokat.length;
+                while (j<m) {
+                    if (luokat[j].primary == true) {
+                        tyyppi = luokat[j].name;
+                        j = m;
+                        if ("icon" in luokat[i] && "prefix" in luokat[i].icon) {
+                            kuvake = luokat[j].icon.prefix + ikoninKoko +
+                                    luokat[j].icon.suffix;
+                        }
+                    }
+                    j++;
+                }
+                // */
+            }
+
+            nimi = "";
+            if ("name" in haetut[i]) {
+                nimi = haetut[i].name;
+            }
+
+            osoite = "";
+            if (onkoTietoa(haetut[i].location,"address")){
+                osoite = haetut[i].location.address;
+            }
+            if (onkoTietoa(haetut[i].location,"distance")){
+                if (osoite != "") {
+                    osoite += ", ";
+                }
+                osoite += haetut[i].location.distance + " m";
+            }
+            if (onkoTietoa(haetut[i].location,"lat")) {
+                levpii = haetut[i].location.lat;
+            } else {
+                levpii = leveyspiiri.text;
+            }
+            if (onkoTietoa(haetut[i].location,"lng")) {
+                pitpii = haetut[i].location.lng;
+            } else {
+                pitpii = pituuspiiri.text;
+            }
+
+            loydetytBaarit.lisaa(haetut[i].id, nimi, osoite, tyyppi,
+                                 encodeURI(kuvake), levpii, pitpii);
+            i++;
+        }
+
+        if (n === 0) {
+            txtBaari.text = qsTr("None found.");
+            txtBaari.label = qsTr("Better luck next time.");
+            asetuksetNakyvat = true;
+        }
+
+        return;
+    }
+
+    function printableMethod(method) {
+        if (method === PositionSource.SatellitePositioningMethods) {
+            return qsTr("Satellite");
+        } else if (method === PositionSource.NoPositioningMethods) {
+            return qsTr("Not available");
+        } else if (method === PositionSource.NonSatellitePositioningMethods) {
+            return qsTr("Non-satellite");
+        } else if (method === PositionSource.AllPositioningMethods) {
+            return qsTr("Multiple");
+        }
+        return qsTr("source error");
+    }
 }

@@ -7,8 +7,8 @@ Item {
     width: parent.width
     height: Theme.itemSizeLarge
 
+    property bool   kesken: false
     property alias  nykyinen: pylvaikko.currentIndex
-    //property bool   alustus: false
     property alias  pylvasKuvaaja: pylvaikko
     property string riskiAlhainen: "green"
     property string riskiKohonnut: "yellow"
@@ -29,19 +29,41 @@ Item {
     signal pitkaPainanta(int pylvasNro, real valitunArvo, string valitusNimike)
     signal alussa()
 
-    /*
-    function alkuun(aikaMs, alkoholiaMl) {
-        var ml0, msJuoma, nyt, paiva, vuosi, viikko, ajat;
+    ListModel {
+        id: vkoKulutus
+        property int viimeisin: -1
+        //{"vuosi", "vkoNro", "barValue", "barColor", "barLabel", "sect"}
+    }
 
-        msJuoma = aikaMs - vrkVaihtuu*60*1000;
+    ListModel {
+        id: pvKulutus
+        property int viimeisin: -1
+        //{"vuosi", "vkoNro", "paiva", "barValue", "barColor", "barLabel", "sect"}
+    }
 
-        ajat = maaritaAjat(msJuoma);
-        vuosi = ajat[0]; // vuosi = nyt.getFullYear() tai +/- 1 viikolla 1/53
-        viikko = ajat[1]; // viikonNumero(msJuoma)
-        paiva = ajat[2]; // date.getDay() = 0 (su) - 6 (la) => 1 (ma) - 7 (su)
+    BarChart {
+        id: pylvaikko
+        anchors.fill: parent
+        orientation: ListView.Horizontal
+        model: (tyyppi === 0) ? vkoKulutus : pvKulutus
+        scale: tyyppi === 0 ? height/skaalaVko : height/skaalaPv
+        onBarSelected: { //(int barNr, real barValue, string barLabel)
+            pylvasValittu(barNr, barValue, barLabel)
+        }
+        onBarPressAndHold: {
+            pitkaPainanta(barNr, barValue, barLabel)
+        }
+        onMovementEnded: {
+            if (atXBeginning)
+                alussa()
+        }
+    }
 
-        return;
-    } // */
+    BusyIndicator {
+        size: BusyIndicatorSize.Medium
+        anchors.centerIn: parent
+        running: kesken
+    }
 
     function aikaVertailu(vuosi, viikko, paiva) {
         if (paiva === undefined)
@@ -55,28 +77,28 @@ Item {
 
     function aikaVertailuPv(i) {
         var vertailuAika;
-        if (i < 0 || i > pvKulutus.count -1 )
-            vertailuAika = -1
-        else
+        if (i < 0 || i > pvKulutus.count -1 ) {
+            vertailuAika = -1;
+        } else {
             vertailuAika = aikaVertailu(pvKulutus.get(i).vuosi, pvKulutus.get(i).vkoNro,
                                         pvKulutus.get(i).paiva);
-        return vertailuAika
+        }
+
+        return vertailuAika;
     }
 
     function aikaVertailuVko(i) {
         var vertailuAika;
-        if (i < 0 || i > vkoKulutus.count -1 )
-            vertailuAika = -1
-        else
+        if (i < 0 || i > vkoKulutus.count -1 ) {
+            vertailuAika = -1;
+        } else {
             vertailuAika = aikaVertailu(vkoKulutus.get(i).vuosi, vkoKulutus.get(i).vkoNro);
+        }
 
         return vertailuAika;
     }
 
     function alusta(alkuMs, loppuMs) { // paivia hetkestä 1970.1.1
-        //var aika = new Date(alkuVrk*msVrk), paiviaAlusta, vsVko;
-        //var i, pv, vk, vuosi;
-        //console.log("luodaan tyhjät pylväät")
         if (alkuMs === undefined) {
             return;
         }
@@ -85,44 +107,8 @@ Item {
         if (loppuMs === undefined) {
             loppuMs = new Date().getTime();
         }
+        lisaa(loppuMs, 0);
 
-        var alkuPaiva = new Date(alkuMs)
-        var loppuPaiva = new Date(loppuMs)
-        console.log("alustetaan " + alkuPaiva.getFullYear() + "." + (alkuPaiva.getMonth() + 1) + "." + alkuPaiva.getDate() + " - " + loppuPaiva.getFullYear() + "." + (loppuPaiva.getMonth() + 1) + "." + loppuPaiva.getDate() + " - " + viikonEkaPaiva)
-        lisaa(loppuMs, 0)
-        /*
-        if (loppuVrk === undefined) {
-            loppuVrk = Math.floor(new Date().getTime()/msVrk);
-        }
-
-        paiviaAlusta = loppuVrk - alkuVrk + 1;
-        vsVko = Apuja.viikkoNroJaVuosi(alkuVrk*msVrk);
-        vuosi = vsVko[0];
-        vk = vsVko[1];
-        pv = Apuja.viikonPaiva(alkuVrk*msVrk);
-
-        console.log("alusta: " + vuosi + ", " + vk + ", " + pv)
-        i = 0;
-        while (i < paiviaAlusta) {
-            lisaaPvArvo(vuosi, vk, pv, 0, riskiAlhainen);
-            pv++;
-            i++;
-            if (pv > 6) {
-                pv = 0;
-                lisaaVkoArvo(vuosi, vk, 0, riskiAlhainen);
-                vk++;
-                if (vk > 51) {
-                    //aika.setTime();
-                    vsVko = Apuja.viikonPaiva((alkuVrk + i)*msVrk)[1];
-                    vuosi = vsVko[0];
-                    vk = vsVko[1];
-                }
-            }
-        }
-
-        // */
-
-        console.log("alustettu")
         return;
     }
 
@@ -205,8 +191,6 @@ Item {
         ml0 = juotuPaivalla(vuosi, viikko, paiva);
         talletaPaivanArvo(vuosi, viikko, paiva, ml0 + alkoholiaMl);
 
-        //console.log("lisätty " + vuosi + ", " + viikko + ", " + paiva)
-        //pylvaikko.positionViewAtEnd();
         return;
     }
 
@@ -227,8 +211,6 @@ Item {
         // lisättävä päivä on myöhempi kuin aiemmin talletetut
         if (tuusi > tvanha) {
             iPv++;
-            //console.log("vanha " + iVs + "-" + iVko + "-" + iPv)
-            //console.log("uusi " + vuosi + "-" + viikko + "-" + paiva)
             while (iVs < vuosi) {
                 nVko = viikonNumero(new Date(iVs,11,31,12,4,53,990).getTime());
                 if (nVko === 1) // jos vuoden viimeinen viikko jää kovin vajaaksi
@@ -271,7 +253,6 @@ Item {
             tvanha = iVs*1000 + iVko*10 + iPv;
             if (tuusi > tvanha)
                 return;
-            //console.log("uusi " + vuosi + "-" + viikko + "-" + paiva + ", vanha " + iVs + "-" + iVko + "-" + iPv)
             while (vuosi < iVs) {
                 while (iVko > 0) {
                     if (iPv === 6)
@@ -288,7 +269,6 @@ Item {
                 iPv = 6;
             }
             while (viikko < iVko) {
-                //console.log("viikko " + iVko)
                 if (iPv === 6)
                     lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen);
                 while (iPv >= 0) {
@@ -358,21 +338,11 @@ Item {
         return ajat;
     }
 
-    /*
-    function msVko(vuosi,viikko) {
-        var ms = new Date(vuosi,0,1,0,0,0,0).getTime();
-        ms += (viikko-1)*7*24*60*60*1000;
-
-        return ms;
-    } // */
-
     function muutaPvArvo(i, arvo, vari) {
-        //console.log(" -- " + i + " - " + arvo + " -- " + vari)
         return pvKulutus.set(i, {"barValue": arvo, "barColor": vari});
     }
 
     function muutaVkoArvo(i, arvo, vari) {
-        //console.log(" -- " + i + " - " + arvo + " -- " + vari)
         return vkoKulutus.set(i, {"barValue": arvo, "barColor": vari});
     }
 
@@ -411,14 +381,6 @@ Item {
         if (uusiTyyppi === 0) {
             pylvaikko.model = vkoKulutus;
             tyyppi = uusiTyyppi;
-            /*while (i < vkoKulutus.count) {
-                pylvaikko.model.append({"vuosi": vkoKulutus.get(i).vuosi, "vkoNro": vkoKulutus.get(i).vkoNro,
-                                           "barValue": vkoKulutus.get(i).barValue,
-                                           "barColor": vkoKulutus.get(i).barColor,
-                                           "barLabel": vkoKulutus.get(i).barLabel,
-                                           "sect": vkoKulutus.get(i).sect})
-                i++
-            }// */
         } else if (uusiTyyppi === 1) {
             pylvaikko.model = pvKulutus;
             tyyppi = uusiTyyppi;
@@ -440,12 +402,13 @@ Item {
 
     function variViikolle(maara) {
         var vari;
-        if (maara < riskiVkoAlempi)
-            vari = riskiAlhainen
-        else if (maara < riskiVkoYlempi)
-            vari = riskiKohonnut
-        else
+        if (maara < riskiVkoAlempi) {
+            vari = riskiAlhainen;
+        } else if (maara < riskiVkoYlempi) {
+            vari = riskiKohonnut;
+        } else {
             vari = riskiKorkea;
+        }
         return vari;
     }
 
@@ -455,49 +418,28 @@ Item {
         var vuosi = new Date(hetki).getFullYear();
         var ekaPvm = new Date(vuosi,0,1,0,0,1);
         var vikaPvm = new Date(vuosi,11,31,1,2,3);
-        var vkpaiva = viikonPaiva(ekaPvm.getTime()); //0-6, ma - su tai su-la
         var vikaVkPaiva = viikonPaiva(vikaPvm.getTime());
-        var vk0, vknyt, erovk, eropv, eroms, vrk = 24*60*60*1000;
+        var vkpaiva = viikonPaiva(ekaPvm.getTime()); //0-6, ma - su tai su-la
+        var vknyt, eroms, vrk = 24*60*60*1000;
         var vk1Ma; // maanantai viikolla 1
 
         // onko vuoden ensimmäinen päivä edellisen vuoden viikolla 52/53 vai tämän vuoden viikolla 1
         if (vkpaiva > 3.5) { // pe-su -> vk 52/53
-            //vk0 = 0;
             vk1Ma = new Date(vuosi, 0, 1 + (7-vkpaiva), 0, 0, 0, 0); // viikko 1 alkaa seuraavana maanantaina
         } else { //ma-to -> vk 1
-            //vk0 = 1;
-            if (vkpaiva === 0) // vuosi alkaa maanantaina
+            if (vkpaiva === 0) { // vuosi alkaa maanantaina
                 vk1Ma = new Date(vuosi, 0, 1, 0, 0, 0, 0);
-            else // viikko 1 alkaa edellisenä vuotena
+            } else {// viikko 1 alkaa edellisenä vuotena
                 vk1Ma = new Date(vuosi-1, 11, 31 - (vkpaiva-2), 0, 0, 0, 0);
+            }
         }
 
         eroms = hetki - vk1Ma.getTime(); // ms viikon 1 maanantaista
-        if (eroms < 0)
-            vknyt = viikonNumero(new Date(vuosi-1,11,31,12,0,0).getTime())
-        else
-            vknyt = Math.floor(eroms/(7*vrk)) + 1;
-
-        /*
-        eropv = Math.floor((eroms-erovk*7*vrk)/vrk);
-
-        if ( vkpaiva + eropv > 7.5) { // jos vuosi alkaa keskiviikkona vkpaiva = 3, erovk = 1 ja eropv = 5, ollaan kolmannella viikolla
-            vknyt = vk0 + erovk + 1;
-        } else {
-            vknyt = vk0 + erovk;
-        }
-
-        if (vknyt < 0.5 ) // onko edellisen vuoden viimeinen päivä viikolla 52 vai 53?
+        if (eroms < 0) {
             vknyt = viikonNumero(new Date(vuosi-1,11,31,12,0,0).getTime());
-
-        if (vknyt > 52.5) { // onko vuoden viimeiset päivät jo seuraavan vuoden ensimmäisellä viikolla?
-            if (vikaVkPaiva < 3.5)
-                vknyt = 1;
+        } else {
+            vknyt = Math.floor(eroms/(7*vrk)) + 1;
         }
-        // */
-
-        //var apupv = new Date(hetki)
-        //console.log("eroms " + eroms + ", " + vk1Ma.getDate() + "." + vk1Ma.getMonth() + "., " + vk1Ma.getDay())
 
         return vknyt;
     }
@@ -521,119 +463,21 @@ Item {
             paiva -= 7;
         }
 
-        if (paiva === 0)
-            tulos = qsTr("Sun")
-        else if (paiva === 1)
-            tulos = qsTr("Mon")
-        else if (paiva === 2)
-            tulos = qsTr("Tue")
-        else if (paiva === 3)
-            tulos = qsTr("Wed")
-        else if (paiva === 4)
-            tulos = qsTr("Thu")
-        else if (paiva === 5)
-            tulos = qsTr("Fri")
-        else if (paiva === 6)
+        if (paiva === 0) {
+            tulos = qsTr("Sun");
+        } else if (paiva === 1) {
+            tulos = qsTr("Mon");
+        } else if (paiva === 2) {
+            tulos = qsTr("Tue");
+        } else if (paiva === 3) {
+            tulos = qsTr("Wed");
+        } else if (paiva === 4) {
+            tulos = qsTr("Thu");
+        } else if (paiva === 5) {
+            tulos = qsTr("Fri");
+        } else if (paiva === 6) {
             tulos = qsTr("Sat");
+        }
         return tulos;
-    }
-
-    /*
-
-function viikkoNro(paivaMs) {
-    return viikkoNroJaVuosi(paivaMs)[1];
-}
-
-function viikkoNroJaVuosi(paivaMs) {
-    // paivaMs = ms hetkestä 1970-1-1 0:0:0.000 GMT
-    // vuoden ensimmäinen päivä on viikolla 1, jos
-    // a) viikon alkaessa sunnuntaista, vuoden ensimmäinen päivä on Su-Ke
-    // b) viikon alkaessa maanantaista, vuoden ensimmäinen päivä on Ma-To
-    // muuten vuoden ensimmäinen päivä on edellisen vuoden viimeisellä viikolla
-    // palauttaa [vuosi, viikonNumero]
-    var minMs = 60*1000;
-    var paivays = new Date(paivaMs);
-    var vuosi = paivays.getFullYear();
-    var vuodenEkaPaiva = new Date(vuosi, 0, 1, 0, 0, 0);
-    var vuodenVikaPaiva = new Date(vuosi, 11, 31, 0, 0, 0);
-    var vkPaiva = viikonPaiva(vuodenEkaPaiva.getTime()); // 0-6 Sun - Sat, or 1-7 Mon - Sun
-    //var lastDay = viikonPaiva(vuodenVikaPaiva.getTime());
-    var vkNyt, eroMs, vrkMs = 24*60*60*1000;
-    var vk1Alkaa; // day starting week 1
-    var aikavyohykeNyt, aikavyohykeTalvella, result;
-
-    if (vkPaiva > 3.5 + viikonEkaPaiva) { // viime vuoden viimeinen viikko
-        vk1Alkaa = new Date(vuosi, 0, viikonEkaPaiva + 8 - vkPaiva, 0, 0, 0, 0);
-    } else { // tämän vuoden ensimmäinen viikko
-        if (vkPaiva === viikonEkaPaiva)
-            vk1Alkaa = new Date(vuosi, 0, 1, 0, 0, 0, 0)
-        else // viikko alkaa viime vuoden puolella
-            vk1Alkaa = new Date(vuosi-1, 11, 32 + viikonEkaPaiva - vkPaiva, 0, 0, 0, 0);
-    }
-
-    aikavyohykeNyt = paivays.getTimezoneOffset();
-    aikavyohykeTalvella = vuodenEkaPaiva.getTimezoneOffset();
-
-    eroMs = paivaMs - vk1Alkaa.getTime() - (aikavyohykeNyt - aikavyohykeTalvella)*minMs; // ms viikon 1 ensimmäisestä päivästä
-    if (eroMs < 0)
-        vkNyt = viikkoNro(new Date(vuosi-1, 11, 31, 12, 0, 0).getTime())
-    else
-        vkNyt = Math.floor(eroMs/(7*vrkMs)) + 1;
-
-    if (paivays.getMonth() === 0 && vkNyt > 50) {
-        vuosi--;
-    }
-
-    return [vuosi, vkNyt];
-}
-
-
-
-    function viikonPaiva(hetki) {
-        // palauttaa 1 - maanantai, 7 - sunnuntai
-        // Date().getDay() palauttaa 0 - sunnuntai, 6 - lauantai
-        // hetki - ms hetkestä 1970.1.1 00:00 GMT
-        var paiva = new Date(hetki).getDay();
-
-        //console.log("paiva " + paiva)
-
-        if (paiva === 0)
-            paiva = 7;
-
-        return paiva;
-    }
-
-
-//*/
-
-    ListModel {
-        id: vkoKulutus
-        property int viimeisin: -1
-        //
-        //{"vuosi", "vkoNro", "barValue", "barColor", "barLabel", "sect"}
-    }
-
-    ListModel {
-        id: pvKulutus
-        property int viimeisin: -1
-        //{"vuosi", "vkoNro", "paiva", "barValue", "barColor", "barLabel", "sect"}
-    }
-
-    BarChart {
-        id: pylvaikko
-        anchors.fill: parent
-        orientation: ListView.Horizontal
-        model: (tyyppi === 0) ? vkoKulutus : pvKulutus
-        scale: tyyppi === 0 ? height/skaalaVko : height/skaalaPv
-        onBarSelected: { //(int barNr, real barValue, string barLabel)
-            pylvasValittu(barNr, barValue, barLabel)
-        }
-        onBarPressAndHold: {
-            pitkaPainanta(barNr, barValue, barLabel)
-        }
-        onMovementEnded: {
-            if (atXBeginning)
-                alussa()
-        }
     }
 }

@@ -6,7 +6,6 @@ import "../components"
 
 Page {
     id: sivu
-
     Component.onDestruction: {
         if (muuttunut) {
             vaihdaTunnus(uusiTunnus)
@@ -66,7 +65,6 @@ Page {
                     untpdKysely.authenticate()
                 }
             }
-
         }
 
         Column {

@@ -2,14 +2,10 @@
 #define UNTPD_H
 
 #include <QObject>
-//#include <QJsonArray>
-//#include <QJsonObject>
 #include <QString>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-//#include <QScopedPointer>
-//#include <sailfishapp.h>
 #include <oauth2.h>
 #include <redirectlistener.h>
 
@@ -27,6 +23,8 @@ public:
     Q_INVOKABLE bool isNetworkAvailable();
     Q_INVOKABLE bool queryGet(QString queryId, QString url);
     Q_INVOKABLE bool queryGet(QString queryId, QString path, QString definedQuery, QString parametersToAdd="");
+    Q_INVOKABLE bool queryHeaderedGet(QString queryId, QString path, QString query, QString headers, QString parametersToAdd="");
+    Q_INVOKABLE bool queryHeaderedPost(QString queryId, QString path, QString query, QString headers, QString parametersToAdd="");
     Q_INVOKABLE bool queryPost(QString queryId, QString url);
     Q_INVOKABLE bool queryPost(QString queryId, QString path, QString definedQuery, QString parametersToAdd="");
     Q_INVOKABLE QString readOAuth2Token();
@@ -34,7 +32,7 @@ public:
     Q_INVOKABLE bool setOAuthPath(QString path);
     Q_INVOKABLE bool setOAuthRedirect(QString redirect);
     Q_INVOKABLE bool setOAuthSecret(QString secret);
-    Q_INVOKABLE bool setOAuth2Token(QString token);
+    Q_INVOKABLE bool setOAuthToken(QString token);
     Q_INVOKABLE bool setOAuthTokenPath(QString path);
     Q_INVOKABLE int  setQueryParameter(QString id, QString value, QString key="");
     Q_INVOKABLE bool setServer(QString protocol, QString address, int port = -1);
@@ -79,10 +77,11 @@ private:
     QString errorStatusToString(QueryStatus status);
     int findRequest(QNetworkReply *reply);
     QueryStatus getQueryStatus(QJsonObject reply);
+    int parameterIndex(QString id);
     QString readResponse(QNetworkReply *reply);
     QJsonObject responseToJson(QNetworkReply *reply, QString *replyString);
-    bool sendRequest(QString queryId, QUrl url, bool isGet);
-    bool sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet);
+    bool sendRequest(QString queryId, QUrl url, bool isGet, QString headers = "");
+    bool sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet, QString headers = "");
     QString uriKey(QString uriStr, QString key, int n = -1);
 };
 

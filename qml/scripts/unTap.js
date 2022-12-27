@@ -1,5 +1,7 @@
 .pragma library
 
+var apiProtocol = "https"
+var apiServer = "api.untappd.com"
 var callbackURL = "", newBadges, newBadgesSet = false, notificationsRespond // JSON-objekti
 var oluetSuosionMukaan = true
 var oluenEtiketti = "", oluenHappamuus = -1, oluenId = -1, oluenNimi = "", oluenPanimo = ""
@@ -8,8 +10,8 @@ var postFoursquare = false, postFacebook = false, postTwitter = false
 var programName = "", queryLimit = 25
 var kayttaja = ""
 var unTpdId = "" // ohjelman clientId
-var unTpOsoite = "https://api.untappd.com/v4" // url
-var unTpdSecret = "" // ohjelman salasana
+//var unTpOsoite = "https://api.untappd.com/v4" // url
+//var unTpdSecret = "" // ohjelman salasana
 var unTpToken = "" // käyttäjän valtuutus
 var yhteys = ""
 

@@ -10,69 +10,6 @@ Page {
 
     property int tunniste: -1
 
-    function kirjoitaTiedot(tiedot) {
-        var vastaus=tiedot.response.brewery, i=0, mj="", yhteystieto, solu
-        otsikko.title = vastaus.brewery_name
-        if ("brewery_label" in vastaus) {
-            juliste.source = vastaus.brewery_label
-        }
-
-        luokitus.text = vastaus.brewery_type
-        if (vastaus.brewery_in_production === 0) {
-            luokitus.label = "" //qsTr("brewing")
-        } else {
-            luokitus.label = qsTr("not producing")
-            luokitus.color = Theme.secondaryHighlightColor
-        }
-
-        if ("location" in vastaus) {
-            if (vastaus.location.brewery_address > "") {
-                osoite.text = vastaus.location.brewery_address
-                osoite.label = qsTr("lat: ") +  vastaus.location.brewery_lat + qsTr(", lng: ") +
-                        vastaus.location.brewery_lng
-            } else {
-                osoite.text = qsTr("lat: ") +  vastaus.location.brewery_lat + qsTr(", lng: ") +
-                        vastaus.location.brewery_lng
-            }
-            kaupunki.text = vastaus.location.brewery_city
-            if (vastaus.location.brewery_state > "")
-                kaupunki.text += ", " + vastaus.location.brewery_state
-            kaupunki.label = vastaus.country_name
-        }
-
-        if ("contact" in vastaus) {
-            for (yhteystieto in vastaus.contact) {
-                if (yhteystieto === "url" || yhteystieto === "facebook" ||
-                        yhteystieto === "instagram") {
-                    if (www.text.length > 0)
-                        www.text += "\n"
-                    www.text += vastaus.contact[yhteystieto]
-                } else if (vastaus.contact[yhteystieto] > "")
-                    twitter.text += yhteystieto + ": " + vastaus.contact[yhteystieto] + ", "
-            }
-        }
-        if ("foursquare" in vastaus && "foursquare_url" in vastaus.foursquare) {
-            if (www.text > "")
-                www.text += ", "
-            www.text += vastaus.foursquare.foursquare_url
-        }
-        for (solu in vastaus.stats)
-            tilastoja.text += solu + ": " + vastaus.stats[solu] + ", "
-
-        if ("beer_list" in vastaus) {
-            i=0
-            while (i < vastaus.beer_list.count) {
-                tuotteet.lisaa(vastaus.beer_list.items[i].beer.beer_name,
-                               vastaus.beer_list.items[i].beer.bid,
-                               vastaus.beer_list.items[i].beer.beer_style,
-                               vastaus.beer_list.items[i].beer.beer_label)
-                i++
-            }
-        }
-
-        return
-    }
-
     XhttpYhteys {
         id: utYhteys
         anchors.top: parent.top
@@ -124,6 +61,7 @@ Page {
         id: tietojaOluista
         ListItem {
             id: tietue
+            contentHeight: etiketti.height
             menu: ContextMenu {
                 MenuItem {
                     text: qsTr("beer info")
@@ -147,17 +85,25 @@ Page {
                 height: Theme.iconSizeLarge
                 width: height
             }
-            TextField {
-                id: oluenTiedot
-                text: merkki
-                label: tyyppi
+            Label {
                 anchors {
                     left: etiketti.right
-                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    top: etiketti.top
                 }
+                text: merkki
                 color: Theme.highlightColor
-                readOnly: true
             }
+            Label {
+                anchors {
+                    left: etiketti.right
+                    leftMargin: Theme.paddingMedium
+                    bottom: etiketti.bottom
+                }
+                text: tyyppi
+                color: Theme.secondaryHighlightColor
+            }
+
             property int olutTunnus: olutId
         }
     }
@@ -273,5 +219,70 @@ Page {
     }
     Component.onCompleted: {
         utYhteys.haePanimo(tunniste)
+    }
+
+    function kirjoitaTiedot(tiedot) {
+        var vastaus=tiedot.response.brewery, i=0, mj="", yhteystieto, solu;
+        otsikko.title = vastaus.brewery_name;
+        if ("brewery_label" in vastaus) {
+            juliste.source = vastaus.brewery_label;
+        }
+
+        luokitus.text = vastaus.brewery_type;
+        if (vastaus.brewery_in_production === 0) {
+            luokitus.label = ""; //qsTr("brewing")
+        } else {
+            luokitus.label = qsTr("not producing");
+            luokitus.color = Theme.secondaryHighlightColor;
+        }
+
+        if ("location" in vastaus) {
+            if (vastaus.location.brewery_address > "") {
+                osoite.text = vastaus.location.brewery_address;
+                osoite.label = qsTr("lat: ") +  vastaus.location.brewery_lat + qsTr(", lng: ") +
+                        vastaus.location.brewery_lng;
+            } else {
+                osoite.text = qsTr("lat: ") +  vastaus.location.brewery_lat + qsTr(", lng: ") +
+                        vastaus.location.brewery_lng;
+            }
+            kaupunki.text = vastaus.location.brewery_city;
+            if (vastaus.location.brewery_state > "")
+                kaupunki.text += ", " + vastaus.location.brewery_state;
+            kaupunki.label = vastaus.country_name;
+        }
+
+        if ("contact" in vastaus) {
+            for (yhteystieto in vastaus.contact) {
+                if (yhteystieto === "url" || yhteystieto === "facebook" ||
+                        yhteystieto === "instagram") {
+                    if (www.text.length > 0)
+                        www.text += "\n";
+                    www.text += vastaus.contact[yhteystieto];
+                } else if (vastaus.contact[yhteystieto] > "") {
+                    twitter.text += yhteystieto + ": " + vastaus.contact[yhteystieto] + ", ";
+                }
+            }
+        }
+        if ("foursquare" in vastaus && "foursquare_url" in vastaus.foursquare) {
+            if (www.text > "")
+                www.text += ", ";
+            www.text += vastaus.foursquare.foursquare_url;
+        }
+        for (solu in vastaus.stats) {
+            tilastoja.text += solu + ": " + vastaus.stats[solu] + ", ";
+        }
+
+        if ("beer_list" in vastaus) {
+            i=0;
+            while (i < vastaus.beer_list.count) {
+                tuotteet.lisaa(vastaus.beer_list.items[i].beer.beer_name,
+                               vastaus.beer_list.items[i].beer.bid,
+                               vastaus.beer_list.items[i].beer.beer_style,
+                               vastaus.beer_list.items[i].beer.beer_label);
+                i++;
+            }
+        }
+
+        return;
     }
 }

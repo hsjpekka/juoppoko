@@ -40,6 +40,7 @@ public:
     Q_INVOKABLE int muutaJuoma(int id, int ml, double prosentteja, QDateTime aika);
     Q_INVOKABLE bool onkoOletukset();
     Q_INVOKABLE void paivitaRajat();
+    Q_INVOKABLE double paljonkoAikana(qint64 alku, qint64 loppu, bool paivittain = true); // ml aikavälillä
     Q_INVOKABLE double paljonkoAikana(QDateTime alku, QDateTime loppu, bool paivittain = true); // ml aikavälillä
     Q_INVOKABLE double paljonkoPaivassa(QDateTime loppu, int paivia = 1); // ml
     Q_INVOKABLE double paljonkoPaivassa(qint64 loppu, int paivia = 1); // ml
@@ -47,8 +48,6 @@ public:
     Q_INVOKABLE double polttonopeus(double paino, double maksa = 1.0);
     Q_INVOKABLE double promilleja(QDateTime aika = QDateTime::currentDateTime(), bool veresta = false);
     Q_INVOKABLE double promilleja(qint64 ms1970, bool veresta = false);
-    //Q_INVOKABLE double promilleja(bool veresta, QDateTime aika = QDateTime::currentDateTime());
-    //Q_INVOKABLE double promilleja(bool veresta, qint64 ms1970);
     Q_INVOKABLE QDateTime selvana();
     Q_INVOKABLE QDateTime rajalla();
 

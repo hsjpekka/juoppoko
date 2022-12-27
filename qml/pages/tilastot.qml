@@ -4,7 +4,7 @@ import "../scripts/scripts.js" as Apuja
 
 Dialog {
     id: sivu
-    property var    juodut
+    //property var    juodut
     property real   mlKuussa
     property real   mlViikossa
     property real   mlVuodessa
@@ -63,9 +63,8 @@ Dialog {
     }
 
     function mlAikana(kesto, loppu) { // jakso = ms nykyhetkestä (tai tulevasta juoman hetkestä)
-        //var nyt = new Date().getTime()
+        /*
         var ml = 0, i = juodut.length - 1, t0, t1 = loppu;
-        //Apuja.juomienMaara() - 1
         if (t1 === undefined)
             t1 = new Date().getTime();
         if (t1 < juodut[i].ms)
@@ -76,24 +75,22 @@ Dialog {
         while (i >= 0 && juodut[i].ms >= t0) {
             ml += juodut[i].ml;
             i--;
+        } // */
+        if (loppu === undefined) {
+            loppu = new Date().getTime();
+            if (loppu < juoja.juodunAika()) {
+                loppu = juoja.juodunAika();
+            }
         }
 
-        //console.log(" zzz " + juodut[juodut.length-1].ms + ", " + juodut[juodut.length-1].ml)
-        //if ( Apuja.juomanAika(i) > nyt)
-        //    nyt = Apuja.juomanAika(i)
-
-        //while ( (i >=0 ) && (Apuja.juomanAika(i) >= nyt - jakso)){
-        //    ml = ml + Apuja.juomanTilavuus(i)*Apuja.juomanVahvuus(i)/100
-        //    i--
-        //}
-
-        return ml;
+        return juoja.paljonkoAikana(loppu - kesto, loppu);//ml;
     }
 
     function vuodessa() {
         var nyt = new Date().getTime();
-        var suhde = 1, i = juodut.length - 1;
+        var suhde = 1;//, i = juodut.length - 1;
 
+        /*
         if (juodut[i].ms > nyt)
             nyt = juodut[i].ms;
 
@@ -103,10 +100,20 @@ Dialog {
                 suhde = 1/52;
             txtVuodessa.font.italic = !txtVuodessa.font.italic;
         }
+        //*/
 
         //console.log("oo  " + suhde);
+        if (juoja.juodunAika() > nyt)
+            nyt = juoja.juodunAika();
 
-        return mlAikana(365*paiva)/suhde;
+        if (juoja.juodunAika(0) > nyt - 365*paiva){
+            suhde = (nyt-juoja.juodunAika(0))/(365*paiva);
+            if (suhde < 1/52)
+                suhde = 1/52;
+            txtVuodessa.font.italic = !txtVuodessa.font.italic;
+        }
+
+        return mlAikana(365*paiva, nyt)/suhde;
     }
 
     SilicaFlickable {
@@ -128,9 +135,12 @@ Dialog {
 
                 menu: ContextMenu {
                     id: drinkMenu
-                    //MenuItem { text: qsTr("day grid") }
-                    MenuItem { text: qsTr("weekly consumption") }
-                    MenuItem { text: qsTr("daily consumption") }
+                    MenuItem {
+                        text: qsTr("weekly consumption")
+                    }
+                    MenuItem {
+                        text: qsTr("daily consumption")
+                    }
                 }
 
                 currentIndex: (valittuKuvaaja > 1.5) ? 0 : valittuKuvaaja
@@ -143,9 +153,6 @@ Dialog {
                     case 1:
                         valittuKuvaaja = 1
                         break
-                    //case 2:
-                      //  valittuKuvaaja = 2
-                        //break
                     }
                 }
 
@@ -155,91 +162,49 @@ Dialog {
                 text: qsTr("last 24 h")
             }
 
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                Label {
-                    id: txtPaivassa
-                    color: Theme.highlightColor
-                    text: tanaan.toFixed(1) + " ml"                    
-                }
-
-            } // päivässä
+            Label {
+                id: txtPaivassa
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                color: Theme.highlightColor
+                text: tanaan.toFixed(1) + " ml"
+            }
 
             SectionHeader {
                 text: qsTr("last week")
             }
 
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                Label {
-                    id: txtViikossa
-                    color: Theme.highlightColor
-                    text: qsTr("%1 ml, equals to %2 l in year").arg(mlViikossa.toFixed(1)).arg((mlViikossa*52/1000).toFixed(1))
-                    //text: mlViikossa.toFixed(1) + " ml"
-                }
-                /*
-                Label {
-                    color: Theme.highlightColor
-                    text: qsTr(", equals to ")
-                }
-
-                Label {
-                    color: Theme.highlightColor
-                    text: (mlViikossa*52/1000).toFixed(1) + " l " + qsTr("in year")
-                }// */
-
-            } // viikossa
-
+            Label {
+                id: txtViikossa
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                color: Theme.highlightColor
+                text: qsTr("%1 ml, equals to %2 l in year").arg(mlViikossa.toFixed(1)).arg((mlViikossa*52/1000).toFixed(1))
+            }
 
             SectionHeader {
                 text: qsTr("last month")
             }
 
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                Label {
-                    id: txtKuussa
-                    color: Theme.highlightColor
-                    text: qsTr("%1 ml, equals to %2 l in year").arg(mlKuussa.toFixed(1)).arg((mlKuussa/30*365/1000).toFixed(1))
-                }
-                /*
-                Label {
-                    color: Theme.highlightColor
-                    text: qsTr(", equals to ")
-                }
-
-                Label {
-                    color: Theme.highlightColor
-                    text: (mlKuussa/30*365/1000).toFixed(1) + " l " + qsTr("in year")
-                } //*/
-
-
-            } // kuussa
+            Label {
+                id: txtKuussa
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                color: Theme.highlightColor
+                text: qsTr("%1 ml, equals to %2 l in year").arg(mlKuussa.toFixed(1)).arg((mlKuussa/30*365/1000).toFixed(1))
+            }
 
             SectionHeader {
                 text: qsTr("in year")
             }
 
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                Label {
-                    id: txtVuodessa
-                    color: Theme.highlightColor
-                    text: qsTr("%1 l in year, equals to %2 ml in week").arg((mlVuodessa/1000).toFixed(1)).arg((mlVuodessa/52).toFixed(1))
-                    //text: (mlVuodessa/1000).toFixed(1) + " l"
-                }
-                /*
-                Label {
-                    color: Theme.highlightColor
-                    text: qsTr(", equals to ")
-                }
-
-                Label {
-                    color: Theme.highlightColor
-                    text: (mlVuodessa()/52).toFixed(1) + " ml " + qsTr("in week")
-                }// */
-
-            } // vuodessa
+            Label {
+                id: txtVuodessa
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                color: Theme.highlightColor
+                text: qsTr("%1 l in year, equals to %2 ml in week").arg((mlVuodessa/1000).toFixed(1)).arg((mlVuodessa/52).toFixed(1))
+            }
 
             SectionHeader {
                 text: qsTr("drinking day ends at")
@@ -279,7 +244,6 @@ Dialog {
     }
 
     Component.onCompleted: {
-        //console.log("vrk vaihtuu " + ryyppyVrk + " - " + kello.valittuTunti + ", " + kello.valittuMinuutti)
         tanaan = mlAikana(paiva)
         mlViikossa = mlAikana(7*paiva)
         mlKuussa = mlAikana(30*paiva)

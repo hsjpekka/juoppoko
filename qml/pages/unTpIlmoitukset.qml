@@ -5,6 +5,10 @@ import "../components/"
 
 Page {
     id: sivu
+    Component.onCompleted: {
+        ilmoituksetListaan()
+    }
+
     property string ilmoitukset: ""
 
     ListModel {
@@ -22,44 +26,47 @@ Page {
         property int kutsuja: -1
 
         function lisaaViesti(luokka, otsikko, teksti, linkki, liite, uusi) {
-            return lisaa(luokka, "", otsikko, teksti, linkki, liite, uusi)
+            return lisaa(luokka, "", otsikko, teksti, linkki, liite, uusi);
         }
 
         function lisaaLinkki(luokka, avattava, teksti) {
-            return lisaa(luokka, avattava, teksti)
+            return lisaa(luokka, avattava, teksti);
         }
 
         function lisaa(luokka, avattava, otsikko, teksti, linkki, liite, uusi) {
             if (luokka === undefined) {
-                console.log("No category for the notification - ignoring.")
-                return
+                console.log("No category for the notification - ignoring.");
+                return;
             }
 
             if (kutsuja === -1) {
-                tiedot.clear()
-                console.log("tyhjennetty")
-                kutsuja++
+                tiedot.clear();
+                console.log("tyhjennetty");
+                kutsuja++;
             }
 
-            if (avattava === undefined) avattava = ""
-            if (otsikko === undefined) otsikko = ""
-            if (teksti === undefined) teksti = ""
-            if (linkki === undefined) linkki = ""
-            if (liite === undefined) liite = ""
-            if (uusi === undefined) uusi = false
+            if (avattava === undefined) avattava = "";
+            if (otsikko === undefined) otsikko = "";
+            if (teksti === undefined) teksti = "";
+            if (linkki === undefined) linkki = "";
+            if (liite === undefined) liite = "";
+            if (uusi === undefined) uusi = false;
 
             tiedot.append({"osio": luokka, "otsake": otsikko, "linkki": linkki,
                               "sisalto": teksti, "liite": liite,
                               "uusi": uusi, "avattava": avattava
-                          })
+                          });
+            return;
         }
 
         function nayta(i) {
-            tiedot.set(i, {"uusi": true})
+            tiedot.set(i, {"uusi": true});
+            return;
         }
 
         function piilota(i) {
-            tiedot.set(i, {"uusi": false})
+            tiedot.set(i, {"uusi": false});
+            return;
         }
     }
 
@@ -90,7 +97,6 @@ Page {
                 anchors {
                     top: parent.top
                     left: parent.left
-                    //leftMargin: Theme.horizontalPageMargin
                     right: parent.right
                     rightMargin: (uutinen.sivulle > "") ? kuvake.width + Theme.paddingSmall : kuva.width + Theme.paddingSmall
                 }
@@ -131,7 +137,7 @@ Page {
                 source: liite
                 anchors.top: parent.top
                 anchors.right: parent.right
-                height: Theme.iconSizeMedium// uutinen.auki? Theme.iconSizeExtraLarge : uutinen.minKorkeus
+                height: Theme.iconSizeMedium
                 width: height
                 visible: !kuvake.visible
                 z: -1
@@ -190,120 +196,116 @@ Page {
 
     function ilmoituksetListaan() {
         var ilmo, maljoja = -1, kommentteja = -1, kavereita = -1, viesteja = -1, uutisia = -1,
-            tarjoajia = -1, veunes = -1, muita = -1, teksti = "", i=0, uusi
+            tarjoajia = -1, veunes = -1, muita = -1, teksti = "", i=0, uusi;
         try {
-            //console.log("uutispuuroa " + ilmoitukset)
-            ilmo = JSON.parse(ilmoitukset)
+            ilmo = JSON.parse(ilmoitukset);
         } catch (err) {
-            console.log(err)
-            return
+            console.log(err);
+            return;
         }
         if ("notifications" in ilmo && "unread_count" in ilmo.notifications ) {
             if ("comments" in ilmo.notifications.unread_count)
-                kommentteja = ilmo.notifications.unread_count.comments
+                kommentteja = ilmo.notifications.unread_count.comments;
             if ("toasts" in ilmo.notifications.unread_count)
-                maljoja = ilmo.notifications.unread_count.toasts
+                maljoja = ilmo.notifications.unread_count.toasts;
             if ("friends" in ilmo.notifications.unread_count)
-                kavereita = ilmo.notifications.unread_count.friends
+                kavereita = ilmo.notifications.unread_count.friends;
             if ("messages" in ilmo.notifications.unread_count)
-                viesteja = ilmo.notifications.unread_count.messages
+                viesteja = ilmo.notifications.unread_count.messages;
             if ("venues" in ilmo.notifications.unread_count)
-                tarjoajia = ilmo.notifications.unread_count.venues
+                tarjoajia = ilmo.notifications.unread_count.venues;
             if ("veunes" in ilmo.notifications.unread_count)
-                veunes = ilmo.notifications.unread_count.veunes
+                veunes = ilmo.notifications.unread_count.veunes;
             if ("others" in ilmo.notifications.unread_count)
-                muita = ilmo.notifications.unread_count.others
+                muita = ilmo.notifications.unread_count.others;
             if ("news" in ilmo.notifications.unread_count)
-                uutisia = ilmo.notifications.unread_count.news
+                uutisia = ilmo.notifications.unread_count.news;
 
-            teksti = qsTr("new comments - %1, new toasts %2").arg(kommentteja).arg(maljoja)
-            tiedot.lisaaLinkki( qsTr("Comments & Toasts"), "unTpKayttaja.qml", teksti)
-            teksti = qsTr("new friend requests - %1").arg(kavereita)
-            tiedot.lisaaLinkki( qsTr("Friend requests"), "unTpKaverit.qml", teksti)
+            teksti = qsTr("new comments - %1, new toasts %2").arg(kommentteja).arg(maljoja);
+            tiedot.lisaaLinkki( qsTr("Comments & Toasts"), "unTpKayttaja.qml", teksti);
+            teksti = qsTr("new friend requests - %1").arg(kavereita);
+            tiedot.lisaaLinkki( qsTr("Friend requests"), "unTpKaverit.qml", teksti);
 
             if ("response" in ilmo) {
-                console.log("response löytyy")
                 if ("messages" in ilmo.response) {
-                    i = 0
+                    i = 0;
                     while (i < ilmo.response.messages.count) {
-                        if (i < viesteja)
-                            uusi = true
-                        else
-                            uusi = vanha
+                        if (i < viesteja) {
+                            uusi = true;
+                        } else {
+                            uusi = vanha;
+                        }
                         tiedot.lisaaViesti( qsTr("Messages"),
                                      ilmo.response.messages.items[i].messages_title,
                                      ilmo.response.messages.items[i].messages_text,
                                      ilmo.response.messages.items[i].messages_link, "", uusi
-                                     )
-                        i++
+                                     );
+                        i++;
                     }
                 }
                 if ("venues" in ilmo.response) {
-                    i = 0
+                    i = 0;
                     while (i < ilmo.response.venues.count) {
-                        if (i < tarjoajia)
-                            uusi = true
-                        else
-                            uusi = vanha
+                        if (i < tarjoajia) {
+                            uusi = true;
+                        } else {
+                            uusi = vanha;
+                        }
                         tiedot.lisaaViesti( qsTr("Venues"),
                                            ilmo.response.venues.items[i].venues_title,
                                            ilmo.response.venues.items[i].venues_text,
                                            ilmo.response.venues.items[i].venues_link, "", uusi
-                                     )
-                        i++
+                                     );
+                        i++;
                     }
                 }
                 if ("veunes" in ilmo.response) {
-                    i = 0
+                    i = 0;
                     while (i < ilmo.response.veunes.count) {
-                        if (i < veunes)
-                            uusi = true
-                        else
-                            uusi = vanha
+                        if (i < veunes) {
+                            uusi = true;
+                        } else {
+                            uusi = vanha;
+                        }
                         tiedot.lisaaViesti( qsTr("Veunes"),
                                      ilmo.response.veunes.items[i].veunes_title,
                                      ilmo.response.veunes.items[i].veunes_text,
                                      ilmo.response.veunes.items[i].veunes_link, "", uusi
-                                     )
-                        i++
+                                     );
+                        i++;
                     }
                 }
                 if ("news" in ilmo.response) {
-                    console.log("news löytyy - " + ilmo.response.news.count + " / " + uutisia)
-                    i = 0
+                    i = 0;
                     while (i < ilmo.response.news.count) {
-                        if (i < uutisia)
-                            uusi = true
-                        else
-                            uusi = false
+                        if (i < uutisia) {
+                            uusi = true;
+                        } else {
+                            uusi = false;
+                        }
                         tiedot.lisaa( qsTr("News"), "", ilmo.response.news.items[i].news_title,
                                      ilmo.response.news.items[i].news_text,
                                      ilmo.response.news.items[i].news_link,
                                      ilmo.response.news.items[i].news_image_link, uusi
-                                     )
-                        i++
+                                     );
+                        i++;
                     }
                 }
                 if ("others" in ilmo.response) {
-                    i = 0
+                    i = 0;
                     while (i < muita) {
                         tiedot.lisaa( qsTr("Others"), ilmo.response.others.items[i].others_title,
                                      ilmo.response.others.items[i].others_text,
                                      ilmo.response.others.items[i].others_link, "", ""
-                                     )
-                        i++
+                                     );
+                        i++;
                     }
                 }
             }
 
         }
 
-        return
-    }
-
-    Component.onCompleted: {
-        console.log("onko tyhjä? " + ilmoitukset.length)
-        ilmoituksetListaan()
+        return;
     }
 
 }

@@ -6,40 +6,6 @@ import "../scripts/unTap.js" as UnTpd
 Page {
     id: sivu
 
-    function haunAloitus(hakuteksti) {
-        loydetytPanimot.clear()
-        unTpKysely.hakunro = 0
-        unTpKysely.haePanimoita(hakuteksti)
-        return
-    }
-
-    function kopioiPanimo(i) {
-        valitunEtiketti.source = loydetytPanimot.get(i).merkki
-        panimonNimi.text = loydetytPanimot.get(i).nimi
-        panimonNimi.label = loydetytPanimot.get(i).tyyppi
-        kaupunki.text = loydetytPanimot.get(i).paikka
-        valittuPanimo.panimoId = loydetytPanimot.get(i).id
-
-        if (loydetytPanimot.get(i).toimii) {
-            panimonNimi.font.italic = false
-            kaupunki.font.italic = false
-        } else {
-            panimonNimi.font.italic = true
-            kaupunki.font.italic = true
-        }
-        return
-    }
-
-    function paivitaHaetut(jsonVastaus) {
-        var i=0
-        console.log(JSON.stringify(jsonVastaus))
-        while (i<jsonVastaus.response.found) {
-            i++
-        }
-
-        return
-    }
-
     ListModel {
         id: loydetytPanimot
 
@@ -166,8 +132,6 @@ Page {
         XhttpYhteys {
             id: unTpKysely
             width: parent.width
-            //unohdaVanhat: true
-            //xhttp: untpdKysely
             onValmis: {
                 var jsonVastaus;
                 try {
@@ -214,5 +178,39 @@ Page {
                 }
             }
         }
+    }
+
+    function haunAloitus(hakuteksti) {
+        loydetytPanimot.clear()
+        unTpKysely.hakunro = 0
+        unTpKysely.haePanimoita(hakuteksti)
+        return
+    }
+
+    function kopioiPanimo(i) {
+        valitunEtiketti.source = loydetytPanimot.get(i).merkki
+        panimonNimi.text = loydetytPanimot.get(i).nimi
+        panimonNimi.label = loydetytPanimot.get(i).tyyppi
+        kaupunki.text = loydetytPanimot.get(i).paikka
+        valittuPanimo.panimoId = loydetytPanimot.get(i).id
+
+        if (loydetytPanimot.get(i).toimii) {
+            panimonNimi.font.italic = false
+            kaupunki.font.italic = false
+        } else {
+            panimonNimi.font.italic = true
+            kaupunki.font.italic = true
+        }
+        return
+    }
+
+    function paivitaHaetut(jsonVastaus) {
+        var i=0
+        console.log(JSON.stringify(jsonVastaus))
+        while (i<jsonVastaus.response.found) {
+            i++
+        }
+
+        return
     }
 }

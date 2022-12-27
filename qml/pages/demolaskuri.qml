@@ -17,19 +17,16 @@ Page {
     readonly property int    minMs: 60*1000
 
     onPvmChanged: {
-        //console.log("pvm vaihtui ")
         if (valmista) {
             paivita()
         }
     }
     Component.onCompleted: {
-        console.log("testaajan alustus " + lahtoTaso)
         testaaja.asetaKeho(paino, vetta, kunto, 0)
         testaaja.asetaPohjaPromillet(lahtoTaso, pvm.getTime())
         testaaja.asetaPromilleraja(promilleRaja1)
         paivita()
         valmista = true
-        console.log("testaaja alustettu")
     }
 
     SilicaFlickable {
@@ -40,7 +37,6 @@ Page {
         Component.onCompleted: {
             kello.tausta = kello._backgroundColor
             paivays.tausta = paivays._backgroundColor
-            //console.log("promilleja " + lahtoTaso + " ‰")
         }
 
         PullDownMenu {
@@ -73,7 +69,6 @@ Page {
                 id: alku
                 title: qsTr("drinker")
                 width: parent.width
-                //font.pixelSize: Theme.fontSizeMedium
                 content.sourceComponent: Column {
                     width: alku.width - x
                     x: Theme.horizontalPageMargin
@@ -153,7 +148,6 @@ Page {
 
                     // pohjat
                     Row {
-                        //id: alkutilanne
                         width: parent.width
 
                         TextField {
@@ -214,7 +208,7 @@ Page {
                             id: paivays0
                             value: alku.alkuaika.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
                             valueColor: Theme.primaryColor
-                            width: Theme.fontSizeMedium*8 //sivu.width - kello.width - pohjat.width - Theme.fontSizeMedium*2 - 4*Theme.paddingSmall
+                            width: Theme.fontSizeMedium*8
                             onClicked: {
                                 avaaPaivanValinta()
                             }
@@ -248,7 +242,7 @@ Page {
 
                 TextField {
                     text: juomari.promilleja < 3.0 ? juomari.promilleja.toFixed(2) + " ‰" : "> 3.0 ‰"
-                    label: qsTr("BAC")//qsTr("BAC at %1").arg(kello.value)
+                    label: qsTr("BAC")
                     readOnly: true
                     font.pixelSize: juomari.promilleja < promilleRaja1? Theme.fontSizeMedium : Theme.fontSizeLarge
                     font.bold: juomari.promilleja < promilleRaja1? false : true
@@ -272,7 +266,6 @@ Page {
                         } else {
                             text = testaaja.selvana().toLocaleTimeString(Qt.locale(), kelloMuoto);
                         }
-                        console.log("selvänä " + testaaja.selvana().toLocaleTimeString(Qt.locale(), kelloMuoto) + " -- " + testaaja.selvana().getTime());
                         return;
                     }
                 }
@@ -293,8 +286,6 @@ Page {
                         } else {
                             text = testaaja.rajalla().toLocaleTimeString(Qt.locale(), kelloMuoto);
                         }
-                        //console.log("rajalla " + testaaja.rajalla().toLocaleTimeString(Qt.locale(), kelloMuoto) + " " + testaaja.rajalla().getTime());
-
                         return;
                     }
                 }
@@ -302,7 +293,6 @@ Page {
             }
 
             Row { // nykyinen aika
-
                 spacing: Theme.paddingSmall
                 x: (parent.width - kello.width - paivays.width - spacing)/2
 
@@ -346,7 +336,7 @@ Page {
                     id: paivays
                     value: pvm.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
                     valueColor: Theme.primaryColor
-                    width: Theme.fontSizeSmall*8 //sivu.width - kello.width - 3*Theme.paddingSmall
+                    width: Theme.fontSizeSmall*8
                     onClicked: {
                             avaaPaivanValinta()
                     }
@@ -360,7 +350,6 @@ Page {
                         dialog.accepted.connect(function() {
                             pvm = new Date(dialog.date.getFullYear(), dialog.date.getMonth(), dialog.date.getDate(),
                                            pvm.getHours(), pvm.getMinutes(), 0, 0)
-                            //value = pvm.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
                             if (pvm.getTime() < alkutilanne.aika.getTime()) {
                                 kello._backgroundColor = Theme.highlightColor
                                 paivays._backgroundColor = Theme.highlightColor
@@ -368,8 +357,6 @@ Page {
                                 kello._backgroundColor = kello.tausta
                                 paivays._backgroundColor = paivays.tausta
                             }
-                            //paivita();
-                            //laskeUudelleen();
                         })
                     }
 
@@ -411,11 +398,10 @@ Page {
                         muutaUusi()
                     }
                 }
-
             }
 
             SectionHeader {
-                text: qsTr("juodut")
+                text: qsTr("drinks")
             }
 
             Juomari {
@@ -450,14 +436,12 @@ Page {
                 }
 
                 onValittuJuomaChanged: {
-                    txtJuoma.text = juodunNimi(valittuJuoma) //valitunNimi //Apuja.juomanNimi(i)
-                    txtMaara.text = juodunTilavuus(valittuJuoma) //valitunTilavuus //lueJuomanMaara(qId)
-                    voltit.text = juodunVahvuus(valittuJuoma) //valitunVahvuus //lueJuomanVahvuus(qId)
+                    txtJuoma.text = juodunNimi(valittuJuoma)
+                    txtMaara.text = juodunTilavuus(valittuJuoma)
+                    voltit.text = juodunVahvuus(valittuJuoma)
                 }
             }
-
         }
-
     }
 
     function muutaUusi() {
@@ -500,7 +484,6 @@ Page {
     }
 
     function paivita() {
-        //console.log(pvm.toLocaleTimeString() + "=" + pvm.getTime() + " -||- " + testaaja.promilleja(pvm.getTime()))
         juomari.promilleja = testaaja.promilleja(pvm.getTime());
         txtSelvana.teksti();
         txtAjokunnossa.teksti();
@@ -508,7 +491,6 @@ Page {
     }
 
     function uusiJuoma(hetki, maara, vahvuus, juomanNimi) {
-        console.log("tää ");
         juomari.jId++;
         testaaja.juo(juomari.jId, maara, vahvuus, hetki);
         juomari.juo(juomari.jId, hetki, maara, vahvuus, juomanNimi);

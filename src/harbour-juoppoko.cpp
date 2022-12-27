@@ -50,17 +50,17 @@ int main(int argc, char *argv[])
     untpdkysely.setOAuthId(UTPD_ID);
     untpdkysely.setOAuthSecret(UTPD_SECRET);
     untpdkysely.setOAuthRedirect(CB_URL);
-    untpdkysely.setServer("https","api.untappd.com");
+    //untpdkysely.setServer("https","api.untappd.com");
     untpdkysely.setOAuthPath("https://untappd.com/oauth/authenticate/");
     untpdkysely.setOAuthTokenPath("https://untappd.com/oauth/authorize/");
     untpdkysely.setQueryParameter("fsqClientId", FSQ_ID, "client_id");
     untpdkysely.setQueryParameter("fsqClientSecret", FSQ_SECRET, "client_secret");
     untpdkysely.setQueryParameter("fsqVersion", FSQ_VERSIO, "v");
+    untpdkysely.setQueryParameter("fsqAPIkey", FSQ_APIKEY, "Authorization");
 
-    view->engine()->rootContext()->setContextProperty("ccKohde", "kone");
     view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
     view->engine()->rootContext()->setContextProperty("unTappdCb", CB_URL);
-    //view->engine()->rootContext()->setContextProperty("unTappdSe", UTPD_SECRET);
+    //view->engine()->rootContext()->setContextProperty("fsqAPIkey", FSQ_APIKEY);
     view->engine()->rootContext()->setContextProperty("untpdKysely", &untpdkysely);
     view->engine()->rootContext()->setContextProperty("juoja", &juoja);
     view->engine()->rootContext()->setContextProperty("testaaja", &ennustaja);
@@ -69,39 +69,4 @@ int main(int argc, char *argv[])
     view->show();
 
     return app->exec();
-
-    /*
-    //char *strings[argc+8]; // + s1-s8
-    //char *s1 = UTPD_ID;
-    //char *s2 = UTPD_SECRET;
-    //char *s3 = CB_URL;
-    //char *s4 = FSQ_ID;
-    //char *s5 = FSQ_SECRET;
-    //char *s6 = FSQ_VERSIO;
-    //char *s7 = JUOPPOKO_VERSIO;
-    //char *s8 = CC_KOHDE;
-    //int i;
-
-    for (i=0; i<argc; i++){
-        strings[i] = argv[i];
-    }
-
-    strings[argc] = s8; // onko käännös pc:lle (i486) vai puhelimeen (armv7hl)
-    argc++;
-    strings[argc] = s7; // ohjelman versio
-    argc++;
-    strings[argc] = s6; // 4square versio (version päivämäärä)
-    argc++;
-    strings[argc] = s5; // 4square salasana
-    argc++;
-    strings[argc] = s4; // 4square appId
-    argc++;
-    strings[argc] = s3; // redirect url
-    argc++;
-    strings[argc] = s2; // unTappd salasana
-    argc++;
-    strings[argc] = s1; // unTappd appId
-    argc++;
-
-    return SailfishApp::main(argc, strings);// */
 }

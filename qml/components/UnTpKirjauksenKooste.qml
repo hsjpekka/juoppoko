@@ -5,7 +5,6 @@ import "../pages"
 //Item {
 ListItem {
     id: kooste
-    //height: kirjaus.height + 2*kirjaus.y
     contentHeight: kirjaus.height + 4
     propagateComposedEvents: true
     width: parent.width
@@ -119,8 +118,7 @@ ListItem {
         border.width: 1
         radius: Theme.paddingMedium
         anchors.fill: parent
-        //y: 0
-    } // */
+    }
 
     Column {
         id: kirjaus

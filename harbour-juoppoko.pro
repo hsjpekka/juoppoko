@@ -12,14 +12,10 @@
 # The name of your application
 TARGET = harbour-juoppoko
 
-#OAuth2 & RedirectListener need link_pkgconfig
-#link_pkgconfig has to be before sailfishapp
-CONFIG += \
-    link_pkgconfig \
-    sailfishapp
+CONFIG += sailfishapp
 
 #sailfish webview
-PKGCONFIG += qt5embedwidget
+#PKGCONFIG += qt5embedwidget
 #OAuth2 & RedirectListener
 PKGCONFIG += amberwebauthorization
 
@@ -85,16 +81,6 @@ DISTFILES += \
 #     "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
 #     "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
 #     "JUOPPOKO_VERSIO=\"\\\"2.5.0\\\"\""
-
-#DEFINES += \
-#     UTPD_ID=\\\$${_CL_ID}\\\" \
-#     UTPD_SECRET=\\\"$${_CL_SECRET}\\\" \
-#     FSQ_ID=\\\"$${_FSQ_ID}\\\" \
-#     FSQ_SECRET=\\\"$${_FSQ_SECRET}\\\" \
-#     CC_KOHDE=\\\"$${_CC_KOHDE}\\\"\
-#     FSQ_VERSIO=\\\"20180712\\\" \
-#     CB_URL=\\\"juoppoko.untpd.tunnistus\\\" \
-#     JUOPPOKO_VERSIO=\\\"2.5.0\\\"
 
 # to disable building translations every time, comment out the
 # following CONFIG line

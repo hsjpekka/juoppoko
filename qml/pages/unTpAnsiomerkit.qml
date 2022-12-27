@@ -17,69 +17,11 @@ Page {
     property string kayttajaTunnus: "" // itse, jos ""
     property bool   naytaKuvaus: false
 
-    function lueMerkit(merkkiTiedot) {
-        var i = 0, taso = "", mj = "";
-        //console.log("merkkejä " + merkkiTiedot.count)
-
-        while (i < merkkiTiedot.count){
-            if (merkkiTiedot.items[i].is_level) {
-                taso = merkkiTiedot.items[i].levels.count + "";
-            }
-
-            isotMerkit.lisaaIsoMerkki(merkkiTiedot.items[i].media.badge_image_lg,
-                           merkkiTiedot.items[i].badge_name,
-                            merkkiTiedot.items[i].badge_description,
-                            merkkiTiedot.items[i].created_at);
-
-            i++;
-        }
-        return;
-    }
-
-    function naytaUudet(){
-        var i = 0, mj = "", merkit = UnTpd.newBadges;
-        if (UnTpd.newBadgesSet) {
-            while (i < merkit.count) {
-                if (merkit.items[i].is_local_badge) {
-                    mj = qsTr("Local Badge");
-                }
-                //else
-                    //mj = qsTr("not Local Badge")
-
-                if (merkit.items[i].venue_name > ""){
-                    if (mj !== "") {
-                        mj += "\n";
-                    }
-                    mj += merkit.items[i].venue_name;
-                }
-
-                isotMerkit.lisaaIsoMerkki(merkit.items[i].badge_image.lg,
-                               merkit.items[i].badge_name,
-                               merkit.items[i].badge_description,
-                               mj);
-                i++;
-            }
-        }
-        else {
-            isotMerkit.lisaaIsoMerkki("",qsTr("No badges during this session!"), "", qsTr("Depressing."));
-        }
-
-        return;
-    }
-
-    function tyhjennaIsotMerkit(){
-        isotMerkit.clear();
-        uTYhteys.hakuNro = 0;
-
-        return;
-    }
-
     ListModel {
         id: isotMerkit
 
         function lisaaIsoMerkki(merkki, nimi, kuvaus, paivays){
             var mj= kuvaus + "\n \n" + paivays;
-            //console.log("erkki " + nimi + ", " + isotMerkit.count)
             isotMerkit.append({"nimi": nimi, "merkinUrl": merkki,
                                   "kuvaus": mj });
             valitutMerkit.positionViewAtBeginning();
@@ -95,7 +37,7 @@ Page {
             width: sivu.width - Theme.horizontalPageMargin
             x: 0.5*(sivu.width - width)
             height: merkkinaytto.height + Theme.paddingLarge
-            //property int reunus: Theme.paddingLarge
+
             Connections {
                 target: sivu
                 onNaytaKuvausChanged: {
@@ -158,6 +100,40 @@ Page {
         }
     }
 
+    XhttpYhteys {
+        id: uTYhteys
+        anchors.top: parent.top
+        z: 1
+        onValmis: {
+            var jsonVastaus, merkkitiedot
+            try {
+                jsonVastaus = JSON.parse(httpVastaus)
+                if (jsonVastaus.response.count < merkkejaPerHaku){
+                    kaikkiHaettu = true
+                }
+                lueMerkit(jsonVastaus.response)
+
+            } catch (err) {
+                console.log("" + err)
+            }
+            hakuNro++
+        }
+
+        property int hakuNro: 0
+        property int merkkejaPerHaku: 25
+        property string toiminto: ""
+
+        function haeMerkit() {
+            var kysely = ""
+            kysely = UnTpd.getBadges(kayttajaTunnus, hakuNro*merkkejaPerHaku,
+                                              merkkejaPerHaku);
+            xHttpGet(kysely[0], kysely[1], "merkit");
+
+            return
+        }
+
+    }
+
     SilicaListView {
         id: valitutMerkit
         anchors.fill: parent
@@ -196,41 +172,61 @@ Page {
             }
         }
 
-        XhttpYhteys {
-            id: uTYhteys
-            anchors.top: parent.top
-            z: 1
-            onValmis: {
-                var jsonVastaus, merkkitiedot
-                try {
-                    jsonVastaus = JSON.parse(httpVastaus)
-                    if (jsonVastaus.response.count < merkkejaPerHaku){
-                        kaikkiHaettu = true
-                    }
-                    lueMerkit(jsonVastaus.response)
-
-                } catch (err) {
-                    console.log("" + err)
-                }
-                hakuNro++
-            }
-
-            property int hakuNro: 0
-            property int merkkejaPerHaku: 25
-            property string toiminto: ""
-
-            function haeMerkit() {
-                var kysely = ""
-                kysely = UnTpd.getBadges(kayttajaTunnus, hakuNro*merkkejaPerHaku,
-                                                  merkkejaPerHaku);
-                xHttpGet(kysely[0], kysely[1], "merkit");
-
-                return
-            }
-
-        }
-
         VerticalScrollDecorator {}
 
     } // valitutMerkit-lista
+
+    function lueMerkit(merkkiTiedot) {
+        var i = 0, taso = "", mj = "";
+
+        while (i < merkkiTiedot.count){
+            if (merkkiTiedot.items[i].is_level) {
+                taso = merkkiTiedot.items[i].levels.count + "";
+            }
+
+            isotMerkit.lisaaIsoMerkki(merkkiTiedot.items[i].media.badge_image_lg,
+                           merkkiTiedot.items[i].badge_name,
+                            merkkiTiedot.items[i].badge_description,
+                            merkkiTiedot.items[i].created_at);
+
+            i++;
+        }
+        return;
+    }
+
+    function naytaUudet(){
+        var i = 0, mj = "", merkit = UnTpd.newBadges;
+        if (UnTpd.newBadgesSet) {
+            while (i < merkit.count) {
+                if (merkit.items[i].is_local_badge) {
+                    mj = qsTr("Local Badge");
+                }
+
+                if (merkit.items[i].venue_name > ""){
+                    if (mj !== "") {
+                        mj += "\n";
+                    }
+                    mj += merkit.items[i].venue_name;
+                }
+
+                isotMerkit.lisaaIsoMerkki(merkit.items[i].badge_image.lg,
+                               merkit.items[i].badge_name,
+                               merkit.items[i].badge_description,
+                               mj);
+                i++;
+            }
+        }
+        else {
+            isotMerkit.lisaaIsoMerkki("",qsTr("No badges during this session!"), "", qsTr("Depressing."));
+        }
+
+        return;
+    }
+
+    function tyhjennaIsotMerkit(){
+        isotMerkit.clear();
+        uTYhteys.hakuNro = 0;
+
+        return;
+    }
 }

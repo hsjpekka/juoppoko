@@ -134,11 +134,11 @@
     </message>
     <message>
         <source>%1 ‰ at</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 klo</translation>
     </message>
     <message>
-        <source>My unTappd account</source>
-        <translation type="unfinished"></translation>
+        <source>UnTappd account</source>
+        <translation>UnTappd-tili</translation>
     </message>
 </context>
 <context>
@@ -318,27 +318,27 @@
     </message>
     <message>
         <source>weight of the drinker</source>
-        <translation>paino</translation>
+        <translation>juojan paino</translation>
     </message>
     <message>
         <source>lever condition %1</source>
-        <translation>maksan kunto</translation>
+        <translation>maksan kunto %1</translation>
     </message>
     <message>
         <source>blood alcohol content limit</source>
         <translation>promilleraja</translation>
     </message>
     <message>
-        <source>juodut</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>BAC</source>
-        <translation>promilleja</translation>
+        <translation>‰ veressä</translation>
     </message>
     <message>
         <source>recalculate</source>
-        <translation>päivitä</translation>
+        <translation>laske uudelleen</translation>
+    </message>
+    <message>
+        <source>drinks</source>
+        <translation>juodut</translation>
     </message>
 </context>
 <context>
@@ -360,11 +360,11 @@
     <name>harbour-juoppoko</name>
     <message>
         <source>%1 drinks, latest %2</source>
-        <translation type="unfinished">juomia %1, viimeisin %2</translation>
+        <translation>juomia %1, viimeisin %2</translation>
     </message>
     <message>
         <source>%1 drinks</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 juotua</translation>
     </message>
 </context>
 <context>
@@ -409,16 +409,14 @@
         <translation>Korkea alkoholipitoisuus voi aiheuttaa kooman tai tappaa. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
     </message>
     <message>
+        <source>Here the limits depend only on the amount of water in body, not on sex.</source>
+        <translation>Tässä rajojen oletetaan riippuvan vain kehossa olevan nesteen määrästä, ei sukupuolesta.</translation>
+    </message>
+    <message>
         <source>The default limits are based on 
  %1 
  - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
-        <translation>Raja-arvot on lähteestä %1, jonka mukaan turvallinen määrä
-        naisille on 7 annosta viikossa ja miehille 14. Ja lisääntyneen riskin raja on naisille 16\
-        annosta viikosssa ja miehille 24.</translation>
-    </message>
-    <message>
-        <source>Here the limits depend only on the amount of water in body, not on sex.</source>
-        <translation>Tässä rajojen oletetaan riippuvan vain kehossa olevan nesteen määrästä, ei sukupuolesta.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -566,10 +564,6 @@
         <translation>leveyspiiri</translation>
     </message>
     <message>
-        <source>limits to Foursquare categories %1 and %2</source>
-        <translation>rajaa Foursquare-luokkiin %1 ja %2</translation>
-    </message>
-    <message>
         <source>searches in all categories</source>
         <translation>älä rajaa hakua</translation>
     </message>
@@ -594,12 +588,16 @@
         <translation>Sijainti</translation>
     </message>
     <message>
-        <source>shows co-ordinates</source>
-        <translation>näyttää koordinaatit</translation>
-    </message>
-    <message>
         <source>hides place</source>
         <translation>piilottaa paikan</translation>
+    </message>
+    <message>
+        <source>shows place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>limits to Foursquare categories %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -940,15 +938,15 @@
     </message>
     <message>
         <source>authenticate</source>
-        <translation type="unfinished"></translation>
+        <translation>kirjaudu</translation>
     </message>
     <message>
         <source>signing out</source>
-        <translation type="unfinished"></translation>
+        <translation>kirjautuu pois</translation>
     </message>
     <message>
         <source>To use your unTappd-profile, choose &apos;authenticate&apos; in the pull down menu, or follow the instructions below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjautuaksesi unTappdiin, valitse &apos;kirjaudu&apos; valikosta, tai seuraa alla olevia ohjeita.</translation>
     </message>
 </context>
 <context>

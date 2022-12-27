@@ -28,31 +28,31 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-//import "../scripts/scripts.js" as Apuja
 
 CoverBackground {
     id: kansi
 
     function naytaPromillet() {
-        var pro = juoja.promilleja() //qqlaskePromillet(new Date().getTime())
-        var str = ""
+        var pro = juoja.promilleja();
+        var str = "";
 
-        str = pro.toFixed(2)  + " ‰"
+        str = pro.toFixed(2)  + " ‰";
 
-        return str
+        return str;
     }
 
     function paivita() {
-        promilleja.text = naytaPromillet()
+        promilleja.text = naytaPromillet();
         if (paaikkuna.juomari.rajalla === undefined) {
-            kunnossa.text = ""
+            kunnossa.text = "";
         } else if (paaikkuna.juomari.rajalla.getTime() < new Date().getTime()){
-            kunnossa.text = ""
+            kunnossa.text = "";
         } else {
-            kunnossa.text = paaikkuna.juomari.promilleRaja + qsTr(" ‰ at ") + paaikkuna.juomari.rajalla.toLocaleTimeString(Qt.locale(),"HH:mm")
+            kunnossa.text = paaikkuna.juomari.promilleRaja +
+                    qsTr(" ‰ at ") + paaikkuna.juomari.rajalla.toLocaleTimeString(Qt.locale(),"HH:mm");
         }
 
-        return
+        return;
     }
 
     Image {
@@ -71,8 +71,6 @@ CoverBackground {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: Theme.fontSizeLarge
         color: Theme.highlightColor
-        //text: naytaPromillet() //paaikkuna.calculatePermille(new Date().getTime()).toFixed(2) + " ‰"
-        //font.pixelSize: Theme.fontSizeMedium
     }
 
     Label {
@@ -104,7 +102,6 @@ CoverBackground {
         repeat: true
         onTriggered: {
             paivita()
-            //console.log("kansi näkyy " + kansi.visible)
         }
     }
 
@@ -123,13 +120,6 @@ CoverBackground {
         }
     }
 
-    onVisibleChanged: {
-        if (visible) {
-            //paivita()
-        }
-    }
-
-    //Component.onCompleted: paivita()
     onStatusChanged: {
         if (status === Cover.Activating || status === Cover.Active) {
             paivita()

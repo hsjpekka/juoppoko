@@ -32,7 +32,46 @@ import "../scripts/unTap.js" as UnTpd
 import "../scripts/tietokanta.js" as Tkanta
 
 Dialog {
-    id: sivu    
+    id: sivu
+    Component.onCompleted: {
+        if (tilavuusMitta == 2) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
+            asetaYksikotUsOz();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
+        } else if (tilavuusMitta == 3) {
+            asetaYksikotImpOz();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
+        } else if (tilavuusMitta == 4) {
+            asetaYksikotImpPint();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
+        } else if (tilavuusMitta == 5) {
+            asetaYksikotUsPint();
+            yksikonValinta.currentIndex = tilavuusMitta - 1;
+        } else
+            asetaYksikotMl();
+
+        nimi0 = nimi;
+        if (UnTpd.oluenEtiketti > "")
+            valitunEtiketti.source = UnTpd.oluenEtiketti;
+
+        alkutoimet = false;
+    }
+    onDone: {
+        if (result == DialogResult.Accepted) {
+            nimi = juoma.text;
+            juomanKuvaus = kuvaus.text;
+            if (nimi0 != nimi){ // nimi0 = joko juodut-tietokantaan talletettu tai untappedista haettu
+                olutId = 0;
+                UnTpd.olutVaihtuu(olutId);
+            }
+
+            if (olutId > 0)
+                UnTpd.saateSanat = kuvaus.text;
+            tilavuus = maara*yksikko;
+
+            Tkanta.arvoTilavuusMitta = tilavuusMitta;
+            Tkanta.paivitaAsetus(Tkanta.tunnusTilavuusMitta,Tkanta.arvoTilavuusMitta);
+        }
+    }
 
     property date aika
     property bool alkutoimet: true
@@ -67,112 +106,6 @@ Dialog {
     property real _haetunVahvuus
     property int _haetunHappamuus
 
-    function asetaYksikotMl() {
-        maara = maara*yksikko
-        yksikko = 1
-        yksikkoTunnus = " mL"
-        maaraMuutos = 1
-        maaraDesimaaleja = 0
-        tilavuusMitta = 1
-        return
-    }
-
-    function asetaYksikotImpOz() {
-        maara = maara*yksikko/ozImp
-        yksikko = ozImp
-        yksikkoTunnus = " oz"
-        maaraMuutos = 0.1
-        maaraDesimaaleja = 1
-        tilavuusMitta = 3
-        return
-    }
-
-    function asetaYksikotImpPint() {
-        maara = maara*yksikko/pintImp
-        yksikko = pintImp
-        yksikkoTunnus = " pt"
-        maaraMuutos = 0.1
-        maaraDesimaaleja = 1
-        tilavuusMitta = 4
-        return
-    }
-
-    function asetaYksikotUsOz() {
-        maara = maara*yksikko/ozUs
-        yksikko = ozUs
-        yksikkoTunnus = " oz"
-        maaraMuutos = 0.1
-        maaraDesimaaleja = 1
-        tilavuusMitta = 2
-        return
-    }
-
-    function asetaYksikotUsPint() {
-        maara = maara*yksikko/pintUs
-        yksikko = pintUs
-        yksikkoTunnus = " pt"
-        maaraMuutos = 0.1
-        maaraDesimaaleja = 1
-        tilavuusMitta = 5
-        return
-    }
-
-    function laskeMuutos(mX, x0, Lx){ // mouseX, mouseArea.x, mouseArea.width
-        var arvo = 0, dx1
-        dx1 = mX-x0
-        if (dx1 < 0.17*Lx){
-            arvo = -100
-            tauko = tauko0*(0.3 + 0.8*dx1/(0.17*Lx))
-        } else if (dx1 < 0.34*Lx){
-            arvo = -10
-            tauko = tauko0*(0.3 + 0.8*(dx1-0.17*Lx)/(0.17*Lx))
-        } else if (dx1 < 0.5*Lx){
-            arvo = -1
-            tauko = tauko0*(0.3 + 0.8*(dx1-0.34*Lx)/(0.16*Lx))
-        } else if (dx1 < 0.66*Lx){
-            arvo = 1
-            tauko = tauko0*(1 - 0.8*(dx1-0.5*Lx)/(0.16*Lx))
-        } else if (dx1 < 0.83*Lx){
-            arvo = 10
-            tauko = tauko0*(1 - 0.8*(dx1-0.66*Lx)/(0.17*Lx))
-        } else {
-            arvo = 100
-            tauko = tauko0*(1 - 0.8*(dx1-0.83*Lx)/(0.17*Lx))
-        }
-
-        return arvo
-    }
-
-    function muutaTilavuus() {
-        var tarkkuus = 0.005
-
-        maara = Math.floor(maara/mlLisays + tarkkuus)*mlLisays
-        maara = maara + mlLisays
-        if (maara < 0)
-            maara = 0
-
-        tilavuus = maara*yksikko
-
-        //maaranNaytto.value = maara.toFixed(1) + yksikkoTunnus
-        maaranNaytto.text = maara.toFixed(maaraDesimaaleja) // + yksikkoTunnus
-
-        return
-    }
-
-    function muutaProsentit() {
-        var tarkkuus = 0.005
-        vahvuus = Math.floor(vahvuus/prosLisays + tarkkuus)*prosLisays // floor(34.999999995 + tarkkuus) = floor(35.00000001 + tarkkuus)
-        vahvuus = vahvuus + prosLisays
-        if (vahvuus < 0)
-            vahvuus = 0
-        if (vahvuus > 100)
-            vahvuus = 100
-
-        prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%"
-
-        return
-    }
-
     Timer {
         id: mlAjastin
         interval: tauko
@@ -194,10 +127,8 @@ Dialog {
     }
 
     SilicaFlickable {
-        //anchors.fill: parent
         width: sivu.width
         height: sivu.height
-        //height: column.height
         contentHeight: column.height
 
         PullDownMenu {
@@ -215,8 +146,6 @@ Dialog {
                             tahtia = 0;
                         olutId = dialog.olutId;
                         valitunEtiketti.source = UnTpd.oluenEtiketti;
-                        //tahtiaRivi.visible = ( > 0) ? true : false
-                        //console.log("avaaUnTappd: olutId " + olutId)
                     })
                 }
             }
@@ -228,11 +157,10 @@ Dialog {
             id: column
             spacing: Theme.paddingLarge
             width: parent.width
-            //anchors.fill: parent
 
             DialogHeader {
                 title: qsTr("Drink")
-            } // */
+            }
 
             Row { // juoma
                 TextField {
@@ -271,7 +199,6 @@ Dialog {
                 visible: (olutId > 0) ? true : false
                 height: visible? (valitunEtiketti.height > arvostelu1.height? valitunEtiketti.height : arvostelu1.height) : 0
                 x: Theme.horizontalPageMargin
-                //spacing: vapaaTila/11
 
                 property int vapaaTila: width - valitunEtiketti.width - 5*arvostelu1.width - 4*arvostelu15.width
                 Image {
@@ -456,11 +383,9 @@ Dialog {
                     }
 
 
-                    // label: "clock"
-                    width: Theme.fontSizeSmall*6 //ExtraSmall*6 //font.pixelSize*5 //
+                    width: Theme.fontSizeSmall*6
                     value: aika.toLocaleTimeString(Qt.locale(),"HH:mm")
                     valueColor: Theme.primaryColor
-                    //readOnly: true
                     onClicked: openTimeDialog()
                 }
 
@@ -481,39 +406,30 @@ Dialog {
                         });
                     }
 
-                    //label: "Date"
                     value: aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
                     valueColor: Theme.primaryColor
-                    //text: aika.toLocaleDateString(Qt.locale(),Locale.ShortFormat)
-                    width: Theme.fontSizeSmall*8 //font.pixelSize*8
-                    //readOnly: true
-                    //font.pixelSize: Theme.fontSizeExtraSmall
+                    width: Theme.fontSizeSmall*8
                     onClicked: openDateDialog()
-                }//
+                }
 
             }
 
             Row { // määrä
                 spacing: Theme.paddingMedium
                 x: 0.5*(sivu.width - maaraLabel.width - maaranNaytto.width - yksikonValinta.width - 2*spacing) //
-                //padding: Theme.paddingMedium
 
                 Label {
                     id: maaraLabel
                     text: qsTr("volume")
                     color: Theme.secondaryHighlightColor //Theme.highlightColor
-                    //width: font.pixelSize*4
-                    //anchors.verticalCenterOffset: 4
                     height: yksikonValinta.height
                     verticalAlignment: Text.AlignVCenter
                 }
 
                 Label {
                     id: maaranNaytto
-                    //width: font.pixelSize*3 //ExtraSmall*6
-                    text: maara.toFixed(maaraDesimaaleja)// + yksikkoTunnus
+                    text: maara.toFixed(maaraDesimaaleja)
                     color: Theme.highlightColor
-                    //anchors.verticalCenterOffset: 0.3*font.pixelSize
                     height: yksikonValinta.height
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignRight
@@ -521,13 +437,10 @@ Dialog {
 
                 ComboBox { //tilavuusyksikkö
                     id: yksikonValinta
-                    //width: sivu.width - sivu.anchors.leftMargin - sivu.anchors.rightMargin - maaraLabel.width - maaranNaytto.width - 2*Theme.paddingMedium
-                    width: Theme.fontSizeSmall*7// font.pixelSize*8
-                    //height: Theme.fontSizeSmall
+                    width: Theme.fontSizeSmall*7
                     valueColor: Theme.primaryColor
 
                     menu: ContextMenu {
-                        //id: drinkMenu
                         MenuItem { text: "mL" }
                         MenuItem { text: "oz (US)" }
                         MenuItem { text: "oz (EN)" }
@@ -556,11 +469,7 @@ Dialog {
                             break
                         }
 
-                        //yksikkoTxt.text = yksikko + " mL"
-                        //maaranNaytto.value = maara.toFixed(maaraDesimaaleja) + yksikkoTunnus
-                        maaranNaytto.text = maara.toFixed(maaraDesimaaleja); // + yksikkoTunnus
-
-                        //prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%"
+                        maaranNaytto.text = maara.toFixed(maaraDesimaaleja);
                     }
 
                 } //combobox
@@ -584,7 +493,6 @@ Dialog {
                     }
 
                     Label {
-                        //id: txtTilavuusMuutos2
                         text: "<<"
                         font.pixelSize: Theme.fontSizeLarge
                         width: txtTilavuusMuutos1.width
@@ -592,7 +500,6 @@ Dialog {
                     }
 
                     Label {
-                        //id: txtTilavuusMuutos3
                         text: "<"
                         font.pixelSize: Theme.fontSizeLarge
                         width: txtTilavuusMuutos1.width
@@ -600,7 +507,6 @@ Dialog {
                     }
 
                     Label {
-                        //id: txtTilavuusMuutos4
                         text: ">"
                         font.pixelSize: Theme.fontSizeLarge
                         width: txtTilavuusMuutos1.width
@@ -608,7 +514,6 @@ Dialog {
                     }
 
                     Label {
-                        //id: txtTilavuusMuutos5
                         text: ">>"
                         font.pixelSize: Theme.fontSizeLarge
                         width: txtTilavuusMuutos1.width
@@ -616,14 +521,13 @@ Dialog {
                     }
 
                     Label {
-                        //id: txtTilavuusMuutos6
                         text: ">>>"
                         font.pixelSize: Theme.fontSizeLarge
                         width: txtTilavuusMuutos1.width
                         horizontalAlignment: Text.AlignHCenter
                     }
 
-                }// volumeChange */
+                }
 
                 MouseArea {
                     anchors.fill: parent
@@ -743,44 +647,110 @@ Dialog {
         }//column
     }
 
-    Component.onCompleted: {
-        if (tilavuusMitta == 2) { // juoman tilavuusyksikkö, 1 = ml, 2 = us oz, 3 = imp oz, 4 = imp pint, 5 = us pint
-            asetaYksikotUsOz();
-            yksikonValinta.currentIndex = tilavuusMitta - 1;
-        } else if (tilavuusMitta == 3) {
-            asetaYksikotImpOz();
-            yksikonValinta.currentIndex = tilavuusMitta - 1;
-        } else if (tilavuusMitta == 4) {
-            asetaYksikotImpPint();
-            yksikonValinta.currentIndex = tilavuusMitta - 1;
-        } else if (tilavuusMitta == 5) {
-            asetaYksikotUsPint();
-            yksikonValinta.currentIndex = tilavuusMitta - 1;
-        } else
-            asetaYksikotMl();
-
-        nimi0 = nimi;
-        if (UnTpd.oluenEtiketti > "")
-            valitunEtiketti.source = UnTpd.oluenEtiketti;
-
-        alkutoimet = false;
+    function asetaYksikotMl() {
+        maara = maara*yksikko;
+        yksikko = 1;
+        yksikkoTunnus = " mL";
+        maaraMuutos = 1;
+        maaraDesimaaleja = 0;
+        tilavuusMitta = 1;
+        return;
     }
 
-    onDone: {
-        if (result == DialogResult.Accepted) {
-            nimi = juoma.text;
-            juomanKuvaus = kuvaus.text;
-            if (nimi0 != nimi){ // nimi0 = joko juodut-tietokantaan talletettu tai untappedista haettu
-                olutId = 0;
-                UnTpd.olutVaihtuu(olutId);
-            }
+    function asetaYksikotImpOz() {
+        maara = maara*yksikko/ozImp;
+        yksikko = ozImp;
+        yksikkoTunnus = " oz";
+        maaraMuutos = 0.1;
+        maaraDesimaaleja = 1;
+        tilavuusMitta = 3;
+        return;
+    }
 
-            if (olutId > 0)
-                UnTpd.saateSanat = kuvaus.text;
-            tilavuus = maara*yksikko;
+    function asetaYksikotImpPint() {
+        maara = maara*yksikko/pintImp;
+        yksikko = pintImp;
+        yksikkoTunnus = " pt";
+        maaraMuutos = 0.1;
+        maaraDesimaaleja = 1;
+        tilavuusMitta = 4;
+        return;
+    }
 
-            Tkanta.arvoTilavuusMitta = tilavuusMitta;
-            Tkanta.paivitaAsetus(Tkanta.tunnusTilavuusMitta,Tkanta.arvoTilavuusMitta);
+    function asetaYksikotUsOz() {
+        maara = maara*yksikko/ozUs;
+        yksikko = ozUs;
+        yksikkoTunnus = " oz";
+        maaraMuutos = 0.1;
+        maaraDesimaaleja = 1;
+        tilavuusMitta = 2;
+        return;
+    }
+
+    function asetaYksikotUsPint() {
+        maara = maara*yksikko/pintUs;
+        yksikko = pintUs;
+        yksikkoTunnus = " pt";
+        maaraMuutos = 0.1;
+        maaraDesimaaleja = 1;
+        tilavuusMitta = 5;
+        return;
+    }
+
+    function laskeMuutos(mX, x0, Lx){ // mouseX, mouseArea.x, mouseArea.width
+        var arvo = 0, dx1;
+        dx1 = mX-x0;
+        if (dx1 < 0.17*Lx){
+            arvo = -100;
+            tauko = tauko0*(0.3 + 0.8*dx1/(0.17*Lx));
+        } else if (dx1 < 0.34*Lx){
+            arvo = -10;
+            tauko = tauko0*(0.3 + 0.8*(dx1-0.17*Lx)/(0.17*Lx));
+        } else if (dx1 < 0.5*Lx){
+            arvo = -1;
+            tauko = tauko0*(0.3 + 0.8*(dx1-0.34*Lx)/(0.16*Lx));
+        } else if (dx1 < 0.66*Lx){
+            arvo = 1;
+            tauko = tauko0*(1 - 0.8*(dx1-0.5*Lx)/(0.16*Lx));
+        } else if (dx1 < 0.83*Lx){
+            arvo = 10;
+            tauko = tauko0*(1 - 0.8*(dx1-0.66*Lx)/(0.17*Lx));
+        } else {
+            arvo = 100;
+            tauko = tauko0*(1 - 0.8*(dx1-0.83*Lx)/(0.17*Lx));
         }
+
+        return arvo;
+    }
+
+    function muutaTilavuus() {
+        var tarkkuus = 0.005;
+
+        maara = Math.floor(maara/mlLisays + tarkkuus)*mlLisays;
+        maara = maara + mlLisays;
+        if (maara < 0) {
+            maara = 0;
+        }
+
+        tilavuus = maara*yksikko;
+        maaranNaytto.text = maara.toFixed(maaraDesimaaleja);
+
+        return;
+    }
+
+    function muutaProsentit() {
+        var tarkkuus = 0.005;
+        vahvuus = Math.floor(vahvuus/prosLisays + tarkkuus)*prosLisays;
+        vahvuus = vahvuus + prosLisays;
+        if (vahvuus < 0) {
+            vahvuus = 0;
+        }
+        if (vahvuus > 100) {
+            vahvuus = 100;
+        }
+
+        prosenttienNaytto.value = vahvuus.toFixed(1) + " vol-%";
+
+        return;
     }
 }

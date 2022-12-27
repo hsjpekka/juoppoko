@@ -135,9 +135,7 @@ Dialog {
                     readOnly: true
                     color: Theme.highlightColor
                     text: (palonopeus*0.7894*kuntoTxt.text/100*massaTxt.text).toFixed(1) + " g/h"
-                    //text: (palonopeus*0.7894*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " g/h"
                     label: (palonopeus*kuntoTxt.text/100*massaTxt.text).toFixed(1) + " ml/h"
-                    //label: (palonopeus*parseFloat(kuntoTxt.text/100)*parseInt(massaTxt.text)).toFixed(1) + " ml/h"
                 }
             } //palonopeus
 
@@ -173,8 +171,6 @@ Dialog {
 
                 TextField {
                     id: nesteTxt
-                    //anchors.bottom: parent.bottom
-                    //anchors.baselineOffset: 60
                     width: leveysOikea*sivu.width
                     validator: IntValidator {bottom: 1; top: 100}
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
@@ -186,10 +182,6 @@ Dialog {
                         if (!oletusRajat.checked)
                             laskeRajat()
                     }
-                    //onAccepted: {
-                    //    nesteprosentti = kehonnesteprosentti.text
-                    //}
-                    //horizontalAlignment: textAlignment
                 }
 
             } //nesteprosentti
@@ -206,8 +198,6 @@ Dialog {
             }
 
             Row { //promilleraja 1
-                //visible: oletusRajat.checked
-
                 TextField {
                     id: ap23
                     width: leveysVasen*sivu.width
@@ -225,15 +215,12 @@ Dialog {
                     text: Number(prom10).toLocaleString(Qt.locale())//prom10.toFixed(2)
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: DoubleValidator {bottom: 0.0; top: 5.0}
-                    //onTextChanged: prom1 = parseFloat(text)
                     onTextChanged: prom1 = Number.fromLocaleString(Qt.locale(),text)
                 }
 
             }
 
             Row { //promilleraja 2
-                //visible: oletusRajat.checked
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -256,8 +243,6 @@ Dialog {
             }
 
             Row { //paivaraja 1
-                //visible: oletusRajat.checked
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -277,11 +262,9 @@ Dialog {
                     onTextChanged: paiva1 = text*1
                 }
 
-            } // */
+            }
 
             Row { //paivaraja 2
-                //visible: oletusRajat.checked
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -302,11 +285,8 @@ Dialog {
                 }
 
             }
-            // */
 
             Row { //viikkoraja 1
-                //visible: oletusRajat.checked
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -325,12 +305,9 @@ Dialog {
                     validator: IntValidator {bottom: 0; top: 500}
                     onTextChanged: viikko1 = vk1txt.text
                 }
-
             }
 
             Row { //viikkoraja 2
-                //visible: oletusRajat.checked
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -349,12 +326,9 @@ Dialog {
                     validator: IntValidator {bottom: 0; top: 3500}
                     onTextChanged: viikko2 = vk2txt.text
                 }
-
             }
 
             Row { //vuosiraja 1
-                //visible: oletusRajat.checked
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -373,12 +347,9 @@ Dialog {
                     validator: IntValidator {bottom: 0; top: 20000}
                     onTextChanged: vuosi1 = vs1txt.text
                 }
-
             }
 
             Row { //vuosiraja 2
-                //visible: oletusRajat.checked
-
                 TextField {
                     width: leveysVasen*sivu.width
                     readOnly: true
@@ -397,45 +368,42 @@ Dialog {
                     validator: IntValidator {bottom: 0; top: 50000}
                     onTextChanged: vuosi2 = vs2txt.text
                 }
-
             }
-
         }// column
 
     }
 
     function alkutoimet() {
-        massa = massa0
-        vetta = vetta0
-        kunto = kunto0
-        prom1 = prom10
-        prom2 = prom20
-        paiva1 = paiva10
-        paiva2 = paiva20
-        viikko1 = viikko10
-        viikko2 = viikko20
-        vuosi1 = vuosi10
-        vuosi2 = vuosi20
+        massa = massa0;
+        vetta = vetta0;
+        kunto = kunto0;
+        prom1 = prom10;
+        prom2 = prom20;
+        paiva1 = paiva10;
+        paiva2 = paiva20;
+        viikko1 = viikko10;
+        viikko2 = viikko20;
+        vuosi1 = vuosi10;
+        vuosi2 = vuosi20;
 
         if (vetta > 0.649 && vetta < 0.651) {
-            cbNeste.currentIndex = 1
+            cbNeste.currentIndex = 1;
         } else if (vetta > 0.749 && vetta < 0.751) {
-            cbNeste.currentIndex = 0
-        } else
-            cbNeste.currentIndex = 2
-
-        return
+            cbNeste.currentIndex = 0;
+        } else {
+            cbNeste.currentIndex = 2;
+        }
+        return;
     }
 
     function palautaAlkuarvot() {
-
-        nesteTxt.text = (vetta0*100).toFixed(0)
-        vetta = vetta0
-        kuntoTxt.text = (kunto0*100).toFixed(0)
-        kunto = kunto0
-        massaTxt.text = massa0
-        massa = massa0
-
+        nesteTxt.text = (vetta0*100).toFixed(0);
+        vetta = vetta0;
+        kuntoTxt.text = (kunto0*100).toFixed(0);
+        kunto = kunto0;
+        massaTxt.text = massa0;
+        massa = massa0;
+        return;
     }
 
     function laskeRajat(){
@@ -444,16 +412,16 @@ Dialog {
         // miesten keskipaino 86 kg, naisten 70 kg
         // 24 annosta ~ 364 ml,  85.5 kg * 75% * 5.5 = 352 ml
         // 16 annosta ~ 243 ml,  70.4 kg * 65% * 5.5 = 251 ml
-        vk2txt.text = (massa*vetta*5.5).toFixed(0)
-        day2text.text = (massa*vetta*5.5*0.5).toFixed(0)
+        vk2txt.text = (massa*vetta*5.5).toFixed(0);
+        day2text.text = (massa*vetta*5.5*0.5).toFixed(0);
 
         // alempi naisten kohtuukäytöstä 7 annosta viikossa
-        vk1txt.text = (massa*vetta*2.3).toFixed(0)
-        day1text.text = (massa*vetta*2.3*0.5).toFixed(0)
+        vk1txt.text = (massa*vetta*2.3).toFixed(0);
+        day1text.text = (massa*vetta*2.3*0.5).toFixed(0);
 
-        vs1txt.text = (massa*vetta*2.3*52).toFixed(0)
+        vs1txt.text = (massa*vetta*2.3*52).toFixed(0);
 
-        vs2txt.text = (massa*vetta*5.5*52).toFixed(0)
-
+        vs2txt.text = (massa*vetta*5.5*52).toFixed(0);
+        return;
     }
 }

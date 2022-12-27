@@ -6,86 +6,21 @@ import "../scripts/unTap.js" as UnTpd
 
 Page {
     id: sivu
+    Component.onCompleted: {
+        uTYhteys.haeKavereita()
+        uTYhteys.kaveriKyselyt()
+    }
+
+    Component.onDestruction: {
+        sulkeutuu(_muuttunut)
+    }
 
     property string ilmoitukset: ""
     property string tunnus: "" //username
     property bool   _pyynnot: false
     property bool   _muuttunut: false
-    //property int haku: 0
-    //property int haettavia: 25
-    //property bool hakuvirhe: false
 
     signal sulkeutuu(bool muuttunut)
-
-    /*
-    function qqhaeKavereita() {
-        var xhttp = new XMLHttpRequest();
-        var kysely = ""
-
-        hetkinen.running = true
-        unTpdViestit.text = qsTr("posting query")
-
-        kysely = UnTpd.getFriendsInfo(tunnus, haku*haettavia, haettavia)
-
-        xhttp.onreadystatechange = function () {
-            //console.log("haeKavereita - " + xhttp.readyState + " - " + xhttp.status + " , " + hakunro)
-            if (xhttp.readyState == 0)
-                unTpdViestit.text = qsTr("request not initialized") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 1)
-                unTpdViestit.text = qsTr("server connection established") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 2)
-                unTpdViestit.text = qsTr("request received") + ", " + xhttp.statusText
-            else if (xhttp.readyState == 3)
-                unTpdViestit.text = qsTr("processing request") + ", " + xhttp.statusText
-            else { //if (xhttp.readyState == 4){
-                //console.log(xhttp.responseText)
-                var vastaus = JSON.parse(xhttp.responseText);
-
-                unTpdViestit.text = xhttp.statusText
-
-                if (xhttp.status == 200) {
-                    //console.log(xhttp.responseText)
-                    hakuvirhe = false
-                    paivitaHaetut(vastaus)
-                } else {
-                    console.log("search friends: " + xhttp.status + ", " + xhttp.statusText)
-                    hakuvirhe = true
-                }
-
-                hetkinen.running = false
-            }
-
-        }
-
-        xhttp.open("GET", kysely, true)
-
-        return xhttp.send()
-    }
-    // */
-
-    function paivitaHaetut(olio, toiminta) { // vastaus = JSON(unTappd-vastaus)
-        var i=0, vastaus, kuva, nimi, sijainti, kayttaja, hkId
-
-        vastaus = olio.response
-        while (i < vastaus.count) {
-            kuva = vastaus.items[i].user.user_avatar
-            nimi = vastaus.items[i].user.first_name + " "
-                    + vastaus.items[i].user.last_name
-            kayttaja = vastaus.items[i].user.user_name
-            sijainti = vastaus.items[i].user.location
-            hkId = vastaus.items[i].user.uid
-            if (toiminta === "pyynnot")
-                pyytajat.lisaa(kuva, nimi, sijainti, kayttaja, hkId)
-            else
-                loydetytKaverit.lisaa(kuva, nimi, sijainti, kayttaja, hkId)
-            i++
-        }
-
-        console.log(toiminta + " " + vastaus.count)
-        console.log(toiminta + " " + JSON.stringify(vastaus))
-
-        return
-    }
 
     ListModel {
         id: loydetytKaverit
@@ -172,11 +107,9 @@ Page {
                 if (!_pyynnot) {
                     tunnus = henkilo.ktunnus;
                     pageContainer.pop()
-                } else {
-                    //henkilo.openMenu()
                 }
 
-                return
+                return;
             }
 
             Row {
@@ -261,11 +194,9 @@ Page {
         property int haku: 0
         property int pyynnot: 0
         property int haettavia: 25
-        //property string toiminto: ""
 
         function haeKavereita() {
             var kysely = "";
-            //toiminto = "kaverit"
             kysely = UnTpd.getFriendsInfo(tunnus, haku*haettavia, haettavia);
             xHttpGet(kysely[0], kysely[1], "kaverit");
             return;
@@ -273,7 +204,6 @@ Page {
 
         function kaveriKyselyt() {
             var kysely = "";
-            //toiminto = "pyynnot"
             kysely = UnTpd.getPendingFriends(pyynnot*haettavia, haettavia);
             xHttpGet(kysely[0], kysely[1], "pyynnot");
             return;
@@ -281,7 +211,6 @@ Page {
 
         function hyvaksyKaveriksi(kohde) {
             var kysely = "";
-            //toiminto = "hyvaksy"
             kysely = UnTpd.acceptFriend(kohde);
             xHttpGet(kysely[0], kysely[1], "hyvaksy");
             return;
@@ -289,7 +218,6 @@ Page {
 
         function hylkaaPyynto(kohde) {
             var kysely = "";
-            //toiminto = "hylkaa"
             kysely = UnTpd.rejectFriend(kohde);
             xHttpGet(kysely[0], kysely[1], "hylkaa");
             return;
@@ -297,7 +225,6 @@ Page {
 
         function poistaKaveri(kohde) {
             var kysely = "";
-            //toiminto = "poista"
             kysely = UnTpd.removeFriend(kohde);
             xHttpGet(kysely[0], kysely[1], "poista");
             return;
@@ -306,11 +233,7 @@ Page {
 
     SilicaListView {
         id: kaverilista
-        //height: sivu.height - otsikko.height
-        //width: sivu.width
         anchors.fill: parent
-        //anchors.leftMargin: Theme.horizontalPageMargin
-        //anchors.rightMargin: Theme.horizontalPageMargin
 
         model: _pyynnot? pyytajat : loydetytKaverit
         header: PageHeader{
@@ -348,12 +271,26 @@ Page {
         VerticalScrollDecorator {}
     }
 
-    Component.onCompleted: {
-        uTYhteys.haeKavereita()
-        uTYhteys.kaveriKyselyt()
+    function paivitaHaetut(olio, toiminta) { // vastaus = JSON(unTappd-vastaus)
+        var i=0, vastaus, kuva, nimi, sijainti, kayttaja, hkId;
+
+        vastaus = olio.response;
+        while (i < vastaus.count) {
+            kuva = vastaus.items[i].user.user_avatar;
+            nimi = vastaus.items[i].user.first_name + " "
+                    + vastaus.items[i].user.last_name;
+            kayttaja = vastaus.items[i].user.user_name;
+            sijainti = vastaus.items[i].user.location;
+            hkId = vastaus.items[i].user.uid;
+            if (toiminta === "pyynnot") {
+                pyytajat.lisaa(kuva, nimi, sijainti, kayttaja, hkId);
+            } else {
+                loydetytKaverit.lisaa(kuva, nimi, sijainti, kayttaja, hkId);
+            }
+            i++;
+        }
+
+        return;
     }
 
-    Component.onDestruction: {
-        sulkeutuu(_muuttunut)
-    }
 }

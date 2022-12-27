@@ -33,8 +33,6 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-//import "private" // ModExpandingSection
-//import "private/Util.js" as Util // ModExpandingSection
 
 Item {
     id: root

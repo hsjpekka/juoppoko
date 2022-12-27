@@ -60,7 +60,6 @@ juomari::mlMaarat juomari::alkoholiaMl(QDateTime nyt, int iJuoma, int iKeho) {
         mlPalanut = 0.0;
     }
 
-    //qInfo() << iJuoma << edellinen.vatsassaEnnen << eroTunti << mlVatsassa << mlVeressa << mlImeytynyt << mlPalanut << juodut.length();
     tulos.vatsassa = mlVatsassa - mlPalanut;
     tulos.veressa = mlVeressa - mlPalanut;
     return tulos;
@@ -256,7 +255,7 @@ int juomari::asetaPohjat(double mlAlkoholia, QDateTime aika) {
         milloinRajalla = milloinPromilleja(raja1, aika);
         milloinSelvana = milloinPromilleja(0, aika);
     } else {
-        qInfo() << "pohjat epäonnistui" << mlAlkoholia << aika.isValid();
+        qDebug() << "pohjat epäonnistui" << mlAlkoholia << aika.isValid();
         onnistuiko = -1;
     }
 
@@ -353,7 +352,6 @@ int juomari::etsiKehonJarjestys(QDate aika){
 int juomari::jarjestaJuomat(int i) {
     // jos i < 0, käy koko listan läpi, muuten hakee juomalle i oikean paikan
     // palauttaa juoman i uuden paikan, tai -1, jos mitään ei muutettu
-    QDateTime aika;
     juotu ryyppy1, ryyppy2;
     int j;
     bool viela;
@@ -588,7 +586,7 @@ double juomari::mlPromilleiksi(double ml, QDateTime aika) {
     if (aika.isValid()) {
         promillet = ml*tiheys/(luePaino(aika)*lueVesimaara(aika));
     } else {
-        qInfo() << "Invalid time in mlPromilleiksi().";
+        qDebug() << "mlPromilleiksi(): epäkelpo aika.";
         promillet = ml*tiheys/(luePaino()*lueVesimaara());
     }
     return promillet;
@@ -646,6 +644,14 @@ void juomari::paivitaRajat() {
         milloinSelvana = milloinPromilleja(0, pohjat.aika);
     }
     return;
+}
+
+double juomari::paljonkoAikana(qint64 alku, qint64 loppu, bool paivittain)
+{
+    QDateTime eka, toka;
+    eka = QDateTime::fromMSecsSinceEpoch(alku);
+    toka = QDateTime::fromMSecsSinceEpoch(loppu);
+    return paljonkoAikana(eka, toka, paivittain);
 }
 
 double juomari::paljonkoAikana(QDateTime alku, QDateTime loppu, bool paivittain){
@@ -746,14 +752,10 @@ int juomari::poistaJuoma(int id, bool tarkistaKaikki) {
     }
     if (i < -1) {
         tulos = -juodut.count();
-    } else {
-        //tulos = juodut.count();
     }
 
     laskeUudelleen(i);
     paivitaRajat();
-
-    //qInfo() << tulos << juodut.length();
 
     return tulos;
 }
@@ -778,7 +780,6 @@ double juomari::promilleja(QDateTime aika, bool veresta) {
     juoja = kehonOminaisuudet(k);
 
     tulos = mlAlkoholia*tiheys/(juoja.paino*juoja.vesiPros);
-    //qInfo() << aika.time().toString() << j << k << mlAlkoholia << juoja.paino;
 
     return tulos;
 }
@@ -792,7 +793,7 @@ double juomari::promilletMlitroiksi(double promillet, QDateTime aika) {
     if (aika.isValid()) {
         ml = promillet*luePaino(aika)*lueVesimaara(aika)/tiheys;
     } else {
-        qInfo() << "Invalid time in promilletMlitroiksi().";
+        qInfo() << "promilletMlitroiksi(): epäkelpo aika.";
         ml = promillet*luePaino()*lueVesimaara()/tiheys;
     }
     return ml;
@@ -802,7 +803,6 @@ QDateTime juomari::rajalla() {
     if (!milloinRajalla.isValid()) {
         milloinRajalla = milloinPromilleja(raja1, juodut.last().aika);
     }
-    qDebug() << "rajalla " << milloinRajalla.toLocalTime();
     return milloinRajalla;
 }
 
@@ -810,6 +810,5 @@ QDateTime juomari::selvana() {
     if (!milloinSelvana.isValid()) {
         milloinSelvana = milloinPromilleja(0, juodut.last().aika);
     }
-    qDebug() << "selvänä " << milloinSelvana.toLocalTime();
     return milloinSelvana;
 }

@@ -4,9 +4,7 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QJsonValue>
-//#include <QDebug>
 #include <QUrlQuery>
-//#include <QByteArray>
 #include <oauth2.h>
 #include <redirectlistener.h>
 
@@ -22,10 +20,8 @@ unTpd::unTpd(QObject *parent) : QObject(parent)
 int unTpd::addToQuery(QUrlQuery &query, QString keyList)
 {
     QStringList keys;
-    //QString result;
     int i, iN, j, jN, result;
-    bool search;
-    qDebug() << "addToQuery:  " << query.toString() << keyList;
+    //bool search;
     keyList.replace(" ", "");
     keys = keyList.split(",",QString::SkipEmptyParts);
     result = 0;
@@ -33,26 +29,13 @@ int unTpd::addToQuery(QUrlQuery &query, QString keyList)
     iN = keys.length();
     jN = storedParameters.length();
     while (i < iN) {
-        j = 0;
-        search = true;
-        while (j < jN && search) {
-            //qInfo() << storedParameters.at(j).id << keys.at(i);
-            if (storedParameters.at(j).id == keys.at(i)) {
-                qInfo() << "löytyi" << i << j << keys.at(i) << storedParameters.at(j).value;
-                search = false;
-            } else {
-                qInfo() << "onko?" << i << j << keys.at(i) << "=" << storedParameters.at(j).id << "(" << storedParameters.at(j).value << ")";
-                j++;
-            }
-        }
+        j = parameterIndex(keys.at(i));
         if (j < jN) {
             query.addQueryItem(storedParameters.at(j).key, storedParameters.at(j).value);
             result++;
         }
         i++;
     }
-
-    qInfo() << query.toString() << keyList << iN << j << jN << search;
 
     return result;
 }
@@ -72,21 +55,10 @@ void unTpd::assembleUrl(QUrl &url, QString path, QString definedQuery, QString p
     if (serverPort > 0) {
         url.setPort(serverPort);
     }
-    url.setPath(path);//(pathCommon + path);
+    url.setPath(path);
 
     query = QUrlQuery(definedQuery);
     addToQuery(query, paramsToAdd);
-    /*
-    if (isClientIdNeeded && !oauthId.isEmpty()) {
-        query.addQueryItem("client_id", oauthId);
-    }
-    if (isClientSecretNeeded && !oauthSecret.isEmpty()) {
-        query.addQueryItem("client_secret", oauthSecret);
-    }
-    if (isTokenRequired && !oauthToken.isEmpty()) {
-        query.addQueryItem("token", oauthToken);
-    }
-    // */
     url.setQuery(query);
 
     return;
@@ -94,35 +66,23 @@ void unTpd::assembleUrl(QUrl &url, QString path, QString definedQuery, QString p
 
 void unTpd::authenticate()
 {
-    return authenticate(oauthPath, oauthRedirect, tokenPath);
-}
-
-void unTpd::authenticate(QString pathAuthorization, QString redirect, QString pathToken)
-{
-    QUrl loginUrl(pathAuthorization), redirUrl(redirect), tokenUrl(pathToken);
-
-    QString query("client_id=");
-    query += oauthId;
-    query += "&response_type=code&redirect_url=";
-    query += oauthRedirect;
-
-    loginUrl.setQuery(query);
-
-    qDebug() << "osoitteet:" << "kirjautuminen" << loginUrl.toString()
-             << "siirto" << redirUrl.toString() << "tunniste" <<
-                tokenUrl.toString() << listener.uri();
-
     QObject::connect(&listener, &RedirectListener::failed, this, [this]() {
         QString error = "Error: Listener failed to listen!";
         qWarning() << error;
         emit finishedAuthentication("", error);
-        //emit failed("Listener failed to listen!");
     } );
 
     QObject::connect(&listener, &RedirectListener::uriChanged,
-                     this, [this, &loginUrl]() {
-        qDebug() << "Listening for redirects on uri:" << listener.uri();
-        //redirUrl = listener.uri();
+                     this, [this]() {
+        QUrl loginUrl(oauthPath);
+
+        QString qry("client_id=");
+        qry += oauthId;
+        qry += "&response_type=code&redirect_url=";
+        qry += oauthRedirect;
+
+        loginUrl.setQuery(qry);
+
         QDesktopServices::openUrl(loginUrl.toString());
     });
 
@@ -132,9 +92,7 @@ void unTpd::authenticate(QString pathAuthorization, QString redirect, QString pa
         QUrl tokenUrl(tokenPath);
         QUrlQuery query;
 
-        qDebug() << "Received redirect";
         code = uriKey(redirectUri, "code");
-        qDebug() << "code= " << code;
         if (!code.isEmpty()) {
             qDebug() << "Received auth code, about to request access token";
             // client_id=CLIENTID&client_secret=CLIENTSECRET&response_type=code&redirect_url=REDIRECT_URL&code=CODE
@@ -145,7 +103,6 @@ void unTpd::authenticate(QString pathAuthorization, QString redirect, QString pa
             query.addQueryItem("redirect_url", oauthRedirect);
             query.addQueryItem("code", code);
             tokenUrl.setQuery(query);
-            qInfo() << "opening token url: " << tokenUrl.toString();
             sendRequest(oauthTokenRequest, tokenUrl, true);
         } else {
             error.append("Unable to parse authorization code from redirect: ");
@@ -161,34 +118,32 @@ void unTpd::authenticate(QString pathAuthorization, QString redirect, QString pa
     return;
 }
 
-void unTpd::authenticateAmber()
+void unTpd::authenticate(QString pathAuthorization, QString redirect,
+                         QString pathToken)
 {
-    return authenticateAmber(oauthPath, oauthRedirect, tokenPath);
+    setOAuthPath(pathAuthorization);
+    setOAuthRedirect(redirect);
+    setOAuthTokenPath(pathToken);
+    return authenticate();
 }
 
-void unTpd::authenticateAmber(QString pathAuthorization, QString redirect, QString pathToken)
+void unTpd::authenticateAmber()
 {
-    QVariantMap myParams;
-    myParams.insert("response_type","code");
-
-    oauth2.setFlowType(Amber::Web::Authorization::OAuth2::ImplicitFlow);
-    oauth2.setAuthorizationEndpoint(pathAuthorization); // "https://untappd.com/oauth/authenticate/", "https://accounts.google.com/o/oauth2/auth"
+    oauth2.setFlowType(Amber::Web::Authorization::OAuth2::AuthorizationCodeFlow);
+    oauth2.setAuthorizationEndpoint(oauthPath); // "https://untappd.com/oauth/authenticate/", "https://accounts.google.com/o/oauth2/auth"
     oauth2.setClientId(oauthId);
     oauth2.setClientSecret(oauthSecret);  // enter your app's clientSecret here
-    oauth2.setScope("-"); // "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+    oauth2.setScope(""); // "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
     oauth2.setState(oauth2.generateState());
     oauth2.setCodeVerifier(oauth2.generateCodeVerifier());
-    oauth2.setRedirectUri(redirect);
-    oauth2.setTokenEndpoint(pathToken); // "https://untappd.com/oauth/authorize/", "https://accounts.google.com/o/oauth2/token"
-    oauth2.setCustomParameters(myParams);
+    oauth2.setRedirectUri(oauthRedirect);
+    oauth2.setTokenEndpoint(tokenPath); // "https://untappd.com/oauth/authorize/", "https://accounts.google.com/o/oauth2/token"
 
     QObject::connect(&listener, &RedirectListener::failed, this, [this]() {
         QString error = "[Amber] Error: Listener failed to listen!";
         qWarning() << error;
         emit finishedAuthentication("", error);
-        //emit failed("Listener failed to listen!");
     } );
-    //QObject::connect(&listener, &RedirectListener::failed, this, &unTpd::redirectListenerFailed);
 
     QObject::connect(&oauth2, &OAuth2::errorChanged, this, [this]() {
         QString error;
@@ -199,7 +154,6 @@ void unTpd::authenticateAmber(QString pathAuthorization, QString redirect, QStri
         qWarning() << error;
         emit finishedAuthentication("", error);
     });
-    //QObject::connect(&oauth2, OAuth2::errorChanged, this, &unTpd::oauth2ErrorChanged);
 
     QObject::connect(&listener, &RedirectListener::uriChanged,
                      this, [this]() {
@@ -230,38 +184,22 @@ void unTpd::authenticateAmber(QString pathAuthorization, QString redirect, QStri
                      this, [this](const QVariantMap &token) {
         qDebug() << "Received access token: " << token.value("access_token").toString();
         listener.stopListening();
-
-        setOAuth2Token(token.value("access_token").toString());
+        setOAuthToken(token.value("access_token").toString());
         emit finishedAuthentication(readOAuth2Token(), "");
-        //QUrl url(QStringLiteral("https://www.googleapis.com/oauth2/v2/userinfo"));
-        //QUrl url(oauthPath);
-        //QNetworkRequest request(url);
-        //request.setRawHeader(QString(QLatin1String("Authorization")).toUtf8(),
-        //                     QString(QLatin1String("Bearer ") + token.value("access_token").toString()).toUtf8());
-        //QNetworkReply *reply = netManager.get(request);
-        //if (!reply) {
-        //    qWarning() << "Failed to perform authenticated request";
-        //    return;
-        //}
-
-        //qDebug() << "Performing authenticated request";
-        //QObject::connect(reply, &QNetworkReply::finished,
-        //                 [&listener, &oauth2, reply]() {
-        //    reply->deleteLater();
-        //    if (reply->error() != QNetworkReply::NoError) {
-        //        qWarning() << "Authenticated request error: " << reply->errorString()
-        //                   << " : " << reply->readAll();
-        //    } else {
-        //        qDebug() << reply->readAll();
-        //    }
-        //});
     });
 
     listener.startListening();
 
     return;
 }
-// */
+
+void unTpd::authenticateAmber(QString pathAuthorization, QString redirect, QString pathToken)
+{
+    setOAuthPath(pathAuthorization);
+    setOAuthRedirect(redirect);
+    setOAuthTokenPath(pathToken);
+    return authenticateAmber();
+}
 
 QString unTpd::errorStatusToString(QueryStatus status)
 {
@@ -398,6 +336,16 @@ bool unTpd::queryGet(QString queryId, QString path, QString definedQuery, QStrin
     return sendRequest(queryId, path, parametersToAdd, definedQuery, true);
 }
 
+bool unTpd::queryHeaderedGet(QString queryId, QString path, QString query, QString headers, QString parametersToAdd)
+{
+    return sendRequest(queryId, path, parametersToAdd, query, true, headers);
+}
+
+bool unTpd::queryHeaderedPost(QString queryId, QString path, QString query, QString headers, QString parametersToAdd)
+{
+    return sendRequest(queryId, path, parametersToAdd, query, false, headers);
+}
+
 bool unTpd::queryPost(QString queryId, QString url) {
     QUrl u(url);
     return sendRequest(queryId, u, false);
@@ -406,6 +354,19 @@ bool unTpd::queryPost(QString queryId, QString url) {
 bool unTpd::queryPost(QString queryId, QString path, QString definedQuery, QString parametersToAdd)
 {
     return sendRequest(queryId, path, parametersToAdd, definedQuery, false);
+}
+
+int unTpd::parameterIndex(QString id)
+{
+    int i=0, result = storedParameters.length();
+    while (i < storedParameters.length()) {
+        if (storedParameters.at(i).id == id) {
+            result = i;
+            i = storedParameters.length();
+        }
+        i++;
+    }
+    return result;
 }
 
 QString unTpd::readOAuth2Token() {
@@ -421,8 +382,6 @@ void unTpd::replyFromServer(QNetworkReply *reply)
     QueryStatus status;
     QString replyString;
 
-    //latestReply.clear();
-
     iReply = findRequest(reply);
     if (iReply < 0 || iReply >= requestHistory.length()) {
         return;
@@ -436,15 +395,11 @@ void unTpd::replyFromServer(QNetworkReply *reply)
     reply->deleteLater();
     requestHistory.removeAt(iReply);
 
-    //if (currentRequest.reply->error() == QNetworkReply::NoError && !replyJson.isEmpty()) {
-        //status = getQueryStatus(replyJson);
-        //emit finishedQuery(currentRequest.queryId, errorStatusToString(status), replyString);
-    //}
     status = getQueryStatus(replyJson);
     if (currentRequest.queryId == oauthTokenRequest) {
         if (replyJson.contains("response")) {
             if (replyJson.value("response").toObject().contains("access_token")) {
-                setOAuth2Token(replyJson.value("response").toObject().value("access_token").toString());
+                setOAuthToken(replyJson.value("response").toObject().value("access_token").toString());
                 qDebug() << "Received access token: " << readOAuth2Token();
             }
         }
@@ -472,11 +427,11 @@ QJsonObject unTpd::responseToJson(QNetworkReply *reply, QString *replyString)
         if (parseError.error == QJsonParseError::NoError) {
             result = document.object();
             if (result.contains("status")) {
-                qInfo() << result.value("status") << ":";
+                qDebug() << result.value("status") << ":";
                 if (result.contains("title"))
-                    qInfo() << result.value("title");
+                    qDebug() << result.value("title");
                 if (result.contains("detail"))
-                    qInfo() << "\n" << result.value("detail") << "\n";
+                    qDebug() << "\n" << result.value("detail") << "\n";
             }
         } else {
             //netQueryStatus = ParseError;
@@ -484,7 +439,7 @@ QJsonObject unTpd::responseToJson(QNetworkReply *reply, QString *replyString)
             str.append(parseError.errorString() + " ::: ");
             str.append(data);
             errorList.append(str);
-            qInfo() << str;
+            qDebug() << str;
         }
     } else {
         //netQueryStatus = NetError;
@@ -492,26 +447,47 @@ QJsonObject unTpd::responseToJson(QNetworkReply *reply, QString *replyString)
         str.append("network error: ");
         str.append(reply->errorString() + " ::: ");
         errorList.append(str);
-        qInfo() << reply->error() << ":" << reply->errorString();
+        qDebug() << reply->error() << ":" << reply->errorString();
     }
 
     return result;
 }
 
-bool unTpd::sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet)
+bool unTpd::sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet, QString headers)
 {
     QUrl url;
     assembleUrl(url, path, definedQuery, parametersToAdd);
     qDebug() << url.toString() << parametersToAdd;
-    return sendRequest(queryId, url, isGet);
+    return sendRequest(queryId, url, isGet, headers);
 }
 
-bool unTpd::sendRequest(QString queryId, QUrl url, bool isGet)
+bool unTpd::sendRequest(QString queryId, QUrl url, bool isGet, QString headers)
 {
     QNetworkRequest request;
     QNetworkReply *netReply;
     sentRequest currentRequest;
+    QStringList hdrs, value;
+    int i, j;
 
+    if (!headers.isEmpty()) {
+        hdrs = headers.split(";");
+        i = 0;
+        while (i < hdrs.length()) {
+            value = hdrs.at(i).split(":");
+            if (value.length() > 1) {
+                request.setRawHeader(value.at(0).toLatin1(), value.at(1).toLatin1());
+            } else {
+                j = parameterIndex(value.at(0));
+                if (j < storedParameters.length()) {
+                    request.setRawHeader(storedParameters.at(j).key.toLatin1(),
+                                         storedParameters.at(j).value.toLatin1());
+                } else {
+                    request.setRawHeader(value.at(0).toLatin1(), "");
+                }
+            }
+            i++;
+        }
+    }
     request.setUrl(url);
 
     //netQueryStatus = Pending;
@@ -519,6 +495,8 @@ bool unTpd::sendRequest(QString queryId, QUrl url, bool isGet)
         netReply = netManager.get(request);
     } else {
         netReply = netManager.post(request, "");
+        qDebug() << "sendRequest:" << isGet << url.toString() <<
+                    ", header:" << request.rawHeader("Content-Type");
     }
 
     currentRequest.queryId = queryId;
@@ -529,31 +507,6 @@ bool unTpd::sendRequest(QString queryId, QUrl url, bool isGet)
     connect(&netManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(replyFromServer(QNetworkReply *)));
 
     return true;
-}
-
-bool unTpd::setOAuthPath(QString path)
-{
-    oauthPath = path;
-    return !oauthPath.isEmpty();
-}
-
-bool unTpd::setOAuth2Token(QString token)
-{
-    bool result;
-    oauthToken = token;
-    if (token.isEmpty()) {
-        result = false;
-    } else {
-        setQueryParameter(tokenKey, token, tokenKey);
-        result = true;
-    }
-    return result;
-}
-
-bool unTpd::setOAuthTokenPath(QString path)
-{
-    tokenPath = path;
-    return !tokenPath.isEmpty();
 }
 
 bool unTpd::setOAuthId(QString id)
@@ -567,6 +520,12 @@ bool unTpd::setOAuthId(QString id)
         result = true;
     }
     return result;
+}
+
+bool unTpd::setOAuthPath(QString path)
+{
+    oauthPath = path;
+    return !oauthPath.isEmpty();
 }
 
 bool unTpd::setOAuthRedirect(QString redirect)
@@ -590,6 +549,25 @@ bool unTpd::setOAuthSecret(QString secret)
         result = true;
     }
     return result;
+}
+
+bool unTpd::setOAuthToken(QString token)
+{
+    bool result;
+    oauthToken = token;
+    if (token.isEmpty()) {
+        result = false;
+    } else {
+        setQueryParameter(tokenKey, token, tokenKey);
+        result = true;
+    }
+    return result;
+}
+
+bool unTpd::setOAuthTokenPath(QString path)
+{
+    tokenPath = path;
+    return !tokenPath.isEmpty();
 }
 
 int unTpd::setQueryParameter(QString id, QString value, QString key)

@@ -7,7 +7,6 @@ import "../scripts/tietokanta.js" as Tkanta
 
 Page {
     id: sivu
-
     Component.onCompleted: {
         if (UnTpd.unTpToken > ""){
             //avaaKirjautumissivu = false
@@ -17,7 +16,6 @@ Page {
             console.log("käyttäjä" + muuJuoja)
         }
     }
-
     Component.onDestruction: {
         sulkeutuu()
     }
@@ -39,12 +37,6 @@ Page {
             try {
                 jsonVastaus = JSON.parse(httpVastaus);
                 if (toiminto === "tiedot") {
-                    if ("user" in jsonVastaus.response)
-                        console.log("unTpKayttaja.qml ->uTYhteys: " + jsonVastaus.response.user.user_name + ", " + jsonVastaus.response.user.uid)
-                    else {
-                        console.log("unTpKayttaja.qml ->uTYhteys: " + "ei user-tietoja")
-                        console.log("  ===  " + JSON.stringify(jsonVastaus))
-                    }
                     kirjoitaTiedot(jsonVastaus)
                 } else if (toiminto === "kirjaukset")
                     kirjoitaKirjaukset(jsonVastaus)
@@ -59,12 +51,6 @@ Page {
             try {
                 jsonVastaus = JSON.parse(httpVastaus);
                 if (toiminto === "tiedot") {
-                    if ("user" in jsonVastaus.response)
-                        console.log(jsonVastaus.response.user.user_name + ", " + jsonVastaus.response.user.uid)
-                    else {
-                        console.log("unTpKayttaja.qml ->uTYhteys: " + "ei user-tietoja")
-                        console.log("  ===  " + JSON.stringify(jsonVastaus))
-                    }
                     kirjoitaTiedot(jsonVastaus)
                 } else if (toiminto === "kirjaukset")
                     kirjoitaKirjaukset(jsonVastaus)
@@ -131,9 +117,6 @@ Page {
             kirjausId: checkinId
             olutId: bid
             naytaTekija: false
-            //kuva: osoite
-            //kayttis: kayttajatunnus
-            //juomari: tekija
             pubi: paikka //
             pubiId: baariId
             tarra: etiketti
@@ -165,7 +148,6 @@ Page {
 
             MenuItem {
                 text: juojanHaku.active? qsTr("hide search") : qsTr("search user")
-                //visible: !juojanHaku.active
                 onClicked: {
                     juojanHaku.active = !juojanHaku.active
                     juojanHaku.focus = juojanHaku.active
@@ -245,7 +227,7 @@ Page {
 
                 Image { //naama
                     id: kuva1
-                    width: Theme.fontSizeMedium*3//sivu.width/3
+                    width: Theme.fontSizeMedium*3
                     anchors.bottom: nimi.bottom
                     x: sivu.width - width - Theme.paddingLarge
                     height: width
@@ -275,10 +257,8 @@ Page {
             Row { // alaotsikot
                 id: alaotsikkorivi
                 height: tilastotNakyvat ? tilastot.height : juodut.height// + Theme.paddingLarge
-                //anchors.topMargin: Theme.paddingMedium
                 x: (sivu.width - tilastot.width - juodut.width)/3
                 spacing: x
-                //width: sivu.width - 2*x
 
                 Label {
                     id: tilastot
@@ -288,7 +268,6 @@ Page {
                     leftPadding: Theme.paddingMedium
                     rightPadding: Theme.paddingMedium
                     topPadding: Theme.paddingMedium
-                    //bottomPadding: Theme.paddingSmall
 
                     MouseArea {
                         anchors.fill: parent
@@ -306,7 +285,6 @@ Page {
                     leftPadding: Theme.paddingMedium
                     rightPadding: Theme.paddingMedium
                     topPadding: Theme.paddingMedium
-                    //bottomPadding: Theme.paddingSmall
 
                     MouseArea {
                         anchors.fill: parent
@@ -479,14 +457,13 @@ Page {
 
                 delegate: kirjaustyyppi
 
-                // /*
                 section {
                     property: "section"
 
                     delegate: SectionHeader {
                         text: section
                     }
-                } // */
+                }
 
                 onMovementEnded: {
                     if (atYEnd) {

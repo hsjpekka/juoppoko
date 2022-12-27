@@ -52,7 +52,6 @@ ApplicationWindow{
         tiedotLuettu();
     }
 
-    //property string kone: ""
     property var tk: null
 
     signal tiedotLuettu()
@@ -60,9 +59,7 @@ ApplicationWindow{
     Paaikkuna {
         id: paaikkuna
         onKysyAsetukset: {
-            console.log("kysytään")
             juoppoko.kysyAsetukset()
-            console.log("kysytty")
         }
     }
 
@@ -70,28 +67,14 @@ ApplicationWindow{
         id: kansi
     }
 
-    PositionSource {
-        id: paikkatieto
-        active: true
-        updateInterval: 15*60*1000 // 15 min
-    }
-
     function asetukset() {
-        //var args = Qt.application.arguments.length
         UnTpd.programName = Qt.application.arguments[0]
-        UnTpd.unTpdId = unTappdId //Qt.application.arguments[args-1]
-        //UnTpd.unTpdSecret = unTappdSe //Qt.application.arguments[args-2]
-        UnTpd.callbackURL = unTappdCb //Qt.application.arguments[args-3]
+        UnTpd.unTpdId = unTappdId
+        UnTpd.callbackURL = unTappdCb
         UnTpd.unTpToken = Tkanta.arvoUnTpToken;
-        //FourSqr.appId = fsqId //Qt.application.arguments[args-4]
-        //FourSqr.appSecret = fsqSec //Qt.application.arguments[args-5]
-        //FourSqr.fsqrVersion = fsqVer //Qt.application.arguments[args-6]
-        //versioNro = Qt.application.arguments[args-7] //Qt.application.version
-        //kone = ccKohde //Qt.application.arguments[args-8]
-        untpdKysely.setQueryParameter(untpdKysely.keyToken(), Tkanta.arvoUnTpToken, untpdKysely.keyToken());
+        untpdKysely.setOAuthToken(Tkanta.arvoUnTpToken);
         juoja.asetaVrkVaihdos(Tkanta.vrkVaihtuu);
         juoja.asetaPromilleraja(Tkanta.promilleRaja1);
-        console.log("muuttujia: " + UnTpd.unTpdId + ", " + UnTpd.callbackURL);
         return;
     }
 
@@ -123,7 +106,7 @@ ApplicationWindow{
                                     });
         dialog.accepted.connect(function() {
             var tulos = 0;
-            var pvm = new Date()
+            var pvm = new Date();
             if (juoja.luePaino() != dialog.massa || juoja.lueVesimaara() != dialog.vetta ||
                     juoja.lueMaksa() != dialog.kunto ){
                 tulos = juoja.asetaKeho(dialog.massa, dialog.vetta, dialog.kunto, pvm.getTime());
@@ -176,8 +159,6 @@ ApplicationWindow{
             i++;
         }
 
-        //paaikkuna.juomari.nakyma.positionViewAtEnd();
-        //console.log("juodut luettu");
         return;
     }
 

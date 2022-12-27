@@ -197,12 +197,9 @@ function lueTkAsetukset() {
             var taulukko2  = tx.executeSql(mj);
             var luettu2 = 0;
 
-            //console.log("lueAsetukset2: rivejä " + taulukko2.rows.length)
             while (luettu2 < taulukko2.rows.length) {
-                //console.log("asetukset2: " + taulukko2.rows[luettu2].asia + " " + taulukko2.rows[luettu2].arvo)
                 if (taulukko2.rows[luettu2].asia === tunnusUnTappdToken ){
                     arvoUnTpToken = taulukko2.rows[luettu2].arvo;
-                    console.log("unTappdToken: " + arvoUnTpToken);
                     if (arvoUnTpToken === null || arvoUnTpToken === undefined)
                         arvoUnTpToken = "";
                     if (arvoUnTpToken !== "")
@@ -213,12 +210,9 @@ function lueTkAsetukset() {
                 luettu2++;
             }
 
-            //console.log("lueAsetukset2 - " + tunnusUnTappdToken + ": " + arvoUnTpToken)
-
         });
     } catch (err) {
         console.log("Error reading asetukset2-table in database: " + err);
-        //virheet = virheet + "Error reading asetukset2-table in database: " + err +" <br> "
         virheet.push(err + " >> " + mj + " <<");
     }
 

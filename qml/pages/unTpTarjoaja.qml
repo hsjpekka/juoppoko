@@ -5,74 +5,8 @@ import "../components"
 
 Page {
     id: sivu
-    //property string baari: ""
+
     property int tunniste: 0
-
-    function kirjoitaTiedot(tiedot) {
-        var vastaus=tiedot.response.venue, i=0, mj="", yhteystieto, solu
-        otsikko.title = vastaus.venue_name
-        if ("primary_category" in vastaus)
-            luokitus.text = vastaus.primary_category
-        else if ("categories" in vastaus && vastaus.categories.count > 0)
-            luokitus.text = vastaus.categories.items[0].category_name
-        if (vastaus.public_venue === "true")
-            luokitus.label = qsTr("public")
-        else
-            luokitus.label = qsTr("private")
-        if ("venue_icon" in vastaus) {
-            if ("md" in vastaus.venue_icon)
-                kuvake.source = vastaus.venue_icon.md
-            else if ("sm" in vastaus.venue_icon)
-                kuvake.source = vastaus.venue_icon.sm
-            else
-                kuvake.source = vastaus.venue_icon.lg
-        }
-
-        if ("location" in vastaus) {
-            if (vastaus.location.venue_address > "") {
-                osoite.text = vastaus.location.venue_address
-                osoite.label = qsTr("lat: ") +  vastaus.location.lat + qsTr(", lng: ") +
-                        vastaus.location.lng
-            } else {
-                osoite.text = qsTr("lat: ") +  vastaus.location.lat + qsTr(", lng: ") +
-                        vastaus.location.lng
-            }
-            kaupunki.text = vastaus.location.venue_city
-            if (vastaus.location.venue_state > "")
-                kaupunki.text += ", " + vastaus.location.venue_state
-            kaupunki.label = vastaus.location.venue_country
-        }
-
-        if ("contact" in vastaus) {
-            for (yhteystieto in vastaus.contact) {
-                if (yhteystieto === "venue_url")
-                    www.text = vastaus.contact[yhteystieto]
-                else if (vastaus.contact[yhteystieto] > "")
-                    twitter.text += yhteystieto + ": " + vastaus.contact[yhteystieto] + ", "
-            }
-        }
-        if ("foursquare" in vastaus && "foursquare_url" in vastaus.foursquare) {
-            if (www.text > "")
-                www.text += ", "
-            www.text += vastaus.foursquare.foursquare_url
-        }
-
-        for (solu in vastaus.stats)
-            tilastoja.text += solu + ": " + vastaus.stats[solu] + ", "
-        if ("top_beers" in vastaus) {
-            i=0
-            while (i < vastaus.top_beers.count) {
-                myydyimmat.lisaa(vastaus.top_beers.items[i].beer.beer_name,
-                                 vastaus.top_beers.items[i].beer.bid,
-                                 vastaus.top_beers.items[i].beer.beer_label,
-                                 vastaus.top_beers.items[i].brewery.brewery_name,
-                                 vastaus.top_beers.items[i].brewery.brewery_id)
-                i++
-            }
-        }
-
-        return
-    }
 
     XhttpYhteys {
         id: utYhteys
@@ -89,11 +23,11 @@ Page {
         }
 
         function haeBaari(pubi) {
-            var kysely, compact = false
-            kysely = UnTpd.getVenueInfo(pubi, compact)
-            xHttpGet(kysely[0], kysely[1], "baari")
+            var kysely, compact = false;
+            kysely = UnTpd.getVenueInfo(pubi, compact);
+            xHttpGet(kysely[0], kysely[1], "baari");
 
-            return
+            return;
         }
     }
 
@@ -110,12 +44,11 @@ Page {
 
         function lisaa(olut, olutId, tarra, panimo, panimoId) {
             if (tyhja) {
-                myydyimmat.clear()
-                tyhja = false
+                myydyimmat.clear();
+                tyhja = false;
             }
-            console.log(olut + ", " + olutId + ", " + tarra + ", " + panimo + ", " + panimoId)
             return myydyimmat.append({"merkki": olut, "olutId": olutId, "panimo": panimo,
-                                 "panimoId": panimoId, "tarra": tarra })
+                                 "panimoId": panimoId, "tarra": tarra });
         }
     }
 
@@ -155,7 +88,6 @@ Page {
                 }
                 text: merkki
                 label: panimo
-                //width: parent.width
                 color: Theme.highlightColor
                 readOnly: true
                 focusOnClick: false
@@ -262,9 +194,6 @@ Page {
             }
 
             Repeater {
-                //id: myydyimmat
-                //width: parent.width
-                //height: count < 5? contentHeight : 8*Theme.fontSizeMedium
                 model: myydyimmat
                 delegate: tietojaOluista
             }
@@ -272,6 +201,77 @@ Page {
     }
     Component.onCompleted: {
         utYhteys.haeBaari(tunniste)
+    }
+
+    function kirjoitaTiedot(tiedot) {
+        var vastaus=tiedot.response.venue, i=0, mj="", yhteystieto, solu;
+        otsikko.title = vastaus.venue_name;
+        if ("primary_category" in vastaus) {
+            luokitus.text = vastaus.primary_category;
+        } else if ("categories" in vastaus && vastaus.categories.count > 0) {
+            luokitus.text = vastaus.categories.items[0].category_name;
+        }
+        if (vastaus.public_venue === "true") {
+            luokitus.label = qsTr("public");
+        } else {
+            luokitus.label = qsTr("private");
+        }
+        if ("venue_icon" in vastaus) {
+            if ("md" in vastaus.venue_icon) {
+                kuvake.source = vastaus.venue_icon.md;
+            } else if ("sm" in vastaus.venue_icon) {
+                kuvake.source = vastaus.venue_icon.sm;
+            } else {
+                kuvake.source = vastaus.venue_icon.lg;
+            }
+        }
+
+        if ("location" in vastaus) {
+            if (vastaus.location.venue_address > "") {
+                osoite.text = vastaus.location.venue_address;
+                osoite.label = qsTr("lat: ") +  vastaus.location.lat + qsTr(", lng: ") +
+                        vastaus.location.lng;
+            } else {
+                osoite.text = qsTr("lat: ") +  vastaus.location.lat + qsTr(", lng: ") +
+                        vastaus.location.lng;
+            }
+            kaupunki.text = vastaus.location.venue_city;
+            if (vastaus.location.venue_state > "")
+                kaupunki.text += ", " + vastaus.location.venue_state;
+            kaupunki.label = vastaus.location.venue_country;
+        }
+
+        if ("contact" in vastaus) {
+            for (yhteystieto in vastaus.contact) {
+                if (yhteystieto === "venue_url") {
+                    www.text = vastaus.contact[yhteystieto];
+                } else if (vastaus.contact[yhteystieto] > "") {
+                    twitter.text += yhteystieto + ": " + vastaus.contact[yhteystieto] + ", ";
+                }
+            }
+        }
+        if ("foursquare" in vastaus && "foursquare_url" in vastaus.foursquare) {
+            if (www.text > "")
+                www.text += ", ";
+            www.text += vastaus.foursquare.foursquare_url;
+        }
+
+        for (solu in vastaus.stats) {
+            tilastoja.text += solu + ": " + vastaus.stats[solu] + ", ";
+        }
+        if ("top_beers" in vastaus) {
+            i=0;
+            while (i < vastaus.top_beers.count) {
+                myydyimmat.lisaa(vastaus.top_beers.items[i].beer.beer_name,
+                                 vastaus.top_beers.items[i].beer.bid,
+                                 vastaus.top_beers.items[i].beer.beer_label,
+                                 vastaus.top_beers.items[i].brewery.brewery_name,
+                                 vastaus.top_beers.items[i].brewery.brewery_id);
+                i++;
+            }
+        }
+
+        return;
     }
 
 }
