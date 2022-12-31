@@ -49,6 +49,7 @@ function searchVenue(query, ll, radius, categories, limit, session) {
 
     return encodeURI(fsqQuery)
     // */
+    // places API
     var endpoint = "/v3/places/search";
     var parameters = "";
     parameters += "query=" + query;

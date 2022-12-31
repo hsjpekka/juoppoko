@@ -134,15 +134,14 @@ Dialog {
     }
 
     SilicaFlickable {
-        id: ruutu
-        anchors.fill: sivu
+        anchors.fill: parent
         contentHeight: column.height
 
         VerticalScrollDecorator {}
 
         Column {
             id: column
-            width: sivu.width
+            width: parent.width
 
             DialogHeader {
                 title: qsTr("Check-in location")
@@ -191,7 +190,7 @@ Dialog {
                     naytaSijainti = checked
                     //baarinTunnus = ""
                     //kuvaBaari.source = ""
-                    txtBaari.text = ""
+                    //txtBaari.text = ""
                 }
             }
 
@@ -343,9 +342,9 @@ Dialog {
 
             ListItem {
                 id: valittuKuppila
-                width: parent.width - x
-                contentHeight: kuvaBaari.height > txtBaari.height ? kuvaBaari.height : txtBaari.height
-                x: Theme.paddingMedium
+                width: parent.width
+                contentHeight: kuvaBaari.height > kuppila.height ? kuvaBaari.height : kuppila.height
+                //x: Theme.paddingMedium
                 menu: ContextMenu {
                     MenuItem {
                         text: qsTr("venue info")
@@ -361,22 +360,50 @@ Dialog {
                             fsYhteys.haeUnTpdId(baarinTunnus, "toiminta")
                         }
                     }
+                    MenuItem {
+                        text: qsTr("clear")
+                        onClicked: {
+                            baarinTunnus = ""
+                            valittuKuppila.nimi = ""
+                        }
+                    }
+                }
+
+                property string nimi: tyhja
+                property string osoite: ""
+                readonly property string tyhja: qsTr("check-in pub")
+                onNimiChanged: {
+                    if (nimi === "" && tyhja !== "") {
+                        nimi = tyhja
+                        osoite = ""
+                        kuvaBaari.source = ""
+                    }
                 }
 
                 Image {
                     id: kuvaBaari
                     width: Theme.iconSizeMedium
                     height: width
+                    x: Theme.paddingMedium
                 }
 
-                TextField {
-                    id: txtBaari
-                    anchors.left: kuvaBaari.right
-                    color: asemanTalletus.checked ? Theme.highlightColor : Theme.highlightDimmerColor
-                    label: qsTr("check-in location")
-                    readOnly: true
-                    width: parent.width - kuvaBaari.width
-                    onPressAndHold: valittuKuppila.openMenu()
+                Column {
+                    id: kuppila
+                    anchors {
+                        left: kuvaBaari.right
+                        leftMargin: Theme.paddingSmall
+                        right: parent.right
+                    }
+                    spacing: Theme.paddingSmall
+
+                    Label {
+                        color: asemanTalletus.checked ? Theme.highlightColor : Theme.highlightDimmerColor
+                        text: valittuKuppila.nimi
+                    }
+                    Label {
+                        color: asemanTalletus.checked ? Theme.secondaryHighlightColor : Theme.highlightDimmerColor
+                        text: valittuKuppila.osoite
+                    }
                 }
             }
 
@@ -411,10 +438,10 @@ Dialog {
             SilicaListView {
                 id: baariLista
                 property int minKorkeus: 4*Theme.fontSizeMedium
-                property int vapaana: sivu.height - piilotusRivi.y - piilotusRivi.height
-                                      - txtBaari.height - haettava.height - 3*column.spacing
+                property int vapaana: sivu.height - y + valittuKuppila.height
+                                      - valittuKuppila.contentHeight
                 height: vapaana > minKorkeus ? vapaana : minKorkeus
-                width: sivu.width
+                width: parent.width
                 clip: true
                 highlightFollowsCurrentItem: true
 
@@ -524,8 +551,8 @@ Dialog {
 
     function kopioiBaari(nro) {
         baari = loydetytBaarit.get(nro).nimi;
-        txtBaari.text = baari;
-        txtBaari.label = (loydetytBaarit.get(nro).osoite == "") ?
+        valittuKuppila.nimi = baari;
+        valittuKuppila.osoite = (loydetytBaarit.get(nro).osoite == "") ?
                     loydetytBaarit.get(nro).tyyppi :
                     loydetytBaarit.get(nro).osoite;
         kuvaBaari.source = loydetytBaarit.get(nro).kuvake;
@@ -659,47 +686,50 @@ Dialog {
             if (onkoTietoa(haetut[i].location,"address")){
                 osoite = haetut[i].location.address;
             }
-            if (onkoTietoa(haetut[i].location,"distance")){
+            if ("distance" in haetut[i]){
                 if (osoite != "") {
                     osoite += ", ";
                 }
-                osoite += haetut[i].location.distance + " m";
+                osoite += haetut[i].distance + " m";
             }
-            if (onkoTietoa(haetut[i].location,"lat")) {
-                levpii = haetut[i].location.lat;
+            if (onkoTietoa(haetut[i].geocodes,"latitude")) {
+                levpii = haetut[i].geocodes.latitude;
             } else {
                 levpii = leveyspiiri.text;
             }
-            if (onkoTietoa(haetut[i].location,"lng")) {
-                pitpii = haetut[i].location.lng;
+            if (onkoTietoa(haetut[i].geocodes,"longitude")) {
+                pitpii = haetut[i].geocodes.longitude;
             } else {
                 pitpii = pituuspiiri.text;
             }
 
-            loydetytBaarit.lisaa(haetut[i].id, nimi, osoite, tyyppi,
+            loydetytBaarit.lisaa(haetut[i].fsq_id, nimi, osoite, tyyppi,
                                  encodeURI(kuvake), levpii, pitpii);
             i++;
         }
 
         if (n === 0) {
-            txtBaari.text = qsTr("None found.");
-            txtBaari.label = qsTr("Better luck next time.");
+            valittuKuppila.nimi = qsTr("None found.");
+            valittuKuppila.osoite = qsTr("Better luck next time.");
             asetuksetNakyvat = true;
         }
 
         return;
     }
 
+    /*
     function printableMethod(method) {
+        var tulos = qsTr("source error");
         if (method === PositionSource.SatellitePositioningMethods) {
-            return qsTr("Satellite");
+            tulos = qsTr("Satellite");
         } else if (method === PositionSource.NoPositioningMethods) {
-            return qsTr("Not available");
+            tulos = qsTr("Not available");
         } else if (method === PositionSource.NonSatellitePositioningMethods) {
-            return qsTr("Non-satellite");
+            tulos = qsTr("Non-satellite");
         } else if (method === PositionSource.AllPositioningMethods) {
-            return qsTr("Multiple");
+            tulos = qsTr("Multiple");
         }
-        return qsTr("source error");
+        return tulos;
     }
+    //*/
 }

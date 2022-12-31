@@ -128,7 +128,7 @@ Page {
             var posoite, kysely;
             kysely = UnTpd.addComment(ckdId, juttuni.text);
 
-            xHttpPost(kysely[0], kysely[1], "kommentoi");
+            xHttpPost(kysely[0], kysely[1], "", "kommentoi");
 
             return;
         }

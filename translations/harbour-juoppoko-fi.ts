@@ -366,6 +366,26 @@
         <source>%1 drinks</source>
         <translation>%1 juotua</translation>
     </message>
+    <message>
+        <source>read %1 body records</source>
+        <translation>luettu %1 kehon tietuetta</translation>
+    </message>
+    <message>
+        <source>no body records</source>
+        <translation>ei keho-tietueita</translation>
+    </message>
+    <message>
+        <source>Weight nr. %1 &lt; 1 kg or &gt; 400 kg, changed to 75 kg.</source>
+        <translation>Paino nro %1 &lt; 1 kg tai &gt; 400 kg, käytetään 75 kg.</translation>
+    </message>
+    <message>
+        <source>body water content nr. %1 &lt; 1 % or &gt; 100 %, changed to 70 %.</source>
+        <translation>Veden määrä nro %1 &lt; 1 % tai &gt; 100 %, käytetään 70 %.</translation>
+    </message>
+    <message>
+        <source>lever condition nr. %1 &lt; 1 % or &gt; 300 %, changed to 100 %.</source>
+        <translation>Maksan kunto nro %1 &lt; 1 % tai &gt; 300 %, käytetään 100 %.</translation>
+    </message>
 </context>
 <context>
     <name>juomanMuokkaus</name>
@@ -415,8 +435,10 @@
     <message>
         <source>The default limits are based on 
  %1 
- - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
-        <translation type="unfinished"></translation>
+ - according to which the low risk limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
+        <translation>Oletetut raja-arvot ovat sivulta
+ %1
+ - jonka mukaan alhaisen riskin raja on naisille 7 annosta viikossa ja miehille 14. Kohonneen riskin raja on 16 annosta naisille ja 24 miehille.</translation>
     </message>
 </context>
 <context>
@@ -504,28 +526,76 @@
 <context>
     <name>unTpCheckIn</name>
     <message>
-        <source>Satellite</source>
-        <translation>satelliitti</translation>
+        <source>venue info</source>
+        <translation>kapakan tiedot</translation>
     </message>
     <message>
-        <source>Not available</source>
-        <translation>ei käytettävissä</translation>
+        <source>venue activity</source>
+        <translation>kapakassa nautittuja</translation>
     </message>
     <message>
-        <source>Non-satellite</source>
-        <translation>ei satelliiteistä</translation>
+        <source>Check-in location</source>
+        <translation>Juomispaikka</translation>
     </message>
     <message>
-        <source>Multiple</source>
-        <translation>monipaikanteinen</translation>
+        <source>shows place</source>
+        <translation>näyttää paikan</translation>
     </message>
     <message>
-        <source>source error</source>
-        <translation>lähdevirhe</translation>
+        <source>hides place</source>
+        <translation>piilottaa paikan</translation>
     </message>
     <message>
         <source>search settings</source>
         <translation>hakuasetukset</translation>
+    </message>
+    <message>
+        <source>location not determined</source>
+        <translation>sijaintia ei määritetty</translation>
+    </message>
+    <message>
+        <source>lng</source>
+        <translation>pituus</translation>
+    </message>
+    <message>
+        <source>lat</source>
+        <translation>leveys</translation>
+    </message>
+    <message>
+        <source>radius</source>
+        <translation>säde</translation>
+    </message>
+    <message>
+        <source>not limited</source>
+        <translation>ei rajata</translation>
+    </message>
+    <message>
+        <source>limits to Foursquare categories %1</source>
+        <translation>rajataan Foursquare-luokkiin %1</translation>
+    </message>
+    <message>
+        <source>searches in all categories</source>
+        <translation>etsitään kaikista luokista</translation>
+    </message>
+    <message>
+        <source>clear</source>
+        <translation>tyhjennä</translation>
+    </message>
+    <message>
+        <source>check-in pub</source>
+        <translation>juomispaikka</translation>
+    </message>
+    <message>
+        <source>place</source>
+        <translation>paikka</translation>
+    </message>
+    <message>
+        <source>location determined %1 min ago</source>
+        <translation>sijainti määritetty %1 min sitten</translation>
+    </message>
+    <message>
+        <source>location determined %1 hours ago</source>
+        <translation>sijainti määritetty %1 h sitten</translation>
     </message>
     <message>
         <source>None found.</source>
@@ -534,70 +604,6 @@
     <message>
         <source>Better luck next time.</source>
         <translation>Parempi onni ensi kerralla.</translation>
-    </message>
-    <message>
-        <source>radius</source>
-        <translation>etäisyys</translation>
-    </message>
-    <message>
-        <source>not limited</source>
-        <translation>ei rajattu</translation>
-    </message>
-    <message>
-        <source>location determined %1 min ago</source>
-        <translation>sijainti määritetty %1 min sitten</translation>
-    </message>
-    <message>
-        <source>location determined %1 hours ago</source>
-        <translation>sijainti määritetty %1 tuntia sitten</translation>
-    </message>
-    <message>
-        <source>location not determined</source>
-        <translation>sijaintia ei määritetty</translation>
-    </message>
-    <message>
-        <source>lng</source>
-        <translation>pituuspiiri</translation>
-    </message>
-    <message>
-        <source>lat</source>
-        <translation>leveyspiiri</translation>
-    </message>
-    <message>
-        <source>searches in all categories</source>
-        <translation>älä rajaa hakua</translation>
-    </message>
-    <message>
-        <source>place</source>
-        <translation>paikka</translation>
-    </message>
-    <message>
-        <source>check-in location</source>
-        <translation>kirjattava paikka</translation>
-    </message>
-    <message>
-        <source>venue info</source>
-        <translation>tarjoilupaikan tiedot</translation>
-    </message>
-    <message>
-        <source>venue activity</source>
-        <translation>kapakassa nautittuja</translation>
-    </message>
-    <message>
-        <source>Check-in location</source>
-        <translation>Sijainti</translation>
-    </message>
-    <message>
-        <source>hides place</source>
-        <translation>piilottaa paikan</translation>
-    </message>
-    <message>
-        <source>shows place</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>limits to Foursquare categories %1</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

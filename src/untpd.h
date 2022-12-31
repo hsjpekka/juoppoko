@@ -22,11 +22,11 @@ public:
     Q_INVOKABLE void authenticateAmber(QString pathAuthorization, QString redirect, QString pathToken);
     Q_INVOKABLE bool isNetworkAvailable();
     Q_INVOKABLE bool queryGet(QString queryId, QString url);
-    Q_INVOKABLE bool queryGet(QString queryId, QString path, QString definedQuery, QString parametersToAdd="");
-    Q_INVOKABLE bool queryHeaderedGet(QString queryId, QString path, QString query, QString headers, QString parametersToAdd="");
-    Q_INVOKABLE bool queryHeaderedPost(QString queryId, QString path, QString query, QString headers, QString parametersToAdd="");
-    Q_INVOKABLE bool queryPost(QString queryId, QString url);
-    Q_INVOKABLE bool queryPost(QString queryId, QString path, QString definedQuery, QString parametersToAdd="");
+    Q_INVOKABLE bool queryGet(QString queryId, QString path, QString definedQuery, QString parametersToAdd = "");
+    Q_INVOKABLE bool queryHeaderedGet(QString queryId, QString path, QString query, QString headers, QString parametersToAdd = "");
+    Q_INVOKABLE bool queryHeaderedPost(QString queryId, QString path, QString query, QString headers, QString posting = "", QString parametersToAdd = "");
+    //Q_INVOKABLE bool queryPost(QString queryId, QString url, QString posting = "");
+    Q_INVOKABLE bool queryPost(QString queryId, QString path, QString query, QString posting = "", QString parametersToAdd = "");
     Q_INVOKABLE QString readOAuth2Token();
     Q_INVOKABLE bool setOAuthId(QString id);
     Q_INVOKABLE bool setOAuthPath(QString path);
@@ -34,12 +34,12 @@ public:
     Q_INVOKABLE bool setOAuthSecret(QString secret);
     Q_INVOKABLE bool setOAuthToken(QString token);
     Q_INVOKABLE bool setOAuthTokenPath(QString path);
-    Q_INVOKABLE int  setQueryParameter(QString id, QString value, QString key="");
+    Q_INVOKABLE int  setQueryParameter(QString id, QString value, QString key = "");
     Q_INVOKABLE bool setServer(QString protocol, QString address, int port = -1);
     Q_INVOKABLE bool setUserInfo(QString user, QString passwd);
     Q_INVOKABLE void setUserInfoReguired(bool required);//http://user:passwd@www.xx.yy
-    Q_INVOKABLE bool singleGet(QString path, QString definedQuery, QString parametersToAdd="");
-    Q_INVOKABLE bool singlePost(QString path, QString definedQuery, QString parametersToAdd="");
+    Q_INVOKABLE bool singleGet(QString path, QString definedQuery, QString parametersToAdd = "");
+    Q_INVOKABLE bool singlePost(QString path, QString posting, QString definedQuery = "", QString parametersToAdd = "");
 
     Q_INVOKABLE QString keyAppId();
     Q_INVOKABLE QString keyAppSecret();
@@ -80,8 +80,8 @@ private:
     int parameterIndex(QString id);
     QString readResponse(QNetworkReply *reply);
     QJsonObject responseToJson(QNetworkReply *reply, QString *replyString);
-    bool sendRequest(QString queryId, QUrl url, bool isGet, QString headers = "");
-    bool sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet, QString headers = "");
+    bool sendRequest(QString queryId, QUrl url, bool isGet, QString headers = "", QString posting = "");
+    bool sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet, QString headers = "", QString posting = "");
     QString uriKey(QString uriStr, QString key, int n = -1);
 };
 

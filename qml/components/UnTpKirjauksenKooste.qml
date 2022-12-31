@@ -14,7 +14,7 @@ ListItem {
             visible: kayttis > ""
             onClicked: {
                 pageContainer.push(Qt.resolvedUrl("../pages/unTpKayttaja.qml"),{
-                                "kayttaja": kayttis } )
+                                "muuJuoja": kayttis } )
             }
         }
         MenuItem {
@@ -68,48 +68,6 @@ ListItem {
     property alias  tarra: juomanEtiketti.source
     property alias  valmistaja: panija.text
     property bool   pubSivulla: false
-
-    function juttele() {
-        var viestisivu, nimi = ""
-        if (juomari != "") {
-            nimi = juomari
-        } else {
-            nimi = kayttis
-        }
-
-        viestisivu = pageContainer.push(Qt.resolvedUrl("../pages/unTpJuomispuheet.qml"), {
-                                        "keskustelu": keskustelu,
-                                        "user_avatar": kuva,
-                                        "user_name": nimi,
-                                        "venue_name": pubi,
-                                        "beer_label": tarra,
-                                        "beer_name": kalja,
-                                        "brewery_name": valmistaja,
-                                        "checkin_comment": sanottu,
-                                        "ckdId": kirjausId
-                                    })
-        viestisivu.sulkeutuu.connect( function() {
-            juttuja = viestisivu.viesteja
-            keskustelu = viestisivu.keskustelu
-            olenkoJutellut(viestisivu.keskustelu)
-            return
-        })
-
-        return
-    }
-
-    function olenkoJutellut() {
-        var juttuja = keskustelu.count, i = 0
-        while(i < juttuja){
-            if (keskustelu.items[i].comment_editor === true){
-                osallistunut = true
-                return true
-            }
-            i++
-        }
-        osallistunut = false
-        return false
-    }
 
     Rectangle {
         id: kehys
@@ -281,5 +239,47 @@ ListItem {
                 }
             }
         }
+    }
+
+    function juttele() {
+        var viestisivu, nimi = ""
+        if (juomari != "") {
+            nimi = juomari
+        } else {
+            nimi = kayttis
+        }
+
+        viestisivu = pageContainer.push(Qt.resolvedUrl("../pages/unTpJuomispuheet.qml"), {
+                                        "keskustelu": keskustelu,
+                                        "user_avatar": kuva,
+                                        "user_name": nimi,
+                                        "venue_name": pubi,
+                                        "beer_label": tarra,
+                                        "beer_name": kalja,
+                                        "brewery_name": valmistaja,
+                                        "checkin_comment": sanottu,
+                                        "ckdId": kirjausId
+                                    })
+        viestisivu.sulkeutuu.connect( function() {
+            juttuja = viestisivu.viesteja
+            keskustelu = viestisivu.keskustelu
+            olenkoJutellut(viestisivu.keskustelu)
+            return
+        })
+
+        return
+    }
+
+    function olenkoJutellut() {
+        var juttuja = keskustelu.count, i = 0
+        while(i < juttuja){
+            if (keskustelu.items[i].comment_editor === true){
+                osallistunut = true
+                return true
+            }
+            i++
+        }
+        osallistunut = false
+        return false
     }
 }

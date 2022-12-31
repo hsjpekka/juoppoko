@@ -93,10 +93,10 @@ Page {
             return;
         }
 
-        function unTpdToast(ckId) {
+        function kippis(ckId) {
             var kysely = "";
             kysely = UnTpd.toast(ckId);
-            xHttpPost(kysely[0], kysely[1], "kippis");
+            xHttpPost(kysely[0], kysely[1], "", "kippis");
             return;
         }
 
@@ -128,6 +128,9 @@ Page {
             juttuja: jutteluita
             keskustelu: jutut
             osallistunut: mukana
+            onMalja: {
+                uTYhteys.kippis(kirjausId)
+            }
         }
     }
 

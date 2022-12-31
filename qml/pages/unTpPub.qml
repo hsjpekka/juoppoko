@@ -105,9 +105,9 @@ Page {
         }
 
         function kippis(ckId) {
-            var kysely = "", posoite = "";
-            posoite = UnTpd.toast(ckId);
-            xHttpPost(kysely[0], kysely[1], "kippis");
+            var kysely = "";
+            kysely = UnTpd.toast(ckId);
+            xHttpPost(kysely[0], kysely[1], "", "kippis");
             return;
         }
     }

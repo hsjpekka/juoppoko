@@ -34,10 +34,12 @@ function olutVaihtuu(beerId){
 //post-komennot: addComment, removeComment, checkIn, toast
 //get-komennot: muut
 
+/*
 function userAut() {
     // access_token=ACESSTOKENHERE
     return "access_token=" + unTpToken;
 }
+//*/
 
 //function appAut() {
 //    // client_id=CLIENTID&client_secret=CLIENTSECRET
@@ -72,12 +74,11 @@ function addCommentString(comment){
 } //*/
 
 function addComment(checkinId, comment){
-    //post-string "&comment=" + comment
+    //post-string "comment=" + comment
     //CHECKIN_ID (int, required) - The checkin id of the check-in you want to add the comment.//"32"
     //comment (string, required) - The text of the comment you want to add. Max of 140 characters.//"&comment=Tou!"
     var endpoint = "/v4/checkin/addcomment/"+ checkinId;
     //var query = unTpOsoite + endpoint + "?" + userAut();
-    //"&comment=" + comment;
     var parameters = "comment=" + comment;
     return [endpoint, encodeURI(parameters)];
 

@@ -168,26 +168,26 @@ ApplicationWindow{
         keho = Tkanta.lueTkJuomari();
         if (keho.length > 0){
             i = 0;
-            console.log("painohistorioita " + keho.length)
+            console.log(qsTr("read %1 body records").arg(keho.length));
         } else {
             i = -1;
-            console.log("ei painohistorioita " + keho)
+            console.log(qsTr("no body records"))
         }
 
         while (i >= 0 && i < keho.length) {
             paino = keho[i].paino;
             vetta = keho[i].neste;
             kunto = keho[i].maksa;
-            if (paino < 1) {
-                console.log("arvo " + (i+1) + ": paino < 1 kg, muutettu 75 kg");
+            if (paino < 1 || paino > 400) {
+                console.log(qsTr("Weight nr. %1 < 1 kg or > 400 kg, changed to 75 kg.").arg(i+1));
                 paino = 75;
             }
-            if (vetta < 0.01) {
-                console.log("arvo " + (i+1) + ": vesipitoisuus < 1 %, muutettu 70%");
+            if (vetta < 0.01 || vetta > 1) {
+                console.log(qsTr("body water content nr. %1 < 1 % or > 100 %, changed to 70 %.").arg(i+1));
                 vetta = 0.7;
             }
-            if (kunto < 0.01) {
-                console.log("arvo " + (i+1) + ": maksan kunto < 1 %, muutettu 100%");
+            if (kunto < 0.01 || kunto > 3) {
+                console.log(qsTr("lever condition nr. %1 < 1 % or > 300 %, changed to 100 %.").arg(i+1));
                 kunto = 1.0;
             }
             juoja.asetaKeho(paino, vetta, kunto, keho[i].aika);

@@ -25,7 +25,7 @@ Page {
                 wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                 x: Theme.horizontalPageMargin
 
-                plainText: qsTr("The default limits are based on \n %1 \n - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. ").arg(paihdelinkki) +
+                plainText: qsTr("The default limits are based on \n %1 \n - according to which the low risk limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. ").arg(paihdelinkki) +
                       qsTr("Here the limits depend only on the amount of water in body, not on sex.") +
                       "\n \n" +
                       qsTr("Alcohol burning rate is also from the same site.") + "\n \n" +

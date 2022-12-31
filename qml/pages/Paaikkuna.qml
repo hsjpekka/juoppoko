@@ -39,9 +39,6 @@ import "../components/"
 
 Page {
     id: sivu
-    Component.onCompleted: {
-        uTYhteys.unTpdOnkoUutisia()
-    }
     onPvmChanged: {
         if (!alustusKaynnissa) {
             promillerivi.muutaPromillet()
@@ -85,7 +82,9 @@ Page {
             }
 
             promillerivi.muutaPromillet()
-            tarkistaUnTpd()
+            if (tarkistaUnTpd()) {
+                uTYhteys.unTpdOnkoUutisia()
+            }
         }
     }
 
@@ -224,7 +223,7 @@ Page {
                                    naytaSijainti, leveys, pituus,
                                    huuto, tahtia, face, twit, fsqr);
 
-            xHttpPost(kysely[0], kysely[1], "checkIn");
+            xHttpPost(kysely[0], kysely[1], "", "checkIn");
 
             return;
         }
@@ -270,10 +269,6 @@ Page {
             MenuItem {
                 text: qsTr("foreteller")
                 onClicked: {
-                    console.log(juoja.lueMaksa(pvm) + ", lahtoTaso " +
-                                juoja.promilleja(pvm) + ", paino " +
-                                juoja.luePaino(pvm) + ", vetta " +
-                                juoja.lueVesimaara(pvm))
                     pageContainer.push(Qt.resolvedUrl("demolaskuri.qml"), {
                                    "kunto": juoja.lueMaksa(pvm),
                                    "lahtoTaso": juoja.promilleja(pvm),

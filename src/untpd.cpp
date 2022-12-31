@@ -341,19 +341,21 @@ bool unTpd::queryHeaderedGet(QString queryId, QString path, QString query, QStri
     return sendRequest(queryId, path, parametersToAdd, query, true, headers);
 }
 
-bool unTpd::queryHeaderedPost(QString queryId, QString path, QString query, QString headers, QString parametersToAdd)
+bool unTpd::queryHeaderedPost(QString queryId, QString path, QString query, QString headers, QString posting, QString parametersToAdd)
 {
-    return sendRequest(queryId, path, parametersToAdd, query, false, headers);
+    return sendRequest(queryId, path, parametersToAdd, query, false, headers, posting);
 }
 
+/*
 bool unTpd::queryPost(QString queryId, QString url) {
     QUrl u(url);
     return sendRequest(queryId, u, false);
 }
+//*/
 
-bool unTpd::queryPost(QString queryId, QString path, QString definedQuery, QString parametersToAdd)
+bool unTpd::queryPost(QString queryId, QString path, QString query, QString posting, QString parametersToAdd)
 {
-    return sendRequest(queryId, path, parametersToAdd, definedQuery, false);
+    return sendRequest(queryId, path, parametersToAdd, query, false, "", posting);
 }
 
 int unTpd::parameterIndex(QString id)
@@ -453,15 +455,14 @@ QJsonObject unTpd::responseToJson(QNetworkReply *reply, QString *replyString)
     return result;
 }
 
-bool unTpd::sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet, QString headers)
+bool unTpd::sendRequest(QString queryId, QString path, QString parametersToAdd, QString definedQuery, bool isGet, QString headers, QString posting)
 {
     QUrl url;
     assembleUrl(url, path, definedQuery, parametersToAdd);
-    qDebug() << url.toString() << parametersToAdd;
-    return sendRequest(queryId, url, isGet, headers);
+    return sendRequest(queryId, url, isGet, headers, posting);
 }
 
-bool unTpd::sendRequest(QString queryId, QUrl url, bool isGet, QString headers)
+bool unTpd::sendRequest(QString queryId, QUrl url, bool isGet, QString headers, QString posting)
 {
     QNetworkRequest request;
     QNetworkReply *netReply;
@@ -494,9 +495,7 @@ bool unTpd::sendRequest(QString queryId, QUrl url, bool isGet, QString headers)
     if (isGet) {
         netReply = netManager.get(request);
     } else {
-        netReply = netManager.post(request, "");
-        qDebug() << "sendRequest:" << isGet << url.toString() <<
-                    ", header:" << request.rawHeader("Content-Type");
+        netReply = netManager.post(request, posting.toLatin1());
     }
 
     currentRequest.queryId = queryId;
@@ -642,9 +641,9 @@ bool unTpd::singleGet(QString path, QString definedQuery, QString parametersToAd
     return sendRequest("", path, parametersToAdd, definedQuery, true);
 }
 
-bool unTpd::singlePost(QString path, QString definedQuery, QString parametersToAdd)
+bool unTpd::singlePost(QString path, QString posting, QString definedQuery, QString parametersToAdd)
 {
-    return sendRequest("", path, parametersToAdd, definedQuery, false);
+    return sendRequest("", path, parametersToAdd, definedQuery, false, "", posting);
 }
 
 QString unTpd::uriKey(QString uriStr, QString key, int n)

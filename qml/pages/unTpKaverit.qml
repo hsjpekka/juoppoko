@@ -77,7 +77,7 @@ Page {
                     visible: _pyynnot
                     onClicked: {
                         pageContainer.push(Qt.resolvedUrl("unTpKayttaja.qml"), {
-                                    "kayttaja": henkilo.ktunnus })
+                                    "muuJuoja": henkilo.ktunnus })
                     }
                 }
                 MenuItem {
@@ -204,7 +204,7 @@ Page {
 
         function kaveriKyselyt() {
             var kysely = "";
-            kysely = UnTpd.getPendingFriends(pyynnot*haettavia, haettavia);
+            kysely = UnTpd.getPendingFriends();
             xHttpGet(kysely[0], kysely[1], "pyynnot");
             return;
         }
@@ -245,8 +245,8 @@ Page {
         onMovementEnded: {
             if (atYEnd) {
                 if (_pyynnot) {
-                    uTYhteys.pyynnot++
-                    uTYhteys.kaveriKyselyt()
+                    //uTYhteys.pyynnot++
+                    //uTYhteys.kaveriKyselyt()
                 } else {
                     uTYhteys.haku++
                     uTYhteys.haeKavereita()
@@ -259,10 +259,11 @@ Page {
             MenuItem {
                 text: _pyynnot? qsTr("show friends") : qsTr("show requests")
                 onClicked: {
-                    if (_pyynnot)
+                    if (_pyynnot) {
                         uTYhteys.pyynnot = 0
-                    else
+                    } else {
                         uTYhteys.haku = 0
+                    }
                     _pyynnot = !_pyynnot
                 }
             }
@@ -275,6 +276,7 @@ Page {
         var i=0, vastaus, kuva, nimi, sijainti, kayttaja, hkId;
 
         vastaus = olio.response;
+        console.log("paivitaHaetut: haettuja " + vastaus.count);
         while (i < vastaus.count) {
             kuva = vastaus.items[i].user.user_avatar;
             nimi = vastaus.items[i].user.first_name + " "

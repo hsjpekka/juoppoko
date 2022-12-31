@@ -133,6 +133,17 @@ Item {
         }
     }
 
+    function jsCheckIn(beer) {
+        var https = new XMLHttpRequest(), sync = false;
+        var osoite = "https://api.untappd.com/v4/checkin/add?";
+        var kysely = "gmt_offset=2.0&timezone=EET";
+        osoite += "access_token=" + untpdKysely.readOAuth2Token();
+        https.open("POST", osoite, sync);
+        https.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        https.send(kysely);
+        return;
+    }
+
     function nakyville() {
         yhteys.state = "nakyvilla";
         hetkinen.running = true;
@@ -169,26 +180,23 @@ Item {
         return xHttpYhteysOtsikoilla(yhteysId, _get, polku, kysely, otsikkoon, lisattavat);
     }
 
-    function xHttpPost(polku, kysely, yhteysId, lisattavat) {
+    function xHttpPost(polku, julkaisu, kysely, yhteysId, lisattavat) {
         if (lisattavat === undefined) {
             lisattavat = "";
         }
-        //"Content-Type:application/json"
-        xHttpYhteysOtsikoilla(yhteysId, _post, polku, kysely, "Content-Type:text/plain", lisattavat);
-        //xHttpYhteysOtsikoilla(yhteysId, _post, polku, kysely, "Content-Type:application/json", lisattavat);
-        //xHttpYhteysOtsikoilla(yhteysId, _post, polku, kysely, "Content-Type:application/x-www-form-urlencoded", lisattavat);
+        xHttpYhteysOtsikoilla(yhteysId, _post, polku, kysely, "Content-type:application/x-www-form-urlencoded", julkaisu, lisattavat);
         return;
     }
 
-    function xHttpPostOtsikoilla(polku, kysely, otsikkoon, yhteysId, lisattavat) {
+    function xHttpPostOtsikoilla(polku, julkaisu, otsikkoon, kysely, yhteysId, lisattavat) {
         if (lisattavat === undefined) {
             lisattavat = "";
         }
 
-        return xHttpYhteysOtsikoilla(yhteysId, _post, polku, kysely, otsikkoon, lisattavat);
+        return xHttpYhteysOtsikoilla(yhteysId, _post, polku, kysely, otsikkoon, julkaisu, lisattavat);
     }
 
-    function xHttpYhteys(yhteysId, haku, polku, kysely, lisattavat) {
+    function xHttpYhteys(yhteysId, haku, polku, kysely, julkaisu, lisattavat) {
         if (yhteysId === undefined) {
             yhteysId = "";
         }
@@ -209,20 +217,23 @@ Item {
             xhttp.queryGet(yhteysId, polku, kysely, lisattavat);
             hakuja++;
         } else if (haku === _post) {
-            xhttp.queryPost(yhteysId, polku, kysely, lisattavat);
+            xhttp.queryPost(yhteysId, polku, kysely, julkaisu, lisattavat);
             hakuja++;
         }
 
         return;
     }
 
-    function xHttpYhteysOtsikoilla(yhteysId, haku, polku, kysely, otsikot, lisattavat) {
+    function xHttpYhteysOtsikoilla(yhteysId, getVaiPost, polku, kysely, otsikot, julkaisu, lisattavat) {
         if (yhteysId === undefined) {
             yhteysId = "";
         }
         if (!naytaVainVirheet)
             yhteys.nakyville();
 
+        if (julkaisu === undefined) {
+            julkaisu = "";
+        }
         if (lisattavat === undefined) {
             lisattavat = "";
         }
@@ -233,11 +244,11 @@ Item {
                     + untpdKysely.keyAppSecret();
         }
 
-        if (haku === _get) {
+        if (getVaiPost === _get) {
             xhttp.queryHeaderedGet(yhteysId, polku, kysely, otsikot, lisattavat);
             hakuja++;
-        } else if (haku === _post) {
-            xhttp.queryHeaderedPost(yhteysId, polku, kysely, otsikot, lisattavat);
+        } else if (getVaiPost === _post) {
+            xhttp.queryHeaderedPost(yhteysId, polku, kysely, otsikot, julkaisu, lisattavat);
             hakuja++;
         }
 
