@@ -6,70 +6,87 @@ import "../scripts/unTap.js" as UnTpd
 Page {
     id: sivu
     allowedOrientations: Orientation.All
+    Component.onCompleted: {
+        kayttaja.text = ""
+        if (UnTpd.unTpToken != "")
+            kirjautunut = true
+        unTpKysely.lueOluenTiedot(olutId)
+    }
 
     property int olutId
     property int panimoId
     property bool toive: false
     property bool kirjautunut: false
 
-    function kirjoitaTiedot(jsonVastaus) {
-        var arvio, mj, mj2
-        otsikko.title = jsonVastaus.response.beer.beer_name
-        etiketti.source = jsonVastaus.response.beer.beer_label
-        //UnTpd.oluenEtiketti = jsonVastaus.response.beer.beer_label
-        txtPanimo.text = jsonVastaus.response.beer.brewery.brewery_name
-        oluenArvot.text = qsTr("abv %1 %, ").arg(jsonVastaus.response.beer.beer_abv) +
-                qsTr("ibu %1").arg(jsonVastaus.response.beer.beer_ibu)
-        olutTyyppi.text = jsonVastaus.response.beer.beer_style
+    XhttpYhteys {
+        id: unTpKysely
+        anchors.top: parent.top
+        z: 1
+        onValmis: {
+            var jsonVastaus = JSON.parse(httpVastaus);
+            try {
+                if (toiminto === "toive") {
+                    if (jsonVastaus.response.result === "success") {
+                        if (jsonVastaus.response.action === "add")
+                            toive = true
+                        else
+                            toive = false
+                    }
+                } else if (toiminto === "tiedot") {
+                    kirjoitaTiedot(jsonVastaus)
+                }
+            } catch (err) {
+                console.log("" + err)
+            }
+        }
+        onVirhe: {
+            console.log("yhteydenottovirhe: " + vastaus)
+        }
 
-        arvio = jsonVastaus.response.beer.auth_rating
-        if (arvio > 0)
-            arviot.text = arviot.text + " " + arvio
-        else
-            arviot.text = arviot.text + " _"
+        function lisaaToiveisiin() {
+            var kysely = "";
+            if (olutId < 1) {
+                viesti = qsTr("no beer selected");
+                naytaViesti = true;
+                return;
+            }
 
-        arvio = jsonVastaus.response.beer.rating_score
-        if (arvio > 0)
-            arviot.label = arviot.label + " " + arvio
-        else
-            arviot.label = arviot.label + " _"
+            kysely = UnTpd.addToWishList(olutId);
+            xHttpGet(kysely[0], kysely[1], "toive");
+            return;
+        }
 
-        toive = jsonVastaus.response.beer.wish_list
-        kayttaja.text = jsonVastaus.response.beer.stats.user_count
-        yhteismaara.text = jsonVastaus.response.beer.stats.total_count
-        kuukausimaara.text = jsonVastaus.response.beer.stats.monthly_count
-        juoneita.text = jsonVastaus.response.beer.stats.total_user_count
-        panimoId = jsonVastaus.response.beer.brewery.brewery_id
-        kuvaus.text = jsonVastaus.response.beer.beer_description
+        function lueOluenTiedot(bid) {
+            var kysely = "";
+            if (bid < 0.5) {
+                viesti = qsTr("no beer selected");
+                naytaViesti = true;
+                return;
+            }
 
-        mj = jsonVastaus.response.beer.brewery.country_name
-        mj2 = jsonVastaus.response.beer.brewery.location.brewery_state
-        if ((mj2 != "") && (mj2 != " "))
-            mj += ", " + mj2
-        maa.text =  mj + ", " + jsonVastaus.response.beer.brewery.location.brewery_city
-        www.plainText = jsonVastaus.response.beer.brewery.contact.url
+            kysely = UnTpd.getBeerInfo(bid, false); // bid, compact
+            xHttpGet(kysely[0], kysely[1], "tiedot");
+            return;
+        }
 
-        return
-    }
+        function poistaToiveista() {
+            var kysely = "";
+            if (olutId < 1) {
+                viesti = qsTr("no beer selected");
+                naytaViesti = true;
+                return;
+            }
 
-    /*
-    Timer{
-        id: sekunti
-        interval: 1*1000
-        running: false
-        repeat: false
-        onTriggered: {
-            hetkinen.running = false
+            kysely = UnTpd.removeFromWishList(olutId);
+            xHttpGet(kysely[0], kysely[1], "toive");
+            return;
         }
     }
-    // */
 
     SilicaFlickable {
         height: sivu.height
         contentHeight: column.height
         anchors.fill: sivu //parent
-        //anchors.leftMargin: Theme.paddingLarge
-        //anchors.rightMargin: Theme.paddingLarge
 
         VerticalScrollDecorator {}
 
@@ -102,76 +119,6 @@ Page {
             }
         }
 
-        XhttpYhteys {
-            id: unTpKysely
-            anchors.top: parent.top
-            z: 1
-            onValmis: {
-                var jsonVastaus = JSON.parse(httpVastaus);
-                try {
-                    if (toiminto === "toive") {
-                        if (jsonVastaus.response.result === "success") {
-                            if (jsonVastaus.response.action === "add")
-                                toive = true
-                            else
-                                toive = false
-                        }
-                    } else if (toiminto === "tiedot") {
-                        kirjoitaTiedot(jsonVastaus)
-                    }
-                } catch (err) {
-                    console.log("" + err)
-                }
-            }
-            onVirhe: {
-                console.log("yhteydenottovirhe: " + vastaus)
-            }
-
-            //property string toiminto: ""
-
-            function lisaaToiveisiin() {
-                var kysely = ""
-                if (olutId < 1) {
-                    viesti = qsTr("no beer selected")
-                    naytaViesti = true
-                    return
-                }
-                //toiminto = "toive";
-
-                kysely = UnTpd.addToWishList(olutId);
-                xHttpGet(kysely, "toive");
-                return
-            }
-
-            function lueOluenTiedot(bid) {
-                var kysely = ""
-                if (bid < 0.5) {
-                    viesti = qsTr("no beer selected")
-                    naytaViesti = true
-                    return
-                }
-
-                //toiminto = "tiedot";
-                kysely = UnTpd.getBeerInfo(bid, false); // bid, compact
-                xHttpGet(kysely, "tiedot");
-                return
-            }
-
-            function poistaToiveista() {
-                var kysely = ""
-                if (olutId < 1) {
-                    viesti = qsTr("no beer selected")
-                    naytaViesti = true
-                    return
-                }
-
-                //toiminto = "toive";
-                kysely = UnTpd.removeFromWishList(olutId);
-                xHttpGet(kysely, "toive");
-                return
-            }
-        }
-
         Column {
             id: column
 
@@ -192,8 +139,7 @@ Page {
                 id: txtOluenNimi
                 x: Theme.paddingMedium
                 width: sivu.width - 2*x
-                text: otsikko.title // + " " + (sivu.width/(otsikko.title.length*Theme.fontSizeLarge)).toFixed(2)
-                //visible: ( sivu.width < 0.37*(otsikko.title.length*Theme.fontSizeLarge) ) ? true : false
+                text: otsikko.title
                 color: Theme.highlightColor
                 visible: (leveystesti.width > sivu.width) ? true : false
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -205,33 +151,6 @@ Page {
                 color: "transparent"
                 visible: txtOluenNimi.visible
             }
-
-            /*
-            Label {
-                x: Theme.paddingMedium
-                width: sivu.width - 2*x
-                text: txtPanimo.text
-                visible: (txtPanimo.width > sivu.width - etiketti.width) ? true : false
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            }
-            // */
-
-            /*
-            BusyIndicator {
-                id: hetkinen
-                size: BusyIndicatorSize.Medium
-                anchors.horizontalCenter: parent.horizontalCenter
-                running: true
-                visible: running
-            }
-
-            Label {
-                id: unTpdViestit
-                color: Theme.secondaryHighlightColor
-                visible: hetkinen.running
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-            // */
 
             Row {
                 id: etikettiRivi
@@ -248,12 +167,10 @@ Page {
 
                     Label {
                         id: olutTyyppi
-                        //readOnly: true
                         text: "oluen tyyppi"
                         color: Theme.highlightColor
                         width: sivu.width - etikettiRivi.x - etiketti.width - etikettiRivi.spacing - Theme.paddingSmall
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        //x: txtPanimo.x + Theme.paddingLarge
                     }
 
                     Label {
@@ -264,7 +181,6 @@ Page {
 
                     Label {
                         id: txtPanimo
-                        //readOnly: true
                         width: sivu.width - etikettiRivi.x - etiketti.width - etikettiRivi.spacing
                         text: "panimo"
                         color: Theme.highlightColor
@@ -350,7 +266,6 @@ Page {
                 readOnly: true
                 horizontalAlignment: TextEdit.AlignHCenter
                 visible: text > ""
-                //anchors.horizontalCenter: sivu.horizontalCenter
             }
 
             Label {
@@ -374,12 +289,45 @@ Page {
 
     } //flickable
 
-    Component.onCompleted: {
-        //console.log("tietojaOluesta " + sivu.width + " - " + column.width + ", " + kirjausmaarat.spacing)
-        kayttaja.text = ""
-        if (UnTpd.unTpToken != "")
-            kirjautunut = true
-        unTpKysely.lueOluenTiedot(olutId)
+    function kirjoitaTiedot(jsonVastaus) {
+        var arvio, mj, mj2;
+        otsikko.title = jsonVastaus.response.beer.beer_name;
+        etiketti.source = jsonVastaus.response.beer.beer_label;
+        txtPanimo.text = jsonVastaus.response.beer.brewery.brewery_name;
+        oluenArvot.text = qsTr("abv %1 %, ").arg(jsonVastaus.response.beer.beer_abv) +
+                qsTr("ibu %1").arg(jsonVastaus.response.beer.beer_ibu);
+        olutTyyppi.text = jsonVastaus.response.beer.beer_style;
+
+        arvio = jsonVastaus.response.beer.auth_rating;
+        if (arvio > 0) {
+            arviot.text = arviot.text + " " + arvio;
+        } else {
+            arviot.text = arviot.text + " _";
+        }
+
+        arvio = jsonVastaus.response.beer.rating_score;
+        if (arvio > 0) {
+            arviot.label = arviot.label + " " + arvio;
+        } else {
+            arviot.label = arviot.label + " _";
+        }
+
+        toive = jsonVastaus.response.beer.wish_list;
+        kayttaja.text = jsonVastaus.response.beer.stats.user_count;
+        yhteismaara.text = jsonVastaus.response.beer.stats.total_count;
+        kuukausimaara.text = jsonVastaus.response.beer.stats.monthly_count;
+        juoneita.text = jsonVastaus.response.beer.stats.total_user_count;
+        panimoId = jsonVastaus.response.beer.brewery.brewery_id;
+        kuvaus.text = jsonVastaus.response.beer.beer_description;
+
+        mj = jsonVastaus.response.beer.brewery.country_name;
+        mj2 = jsonVastaus.response.beer.brewery.location.brewery_state;
+        if ((mj2 != "") && (mj2 != " "))
+            mj += ", " + mj2;
+        maa.text =  mj + ", " + jsonVastaus.response.beer.brewery.location.brewery_city;
+        www.plainText = jsonVastaus.response.beer.brewery.contact.url;
+
+        return;
     }
 
 }

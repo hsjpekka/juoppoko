@@ -36,8 +36,6 @@ Dialog {
                 x: Theme.horizontalPageMargin
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
-
         }
     }
-
 }

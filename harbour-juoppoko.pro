@@ -14,8 +14,22 @@ TARGET = harbour-juoppoko
 
 CONFIG += sailfishapp
 
+#sailfish webview
+#PKGCONFIG += qt5embedwidget
+#OAuth2 & RedirectListener
+PKGCONFIG += amberwebauthorization
+
+QT += positioning
+
 SOURCES += \
-    src/harbour-juoppoko.cpp
+    src/harbour-juoppoko.cpp \
+    src/juomari.cpp \
+    src/untpd.cpp
+
+HEADERS += \
+    src/juomari.h \
+    src/salaisuudet.h \
+    src/untpd.h
 
 OTHER_FILES += \
     translations/*.ts
@@ -26,6 +40,7 @@ DISTFILES += \
     qml/components/BarChart.qml \
     qml/components/Juomari.qml \
     qml/components/KulutusKuvaajat.qml \
+    qml/components/ModExpandingSection.qml \
     qml/components/XhttpYhteys.qml \
     qml/pages/asetukset.qml \
     qml/pages/demolaskuri.qml \
@@ -57,17 +72,15 @@ DISTFILES += \
     qml/harbour-juoppoko.qml
 
 # defines windowsissa "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"", linuxissa XXX
-DEFINES += \
-     "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"" \
-     "UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\"" \
-     "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
-     "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
-     "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
-     "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
-     "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
-     "JUOPPOKO_VERSIO=\"\\\"2.4.2\\\"\""
-
-QT += positioning
+#DEFINES += \
+#     "UTPD_ID=\"\\\"$${_CL_ID}\\\"\"" \
+#     "UTPD_SECRET=\"\\\"$${_CL_SECRET}\\\"\"" \
+#     "FSQ_ID=\"\\\"$${_FSQ_ID}\\\"\"" \
+#     "FSQ_SECRET=\"\\\"$${_FSQ_SECRET}\\\"\"" \
+#     "CC_KOHDE=\"\\\"$${_CC_KOHDE}\\\"\""\
+#     "FSQ_VERSIO=\"\\\"20180712\\\"\"" \
+#     "CB_URL=\"\\\"juoppoko.untpd.tunnistus\\\"\"" \
+#     "JUOPPOKO_VERSIO=\"\\\"2.5.0\\\"\""
 
 # to disable building translations every time, comment out the
 # following CONFIG line

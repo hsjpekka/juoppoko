@@ -28,45 +28,45 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef QT_QML_DEBUG
+#ifndef QT_QML_DEBUG
 #include <QtQuick>
 #endif
 
 #include <sailfishapp.h>
+#include <QScopedPointer>
+#include "juomari.h"
+#include "untpd.h"
+#include "salaisuudet.h"
 
 int main(int argc, char *argv[])
 {
-    char *strings[argc+8]; // + s1-s8
-    char *s1 = UTPD_ID;
-    char *s2 = UTPD_SECRET;
-    char *s3 = CB_URL;
-    char *s4 = FSQ_ID;
-    char *s5 = FSQ_SECRET;
-    char *s6 = FSQ_VERSIO;
-    char *s7 = JUOPPOKO_VERSIO;
-    char *s8 = CC_KOHDE;
-    int i;
+    QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    QScopedPointer<QQuickView> view(SailfishApp::createView());
+    juomari juoja, ennustaja;
+    unTpd untpdkysely;
 
-    for (i=0; i<argc; i++){
-        strings[i] = argv[i];
-    }
+    app->setApplicationVersion(JUOPPOKO_VERSIO);
 
-    strings[argc] = s8; // onko käännös pc:lle (i486) vai puhelimeen (armv7hl)
-    argc++;
-    strings[argc] = s7; // ohjelman versio
-    argc++;
-    strings[argc] = s6; // 4square versio (version päivämäärä)
-    argc++;
-    strings[argc] = s5; // 4square salasana
-    argc++;
-    strings[argc] = s4; // 4square appId
-    argc++;
-    strings[argc] = s3; // redirect url
-    argc++;
-    strings[argc] = s2; // unTappd salasana
-    argc++;
-    strings[argc] = s1; // unTappd appId
-    argc++;
+    untpdkysely.setOAuthId(UTPD_ID);
+    untpdkysely.setOAuthSecret(UTPD_SECRET);
+    untpdkysely.setOAuthRedirect(CB_URL);
+    //untpdkysely.setServer("https","api.untappd.com");
+    untpdkysely.setOAuthPath("https://untappd.com/oauth/authenticate/");
+    untpdkysely.setOAuthTokenPath("https://untappd.com/oauth/authorize/");
+    untpdkysely.setQueryParameter("fsqClientId", FSQ_ID, "client_id");
+    untpdkysely.setQueryParameter("fsqClientSecret", FSQ_SECRET, "client_secret");
+    untpdkysely.setQueryParameter("fsqVersion", FSQ_VERSIO, "v");
+    untpdkysely.setQueryParameter("fsqAPIkey", FSQ_APIKEY, "Authorization");
 
-    return SailfishApp::main(argc, strings);
+    view->engine()->rootContext()->setContextProperty("unTappdId", UTPD_ID);
+    view->engine()->rootContext()->setContextProperty("unTappdCb", CB_URL);
+    //view->engine()->rootContext()->setContextProperty("fsqAPIkey", FSQ_APIKEY);
+    view->engine()->rootContext()->setContextProperty("untpdKysely", &untpdkysely);
+    view->engine()->rootContext()->setContextProperty("juoja", &juoja);
+    view->engine()->rootContext()->setContextProperty("testaaja", &ennustaja);
+
+    view->setSource(SailfishApp::pathToMainQml());
+    view->show();
+
+    return app->exec();
 }

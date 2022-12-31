@@ -16,8 +16,6 @@ SilicaListView {
     property real   sectionFontSize: Theme.fontSizeExtraSmall
     property var    sectionOrientation: orientation === ListView.Horizontal ? ListView.Vertical : ListView.Horizontal
     property int    showBarValue: 1 // 0 - no, 1 - when clicked, 2 - always
-    //property real   selectedBarHeight: 0
-    //property string selectedBarLabel: ""
 
     signal barSelected(int barNr, real barValue, string barLabel)
     signal barPressAndHold(int barNr, real barValue, string barLabel)
@@ -92,10 +90,7 @@ SilicaListView {
                                      Text.AlignHCenter : Text.AlignLeft
             x: barChartView.orientation === ListView.Horizontal ?
                    0.5*(parent.width - width) : defX
-                   //(defX > parent.width ? parent.width - width : defX)
-                   //chartBar.x + chartBar.width + Theme.paddingSmall
             y: barChartView.orientation === ListView.Horizontal ? // chartBar.y - height - Theme.paddingSmall
-                    //defY : 0.5*(parent.contentHeight - height)
                     (inFront ? 0 : defY) : 0.5*(parent.contentHeight - height)
             color: labelColor
             width: barChartView.orientation === ListView.Horizontal? parent.width : labelWidth
@@ -104,7 +99,6 @@ SilicaListView {
             property int defY: chartBar.y - height - Theme.paddingSmall
             property bool inFront: defY < -chartBar.y
 
-            //*
             Rectangle {
                 id: tausta
                 anchors.fill: parent
@@ -113,7 +107,6 @@ SilicaListView {
                 visible: parent.inFront ? (valueLabel.text > "") : false
                 z:-1
             }
-            // */
         }
     }//listitem
 

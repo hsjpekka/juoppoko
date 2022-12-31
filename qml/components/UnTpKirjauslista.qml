@@ -4,7 +4,6 @@ ListModel {
     function lisaa(kirjaus, bid, aika, kuva, kayttajatunnus, nimi, etiketti, olut,
                           panimo, baari, baariId, maljoja, kohotinko, huuto, juttuja, juttuLista,
                           jutellut){
-        //console.log(" --- " + kirjaus + ", " + kayttajatunnus + ", " + olut + ", " + baari + ", " + baariId);
         if (kuva === undefined)
             kuva = "";
         if (nimi === undefined)

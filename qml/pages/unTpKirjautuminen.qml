@@ -1,142 +1,68 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import QtWebKit 3.0
 import "../scripts/unTap.js" as UnTpd
 import "../scripts/tietokanta.js" as Tkanta
 import "../components"
 
 Page {
     id: sivu
+    Component.onDestruction: {
+        if (muuttunut) {
+            vaihdaTunnus(uusiTunnus)
+            muuttuu()
+        }
+    }
 
     signal muuttuu
     property bool muuttunut: false
+    property string uusiTunnus: ""
 
-    readonly property string unTappdLoginUrl: "https://untappd.com/oauth/authenticate/?client_id=" +
-                                     UnTpd.unTpdId + "&response_type=code&redirect_url=" +
-                                     UnTpd.callbackURL
-    readonly property string accTokenAddress: "https://untappd.com/oauth/authorize/?client_id=" +
-            UnTpd.unTpdId + "&client_secret=" + UnTpd.unTpdSecret +
-            "&response_type=code&redirect_url=" + UnTpd.callbackURL + "&code="
+    readonly property string unTappdLoginUrl:
+        "https://untappd.com/oauth/authenticate/?client_id=" +
+        UnTpd.unTpdId + "&response_type=code&redirect_url=" +
+        UnTpd.callbackURL
 
-    function vaihdaTunnus(tunnus) {
-        muuttunut = true
-        UnTpd.unTpToken = tunnus
-        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, tunnus)
-        return
-    }
-
-    function lueToken() {
-        var i = urlTunnus.text.indexOf("?code=")
-        if (i < 0) {
-            uTpYhteys.tunnus = urlTunnus.text
-        } else {
-            uTpYhteys.tunnus = urlTunnus.text.substring(i+6)
+    Connections {
+        target: untpdKysely
+        onFinishedAuthentication: {
+            if (token > "") {
+                uusiTunnus = token
+                muuttunut = true
+            } else {
+                console.log("error in getting authentication token: " + error + " " + untpdKysely.readOAuth2Token())
+            }
+            pageContainer.pop()
         }
-        uTpYhteys.haeToken()
-        return
-    }
-
-    Component {
-        id: valikko
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("sign out")
-                visible: (UnTpd.unTpToken != "") ? true : false
-                onClicked: {
-                    vaihdaTunnus("")
-                    pageContainer.pop()
-                }
-            }
-            MenuItem {
-                text: qsTr("cancel")
-                onClicked: {
-                    muuttunut = false
-                    pageContainer.pop()
-                }
-            }
-            MenuItem {
-                text: qsTr("open in external browser")
-                onClicked: {
-                    Qt.openUrlExternally(unTappdLoginUrl)
-                    webView.visible = !webView.visible
-                }
-            }
-            MenuItem {
-                text: qsTr("use SilicaWebView")
-                visible: !webView.visible
-                onClicked: {
-                    webView.visible = !webView.visible
-                }
-            }
+        onFinishedQuery: {
+            lueToken(queryReply)
+            pageContainer.pop()
         }
     }
 
-    XhttpYhteys {
-        id: uTpYhteys
-        onValmis: {
-            var jsonVastaus, accessToken
-            try {
-                jsonVastaus = JSON.parse(httpVastaus)
-                if ("response" in jsonVastaus && "access_token" in jsonVastaus.response)
-                    accessToken = jsonVastaus.response.access_token
-                else if ("meta" in jsonVastaus && "error_detail" in jsonVastaus.meta)
-                    nayta(jsonVastaus.meta.error_detail)
-                if (jsonVastaus.meta.http_code != 200)
-                    console.log("unTappd-response: " + httpVastaus)
-                if (accessToken) {
-                    vaihdaTunnus(accessToken)
-                    pageContainer.pop()
-                }
-            } catch (err) {
-                console.log("error while fetching unTappd access token: " + err)
-            }
-        }
-
-        property string tunnus
-
-        function haeToken() {
-            var kysely = accTokenAddress + tunnus
-            //console.log("kysely = " + kysely)
-            xHttpGet(kysely)
-            return
-        }
+    RemorsePopup {
+        id: remorse
     }
 
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
-        //pullDownMenu: valikko
-        visible: !webView.visible
 
         PullDownMenu {
             MenuItem {
                 text: qsTr("sign out")
                 visible: (UnTpd.unTpToken != "") ? true : false
                 onClicked: {
-                    vaihdaTunnus("")
-                    pageContainer.pop()
+                    remorse.execute(qsTr("signing out"), function () {
+                        uusiTunnus = ""
+                        muuttunut = true
+                        pageContainer.pop()
+                    } )
                 }
             }
             MenuItem {
-                text: qsTr("cancel")
+                text: qsTr("authenticate")
                 onClicked: {
-                    muuttunut = false
-                    pageContainer.pop()
-                }
-            }
-            /*
-            MenuItem {
-                text: qsTr("open in external browser")
-                onClicked: {
-                    Qt.openUrlExternally(unTappdLoginUrl)
-                    webView.visible = !webView.visible
-                }
-            } // */
-            MenuItem {
-                text: qsTr("use SilicaWebView")
-                visible: !webView.visible
-                onClicked: {
-                    webView.visible = !webView.visible
+                    untpdKysely.authenticate()
                 }
             }
         }
@@ -157,9 +83,37 @@ Page {
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 x: Theme.horizontalPageMargin
 
-                plainText: qsTr("To use your unTappd-profile, sign in at %1 and " +
-                                "follow the instructions below, " +
-                                "or try the webview (pull down menu).").arg(unTappdLoginUrl)
+                plainText: qsTr("To use your unTappd-profile, choose " +
+                                "'authenticate' in the pull down " +
+                                "menu, or follow " +
+                                "the instructions below.")
+            }
+
+            SectionHeader {
+                text: qsTr("Problems with the browser?")
+            }
+
+            Label {
+                id: lisaOhje
+                color: Theme.highlightColor
+                width: parent.width - 2*x
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                x: Theme.horizontalPageMargin
+
+                text: qsTr("If you have problems with the default " +
+                           "browser, paste the login url below to " +
+                           "the address field of another browser.")
+            }
+
+            TextField {
+                width: parent.width
+                EnterKey.iconSource: "image://theme/icon-m-clipboard"
+                EnterKey.onClicked: {
+                    Clipboard.text = text
+                    focus = false
+                }
+                label: qsTr("unTappd login url")
+                text: unTappdLoginUrl
             }
 
             SectionHeader {
@@ -173,10 +127,11 @@ Page {
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 x: Theme.horizontalPageMargin
 
-                text: qsTr("After signing in, the browser will redirect you to a non-existing " +
-                           "address %1. Copy the address, or just the CODE, to the text field " +
-                           "below, and press enter.").arg(cbu)
-                property string cbu: "untappd.com/.../juoppoko.untpd.tunnistus?code=CODE"
+                text: qsTr("After signing in, the browser will " +
+                           "redirect you to a non-existing address " +
+                           "%1. Copy the address, or just the CODE, " +
+                           "to the text field below, and press enter.").arg(cbu)
+                property string cbu: UnTpd.callbackURL + "/?code=CODE"
             }
 
             TextField {
@@ -191,7 +146,7 @@ Page {
 
                 EnterKey.iconSource: "image://theme/icon-m-enter-accept"
                 EnterKey.onClicked: {
-                    lueToken()
+                    kysyToken()
                     focus = false
                 }
 
@@ -200,72 +155,63 @@ Page {
 
             }
 
-            SectionHeader {
-                text: qsTr("Problems with the browser?")
-            }
-
-            Label {
-                id: lisaOhje
-                color: Theme.highlightColor
-                width: parent.width - 2*x
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                x: Theme.horizontalPageMargin
-
-                text: qsTr("If you have problems with the default browser, paste the login url " +
-                           "below to the address field of another browser.")
-            }
-
-            TextField {
-                width: parent.width
-                EnterKey.iconSource: "image://theme/icon-m-clipboard"
-                EnterKey.onClicked: {
-                    Clipboard.text = text
-                    focus = false
-                }
-                label: qsTr("unTappd login url")
-                text: unTappdLoginUrl
-            }
         }
     }
 
-    SilicaWebView {
-        id: webView
-        anchors.fill: parent
-        url: visible? unTappdLoginUrl : ""
-        visible: false
-
-        property real suurennos: (Screen.width < 550) ? 1.5 : ((Screen.width < 825) ? 2 : 3)
-
-        experimental.customLayoutWidth: Screen.width / suurennos // tekee unTappdin kirjautumisruudun sopivan kokoiseksi
-
-        onLoadingChanged: {
-            var vertailu = new RegExp(UnTpd.callbackURL.replace(/\//g, '\\/') + "\\?code=(.*)")
-            //var xhttp = new XMLHttpRequest()
-            var replyUrl = ""//, code = ""
-
-            if (vertailu.test(loadRequest.url.toString())) {
-                replyUrl = loadRequest.url.toString()
-                /*
-                code = replyUrl.slice(replyUrl.indexOf("?code=")+6)
-                accTokenAddress += code
-                xhttp.onreadystatechange = function() {
-                    if (xhttp.readyState === 4 && xhttp.status === 200 ){
-                        var reply = JSON.parse(xhttp.responseText)
-                        experimental.deleteAllCookies()
-                        vaihdaTunnus(reply.response.access_token)
-                        pageContainer.pop()
-                    }
-                }
-                xhttp.open("GET", accTokenAddress, true)
-                xhttp.send()
-                // */
-                uTpYhteys.tunnus = replyUrl.slice(replyUrl.indexOf("?code=")+6)
-                uTpYhteys.haeToken()
-            }
-        }
+    function vaihdaTunnus(tunniste) {
+        console.log("oauth2 tunniste vaihtuu: " + tunniste)
+        UnTpd.unTpToken = tunniste;
+        Tkanta.paivitaAsetus2(Tkanta.tunnusUnTappdToken, tunniste);
+        return;
     }
 
-    Component.onDestruction:
-        if (muuttunut)
-            muuttuu()
+    function kysyToken() {
+        var i, polku, kysely, lisattavat;
+        // https://untappd.com/oauth/authorize/?client_id=CLIENTID
+        // &client_secret=CLIENTSECRET&response_type=code
+        // &redirect_url=REDIRECT_URL&code=CODE
+        polku = "oauth/authorize/";
+        lisattavat = untpdKysely.keyAppId() + ", " + untpdKysely.keyAppSecret();
+        kysely = "response_type=code&redirect_url=" + UnTpd.callbackURL;
+
+        i = urlTunnus.text.indexOf("?code=");
+        if (i < 0 && urlTunnus.text.length > 0) {
+            kysely += "&code=" + urlTunnus.text;
+        } else {
+            kysely += "&code=" + urlTunnus.text.substring(i+6);
+        }
+
+        untpdKysely.queryGet(untpdKysely.oauthTokenRequest, polku, kysely, lisattavat);
+        return;
+    }
+
+    function lueToken(mj) {
+        // {
+        //"meta": {
+        //  "http_code": 200
+        //},
+        //"response": {
+        //  "access_token": "TOKEHERE"
+        //}
+        var vJson = JSON.parse(mj), tulos;
+        if (!vJson["meta"]) {
+            console.log("META puuttuu")
+        } else if (vJson["meta"]["http_code"] != 200) {
+            console.log("http_code = " + vJson["meta"]["http_code"])
+        }
+
+        if (vJson["response"]) {
+            tulos = vJson["response"]["access_token"];
+            console.log("uusi ")
+        } else {
+            console.log("RESPONSE puuttuu")
+        }
+
+        if (tulos > "") {
+            uusiTunnus = tulos;
+            muuttunut = true;
+        }
+
+        return tulos;
+    }
 }

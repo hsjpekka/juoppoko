@@ -36,6 +36,37 @@
     </message>
 </context>
 <context>
+    <name>KulutusKuvaajat</name>
+    <message>
+        <source>Sun</source>
+        <translation>Su</translation>
+    </message>
+    <message>
+        <source>Mon</source>
+        <translation>Ma</translation>
+    </message>
+    <message>
+        <source>Tue</source>
+        <translation>Ti</translation>
+    </message>
+    <message>
+        <source>Wed</source>
+        <translation>Ke</translation>
+    </message>
+    <message>
+        <source>Thu</source>
+        <translation>To</translation>
+    </message>
+    <message>
+        <source>Fri</source>
+        <translation>Pe</translation>
+    </message>
+    <message>
+        <source>Sat</source>
+        <translation>La</translation>
+    </message>
+</context>
+<context>
     <name>Paaikkuna</name>
     <message>
         <source>info</source>
@@ -56,10 +87,6 @@
     <message>
         <source>sober at</source>
         <translation>selvänä</translation>
-    </message>
-    <message>
-        <source> ‰ at</source>
-        <translation> ‰ klo</translation>
     </message>
     <message>
         <source>beer</source>
@@ -94,10 +121,6 @@
         <translation>kavereiden kirjaukset</translation>
     </message>
     <message>
-        <source>%1 drinks, latest %2</source>
-        <translation>juomia %1, viimeisin %2</translation>
-    </message>
-    <message>
         <source>some error in transmission</source>
         <translation>virhe tiedon siirrossa</translation>
     </message>
@@ -108,6 +131,14 @@
     <message>
         <source>foreteller</source>
         <translation>ennustin</translation>
+    </message>
+    <message>
+        <source>%1 ‰ at</source>
+        <translation>%1 klo</translation>
+    </message>
+    <message>
+        <source>UnTappd account</source>
+        <translation>UnTappd-tili</translation>
     </message>
 </context>
 <context>
@@ -132,40 +163,8 @@
 <context>
     <name>XhttpYhteys</name>
     <message>
-        <source>request not initialized</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server connection established</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request received</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>processing request</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>request finished</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>press &apos;x&apos; to interrupt</source>
-        <translation>keskeytä &apos;x&apos;:stä</translation>
-    </message>
-    <message>
-        <source>no net</source>
-        <translation>ei verkkoa</translation>
-    </message>
-    <message>
         <source>not connected</source>
         <translation>ei yhdistetty</translation>
-    </message>
-    <message>
-        <source>error: </source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -282,14 +281,6 @@
         <translation>klo</translation>
     </message>
     <message>
-        <source>state at %1</source>
-        <translation>tilanne %1</translation>
-    </message>
-    <message>
-        <source>BAC</source>
-        <translation>veressä</translation>
-    </message>
-    <message>
         <source>sober at</source>
         <translation>selvänä</translation>
     </message>
@@ -322,8 +313,32 @@
         <translation>Ennustin</translation>
     </message>
     <message>
+        <source>body water content</source>
+        <translation>kehon neste-%</translation>
+    </message>
+    <message>
+        <source>weight of the drinker</source>
+        <translation>juojan paino</translation>
+    </message>
+    <message>
+        <source>lever condition %1</source>
+        <translation>maksan kunto %1</translation>
+    </message>
+    <message>
+        <source>blood alcohol content limit</source>
+        <translation>promilleraja</translation>
+    </message>
+    <message>
+        <source>BAC</source>
+        <translation>‰ veressä</translation>
+    </message>
+    <message>
         <source>recalculate</source>
         <translation>laske uudelleen</translation>
+    </message>
+    <message>
+        <source>drinks</source>
+        <translation>juodut</translation>
     </message>
 </context>
 <context>
@@ -339,6 +354,37 @@
     <message>
         <source>Do you want to try to search UnTappd anyway?</source>
         <translation>Haluatko silti yrittää etsi UnTappdistä?</translation>
+    </message>
+</context>
+<context>
+    <name>harbour-juoppoko</name>
+    <message>
+        <source>%1 drinks, latest %2</source>
+        <translation>juomia %1, viimeisin %2</translation>
+    </message>
+    <message>
+        <source>%1 drinks</source>
+        <translation>%1 juotua</translation>
+    </message>
+    <message>
+        <source>read %1 body records</source>
+        <translation>luettu %1 kehon tietuetta</translation>
+    </message>
+    <message>
+        <source>no body records</source>
+        <translation>ei keho-tietueita</translation>
+    </message>
+    <message>
+        <source>Weight nr. %1 &lt; 1 kg or &gt; 400 kg, changed to 75 kg.</source>
+        <translation>Paino nro %1 &lt; 1 kg tai &gt; 400 kg, käytetään 75 kg.</translation>
+    </message>
+    <message>
+        <source>body water content nr. %1 &lt; 1 % or &gt; 100 %, changed to 70 %.</source>
+        <translation>Veden määrä nro %1 &lt; 1 % tai &gt; 100 %, käytetään 70 %.</translation>
+    </message>
+    <message>
+        <source>lever condition nr. %1 &lt; 1 % or &gt; 300 %, changed to 100 %.</source>
+        <translation>Maksan kunto nro %1 &lt; 1 % tai &gt; 300 %, käytetään 100 %.</translation>
     </message>
 </context>
 <context>
@@ -383,16 +429,16 @@
         <translation>Korkea alkoholipitoisuus voi aiheuttaa kooman tai tappaa. Liiallisen kilpailun ehkäisemiseksi yli 3.0 ‰ pitoisuuksia ei näytetä.</translation>
     </message>
     <message>
-        <source>The default limits are based on 
- %1 
- - according to which a safe limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
-        <translation>Raja-arvot on lähteestä %1, jonka mukaan turvallinen määrä
-        naisille on 7 annosta viikossa ja miehille 14. Ja lisääntyneen riskin raja on naisille 16
-        annosta viikosssa ja miehille 24.</translation>
-    </message>
-    <message>
         <source>Here the limits depend only on the amount of water in body, not on sex.</source>
         <translation>Tässä rajojen oletetaan riippuvan vain kehossa olevan nesteen määrästä, ei sukupuolesta.</translation>
+    </message>
+    <message>
+        <source>The default limits are based on 
+ %1 
+ - according to which the low risk limit for women is 7 portions weekly, for men 14. The limit of increased risk is 16 portions for women and 24 for men. </source>
+        <translation>Oletetut raja-arvot ovat sivulta
+ %1
+ - jonka mukaan alhaisen riskin raja on naisille 7 annosta viikossa ja miehille 14. Kohonneen riskin raja on 16 annosta naisille ja 24 miehille.</translation>
     </message>
 </context>
 <context>
@@ -480,28 +526,76 @@
 <context>
     <name>unTpCheckIn</name>
     <message>
-        <source>Satellite</source>
-        <translation>satelliitti</translation>
+        <source>venue info</source>
+        <translation>kapakan tiedot</translation>
     </message>
     <message>
-        <source>Not available</source>
-        <translation>ei käytettävissä</translation>
+        <source>venue activity</source>
+        <translation>kapakassa nautittuja</translation>
     </message>
     <message>
-        <source>Non-satellite</source>
-        <translation>ei satelliiteistä</translation>
+        <source>Check-in location</source>
+        <translation>Juomispaikka</translation>
     </message>
     <message>
-        <source>Multiple</source>
-        <translation>monipaikanteinen</translation>
+        <source>shows place</source>
+        <translation>näyttää paikan</translation>
     </message>
     <message>
-        <source>source error</source>
-        <translation>lähdevirhe</translation>
+        <source>hides place</source>
+        <translation>piilottaa paikan</translation>
     </message>
     <message>
         <source>search settings</source>
         <translation>hakuasetukset</translation>
+    </message>
+    <message>
+        <source>location not determined</source>
+        <translation>sijaintia ei määritetty</translation>
+    </message>
+    <message>
+        <source>lng</source>
+        <translation>pituus</translation>
+    </message>
+    <message>
+        <source>lat</source>
+        <translation>leveys</translation>
+    </message>
+    <message>
+        <source>radius</source>
+        <translation>säde</translation>
+    </message>
+    <message>
+        <source>not limited</source>
+        <translation>ei rajata</translation>
+    </message>
+    <message>
+        <source>limits to Foursquare categories %1</source>
+        <translation>rajataan Foursquare-luokkiin %1</translation>
+    </message>
+    <message>
+        <source>searches in all categories</source>
+        <translation>etsitään kaikista luokista</translation>
+    </message>
+    <message>
+        <source>clear</source>
+        <translation>tyhjennä</translation>
+    </message>
+    <message>
+        <source>check-in pub</source>
+        <translation>juomispaikka</translation>
+    </message>
+    <message>
+        <source>place</source>
+        <translation>paikka</translation>
+    </message>
+    <message>
+        <source>location determined %1 min ago</source>
+        <translation>sijainti määritetty %1 min sitten</translation>
+    </message>
+    <message>
+        <source>location determined %1 hours ago</source>
+        <translation>sijainti määritetty %1 h sitten</translation>
     </message>
     <message>
         <source>None found.</source>
@@ -510,70 +604,6 @@
     <message>
         <source>Better luck next time.</source>
         <translation>Parempi onni ensi kerralla.</translation>
-    </message>
-    <message>
-        <source>radius</source>
-        <translation>etäisyys</translation>
-    </message>
-    <message>
-        <source>not limited</source>
-        <translation>ei rajattu</translation>
-    </message>
-    <message>
-        <source>location determined %1 min ago</source>
-        <translation>sijainti määritetty %1 min sitten</translation>
-    </message>
-    <message>
-        <source>location determined %1 hours ago</source>
-        <translation>sijainti määritetty %1 tuntia sitten</translation>
-    </message>
-    <message>
-        <source>location not determined</source>
-        <translation>sijaintia ei määritetty</translation>
-    </message>
-    <message>
-        <source>lng</source>
-        <translation>pituuspiiri</translation>
-    </message>
-    <message>
-        <source>lat</source>
-        <translation>leveyspiiri</translation>
-    </message>
-    <message>
-        <source>limits to Foursquare categories %1 and %2</source>
-        <translation>rajaa Foursquare-luokkiin %1 ja %2</translation>
-    </message>
-    <message>
-        <source>searches in all categories</source>
-        <translation>älä rajaa hakua</translation>
-    </message>
-    <message>
-        <source>place</source>
-        <translation>paikka</translation>
-    </message>
-    <message>
-        <source>check-in location</source>
-        <translation>kirjattava paikka</translation>
-    </message>
-    <message>
-        <source>venue info</source>
-        <translation>tarjoilupaikan tiedot</translation>
-    </message>
-    <message>
-        <source>venue activity</source>
-        <translation>kapakassa nautittuja</translation>
-    </message>
-    <message>
-        <source>Check-in location</source>
-        <translation>Sijainti</translation>
-    </message>
-    <message>
-        <source>shows co-ordinates</source>
-        <translation>näyttää koordinaatit</translation>
-    </message>
-    <message>
-        <source>hides place</source>
-        <translation>piilottaa paikan</translation>
     </message>
 </context>
 <context>
@@ -877,10 +907,6 @@
 <context>
     <name>unTpKirjautuminen</name>
     <message>
-        <source>cancel</source>
-        <translation>peru</translation>
-    </message>
-    <message>
         <source>sign out</source>
         <translation>kirjaudu ulos</translation>
     </message>
@@ -889,20 +915,12 @@
         <translation>CODE tai url, jossa CODE on</translation>
     </message>
     <message>
-        <source>open in external browser</source>
-        <translation>avaa selaimessa</translation>
-    </message>
-    <message>
         <source>unTappd login url</source>
         <translation>unTappd kirjautumisosoite</translation>
     </message>
     <message>
         <source>plain CODE</source>
         <translation>pelkkä CODE</translation>
-    </message>
-    <message>
-        <source>use SilicaWebView</source>
-        <translation>käytä SilicaWebView&apos;tä</translation>
     </message>
     <message>
         <source>If you have problems with the default browser, paste the login url below to the address field of another browser.</source>
@@ -921,12 +939,20 @@
         <translation>Selainongelmia?</translation>
     </message>
     <message>
-        <source>To use your unTappd-profile, sign in at %1 and follow the instructions below, or try the webview (pull down menu).</source>
-        <translation>Käyttääksesi unTappd-tiliäsi, kirjaudu osoitteessa %1 ja seuraa alla olevia ohjeita, tai yritä selainsivulla (vetovalikosta).</translation>
-    </message>
-    <message>
         <source>After signing in, the browser will redirect you to a non-existing address %1. Copy the address, or just the CODE, to the text field below, and press enter.</source>
         <translation>Kirjauduttuasi selain siirtyy olemassa olemattomalle sivulle %1. Kopioi osoite tai pelkkä CODE alla olevaan kenttään, ja paina enteriä. </translation>
+    </message>
+    <message>
+        <source>authenticate</source>
+        <translation>kirjaudu</translation>
+    </message>
+    <message>
+        <source>signing out</source>
+        <translation>kirjautuu pois</translation>
+    </message>
+    <message>
+        <source>To use your unTappd-profile, choose &apos;authenticate&apos; in the pull down menu, or follow the instructions below.</source>
+        <translation>Kirjautuaksesi unTappdiin, valitse &apos;kirjaudu&apos; valikosta, tai seuraa alla olevia ohjeita.</translation>
     </message>
 </context>
 <context>
