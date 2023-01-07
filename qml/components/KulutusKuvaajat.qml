@@ -24,6 +24,7 @@ Item {
 
     readonly property int msVrk: 24*60*60*1000
     readonly property int viikonEkaPaiva: Qt.locale().firstDayOfWeek // 0 - sunnuntai, 1 - maanantai, ...
+    property bool alustus: false
 
     signal pylvasValittu(int pylvasNro, real valitunArvo, string valitusNimike)
     signal pitkaPainanta(int pylvasNro, real valitunArvo, string valitusNimike)
@@ -99,6 +100,7 @@ Item {
     }
 
     function alusta(alkuMs, loppuMs) { // paivia hetkestä 1970.1.1
+        alustus = true;
         if (alkuMs === undefined) {
             return;
         }
@@ -108,6 +110,8 @@ Item {
             loppuMs = new Date().getTime();
         }
         lisaa(loppuMs, 0);
+
+        alustus = false;
 
         return;
     }
@@ -181,6 +185,10 @@ Item {
         viikko = ajat[1]; // viikonNumero(msJuoma)
         paiva = ajat[2]; // date.getDay() = 0 (su/ma) - 6 (la/su)
 
+        if (alustus) {
+            console.log("vuosi " + vuosi + " vk " + viikko + " paiva " + paiva)
+        }
+
         lisaaTyhjiaPaivia(vuosi, viikko, paiva);
 
         // viikkokuvaajan päivitys
@@ -198,30 +206,34 @@ Item {
         // vuosi, viikko ja päivä ovat uuden juoman ajankohta
         // lisätään peräkkäisten kirjausten väliin jäävät päivät kuvaajiin
         var iPv, iVko, iVs, nVko, tvanha, tuusi;
-        if (pvKulutus.count === 0) // ensimmäinen juoma
+        if (pvKulutus.count === 0) { // ensimmäinen juoma
             return;
+        }
 
         iPv = pvKulutus.get(pvKulutus.count-1).paiva;
         iVko = pvKulutus.get(pvKulutus.count-1).vkoNro;
         iVs = pvKulutus.get(pvKulutus.count-1).vuosi;
 
         tvanha = iVs*1000 + iVko*10 + iPv;
-        tuusi = vuosi*1000 + viikko*10 + paiva;
+        tuusi  = vuosi*1000 + viikko*10 + paiva;
 
         // lisättävä päivä on myöhempi kuin aiemmin talletetut
         if (tuusi > tvanha) {
             iPv++;
             while (iVs < vuosi) {
                 nVko = viikonNumero(new Date(iVs,11,31,12,4,53,990).getTime());
-                if (nVko === 1) // jos vuoden viimeinen viikko jää kovin vajaaksi
+                if (nVko === 1) { // jos vuoden viimeinen viikko jää kovin vajaaksi
                     nVko = 52;
+                }
                 while (iVko <= nVko) {
-                    if (iPv === 1)
+                    if (iPv === 0) {
                         lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen);
+                    }
                     while (iPv <= 6) {
                         lisaaPvArvo(iVs, iVko, iPv, 0, riskiAlhainen);
                         iPv++;
                     }
+
                     iPv = 0;
                     iVko++;
                 }
@@ -251,12 +263,12 @@ Item {
             iVko = pvKulutus.get(0).vkoNro;
             iPv = pvKulutus.get(0).paiva-1;
             tvanha = iVs*1000 + iVko*10 + iPv;
-            if (tuusi > tvanha)
-                return;
+            if (tuusi > tvanha) return;
             while (vuosi < iVs) {
                 while (iVko > 0) {
-                    if (iPv === 6)
+                    if (iPv === 6) {
                         lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen);
+                    }
                     while (iPv >= 0) {
                         lisaaPvArvo(iVs, iVko, iPv, 0, riskiAlhainen);
                         iPv--;
@@ -269,8 +281,9 @@ Item {
                 iPv = 6;
             }
             while (viikko < iVko) {
-                if (iPv === 6)
+                if (iPv === 6) {
                     lisaaVkoArvo(iVs, iVko, 0, riskiAlhainen);
+                }
                 while (iPv >= 0) {
                     lisaaPvArvo(iVs, iVko, iPv, 0, riskiAlhainen);
                     iPv--;
@@ -307,9 +320,10 @@ Item {
 
     function lisaaVkoArvo(vuosi, viikko, maara, vari) {
         var t1 = vuosi*100 + viikko, t2 = 0;
-        if (vkoKulutus.count > 0)
+        if (vkoKulutus.count > 0) {
             t2 = vkoKulutus.get(vkoKulutus.count-1).vuosi*100 +
                     vkoKulutus.get(vkoKulutus.count-1).vkoNro;
+        }
         if (t1 > t2) {
             return vkoKulutus.append({ "vuosi": vuosi, "vkoNro": viikko, "barValue": maara,
                               "barLabel": viikko, "barColor": vari, "sect": vuosi });
